@@ -70,10 +70,13 @@ export default function CVPage() {
         const pdf = await pdfjs.getDocument({ data: typedarray }).promise;
         
         let text = '';
+        const allLinks: { url: string; title?: string }[] = [];
+
         for (let i = 1; i <= pdf.numPages; i++) {
           const page = await pdf.getPage(i);
-          const content = await page.getTextContent();
           
+          // 1. Extract text content
+          const content = await page.getTextContent();
           let lastY = -1;
           let pageText = '';
           
@@ -86,16 +89,94 @@ export default function CVPage() {
             pageText += item.str;
             lastY = item.transform[5];
           }
-          
           text += pageText + '\n\n';
+
+          // 2. Extract link annotations
+          try {
+            const annotations = await page.getAnnotations();
+            for (const ann of annotations) {
+              if (ann.subtype === 'Link' || ann.annotationType === 3) {
+                const url = ann.url || ann.unsafeUrl;
+                if (url) {
+                  allLinks.push({ url, title: ann.title });
+                }
+              }
+            }
+          } catch (annError) {
+            console.warn('Failed to extract page annotations:', annError);
+          }
         }
 
-        const trimmedText = text.trim();
-        if (!trimmedText) {
+        let cleanedText = text.trim();
+        if (!cleanedText) {
           throw new Error('PDF file appears to be empty or contains scanned/image-only text.');
         }
 
-        setResumeText(trimmedText);
+        // Deduplicate extracted URLs
+        const uniqueLinksMap = new Map<string, string>();
+        for (const link of allLinks) {
+          uniqueLinksMap.set(link.url, link.title || '');
+        }
+        const uniqueLinks = Array.from(uniqueLinksMap.entries()).map(([url, title]) => ({ url, title }));
+
+        if (uniqueLinks.length > 0) {
+          const embeddedUrls = new Set<string>();
+          
+          for (const link of uniqueLinks) {
+            const url = link.url;
+            
+            // Map common social/email hyperlinks to text occurrences
+            if (url.includes('linkedin.com')) {
+              const regex = /\b(LinkedIn)\b(?!\])/gi;
+              if (regex.test(cleanedText)) {
+                cleanedText = cleanedText.replace(regex, `[LinkedIn](${url})`);
+                embeddedUrls.add(url);
+                continue;
+              }
+            }
+            
+            if (url.includes('github.com')) {
+              const regex = /\b(GitHub)\b(?!\])/gi;
+              if (regex.test(cleanedText)) {
+                cleanedText = cleanedText.replace(regex, `[GitHub](${url})`);
+                embeddedUrls.add(url);
+                continue;
+              }
+            }
+
+            if (url.startsWith('mailto:')) {
+              const email = url.replace('mailto:', '');
+              const emailRegex = new RegExp(`\\b(${email})\\b(?!\\\])`, 'gi');
+              if (emailRegex.test(cleanedText)) {
+                cleanedText = cleanedText.replace(emailRegex, `[Email](${url})`);
+                embeddedUrls.add(url);
+                continue;
+              }
+              const textRegex = /\b(Email)\b(?!\])/gi;
+              if (textRegex.test(cleanedText)) {
+                cleanedText = cleanedText.replace(textRegex, `[Email](${url})`);
+                embeddedUrls.add(url);
+                continue;
+              }
+            }
+          }
+
+          // Prepend any remaining links (e.g. portfolios, personal websites) to the top contact line
+          const remainingLinks = uniqueLinks.filter(l => !embeddedUrls.has(l.url));
+          if (remainingLinks.length > 0) {
+            let linksHeader = '';
+            remainingLinks.forEach(link => {
+              const label = link.title || (link.url.includes('linkedin.com') ? 'LinkedIn' : link.url.includes('github.com') ? 'GitHub' : 'Website');
+              linksHeader += `[${label}](${link.url}) | `;
+            });
+            if (linksHeader.endsWith(' | ')) {
+              linksHeader = linksHeader.slice(0, -3);
+            }
+            cleanedText = linksHeader + '\n\n' + cleanedText;
+          }
+        }
+
+        setResumeText(cleanedText);
         setResumeName(file.name);
         setSuccess('Fantastic start! Uploading your master CV is the first critical step toward aligning your career history with your future goals. Take a moment to review the extracted text in the preview panel, make sure all your key achievements are parsed correctly, and click the green "Save CV" button. We are ready to construct a powerful trajectory from here!');
         setFile(null);
