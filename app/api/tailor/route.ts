@@ -30,10 +30,10 @@ Your task is to:
 2. Maintain all original facts, dates, companies, and roles—do not hallucinate or invent new roles, companies, or credentials.
 3. Perform an ATS keyword matching and gap analysis.
 4. Calculate an estimated ATS match score (0-100) for BOTH the original master resume (representing the 'before' baseline) and the newly tailored resume (representing the 'after' optimization).
-5. As a world-class career coach, evaluate how aligned the target job description is to the user's background (the original master resume). Provide a career coach alignment score from 0 to 100 (where 100 represents a perfect fit). Structure your evaluation into three distinct fields, and write each as a clean bulleted list (using standard '-' bullets):
-   (a) strengths: A list of their top transferable skills and areas of alignment.
-   (b) gaps: A list of the structural, experience, or skill gaps they face.
-   (c) suggestions: A list of strategic, actionable coaching suggestions and positioning recommendations to bridge those gaps.
+5. As a world-class career coach, evaluate how aligned the target job description is to the user's background (the original master resume). Provide a career coach alignment score from 0 to 100 (where 100 represents a perfect fit). Structure your evaluation into three distinct fields, and write each as a clean bulleted list where each bullet point starts on its own new line (using standard '-' bullets, separated by a newline character):
+   (a) strengths: A list of their top transferable skills and areas of alignment, with one bullet point per line (e.g., "- Strengths point 1\n- Strengths point 2").
+   (b) gaps: A list of the structural, experience, or skill gaps they face, with one bullet point per line (e.g., "- Gap point 1\n- Gap point 2").
+   (c) suggestions: A list of strategic, actionable coaching suggestions and positioning recommendations to bridge those gaps, with one bullet point per line (e.g., "- Suggestion point 1\n- Suggestion point 2").
 
 Input Resume:
 """
@@ -126,15 +126,15 @@ Generate the tailored resume in clean markdown format, perform the ATS gap analy
                 },
                 strengths: {
                   type: Type.STRING,
-                  description: 'Detailed analysis of the user\'s top transferable strengths and areas of alignment with the target role.'
+                  description: 'A bulleted list of top transferable strengths, with each point starting on a new line (using standard \'-\' and newlines \\n).'
                 },
                 gaps: {
                   type: Type.STRING,
-                  description: 'Detailed analysis of the structural, experience, or skill gaps between the user\'s background and the target role.'
+                  description: 'A bulleted list of structural, experience, or skill gaps, with each point starting on a new line (using standard \'-\' and newlines \\n).'
                 },
                 suggestions: {
                   type: Type.STRING,
-                  description: 'Strategic suggestions, positioning advice, and coaching recommendations for bridging the gaps and tailoring their story.'
+                  description: 'A bulleted list of coaching suggestions, with each point starting on a new line (using standard \'-\' and newlines \\n).'
                 }
               },
               required: ['alignmentScore', 'strengths', 'gaps', 'suggestions']
