@@ -37,9 +37,9 @@ interface AtsAnalysis {
 
 interface CoachFeedback {
   alignmentScore: number;
-  strengths?: string;
-  gaps?: string;
-  suggestions?: string;
+  strengths?: string[] | string;
+  gaps?: string[] | string;
+  suggestions?: string[] | string;
   feedbackText?: string;
 }
 
@@ -49,6 +49,41 @@ interface TailorResponse {
   atsAnalysis: AtsAnalysis;
   coachFeedback: CoachFeedback;
 }
+
+// Renders either a JSON array or parses a legacy/concatenated bulleted string
+// dynamically, ensuring each point is on its own separate bulleted line.
+const renderBulletPoints = (items: string[] | string | undefined, defaultMsg: string) => {
+  if (!items) return <p className="text-sm text-slate-500 italic">{defaultMsg}</p>;
+  
+  if (Array.isArray(items)) {
+    return (
+      <ul className="list-disc pl-5 space-y-2 text-sm text-slate-700 leading-relaxed">
+        {items.map((item, idx) => {
+          const cleanItem = item.replace(/^-\s*/, '').trim();
+          return cleanItem ? <li key={idx}>{cleanItem}</li> : null;
+        })}
+      </ul>
+    );
+  }
+  
+  // Fallback: Split on newlines OR on hyphens that follow a word and period (e.g. "expertise.- Direct" -> "expertise", "- Direct")
+  const points = items
+    .split(/(?:\r?\n|(?<=\w)\.-)/)
+    .map(p => p.trim())
+    .filter(p => p.length > 0);
+
+  return (
+    <ul className="list-disc pl-5 space-y-2 text-sm text-slate-700 leading-relaxed">
+      {points.map((point, idx) => {
+        let cleanPoint = point.replace(/^-\s*/, '').trim();
+        if (cleanPoint.startsWith('.')) {
+          cleanPoint = cleanPoint.slice(1).trim();
+        }
+        return cleanPoint ? <li key={idx}>{cleanPoint}</li> : null;
+      })}
+    </ul>
+  );
+};
 
 export default function TailorPage() {
   const [resumeText, setResumeText] = useState('');
@@ -410,9 +445,9 @@ export default function TailorPage() {
                               <CheckCircle className="h-4 w-4 text-emerald-600" />
                               <span>Top Transferable Strengths</span>
                             </div>
-                            <p className="text-sm text-slate-700 bg-white p-4 rounded-xl border border-slate-200/60 shadow-sm leading-relaxed whitespace-pre-wrap">
-                              {result.coachFeedback.strengths}
-                            </p>
+                            <div className="bg-white p-4.5 rounded-xl border border-slate-200/60 shadow-sm leading-relaxed">
+                              {renderBulletPoints(result.coachFeedback.strengths, 'No strengths analysis available.')}
+                            </div>
                           </div>
 
                           {/* Gaps */}
@@ -421,9 +456,9 @@ export default function TailorPage() {
                               <AlertTriangle className="h-4 w-4 text-amber-600" />
                               <span>Key Alignment Gaps</span>
                             </div>
-                            <p className="text-sm text-slate-700 bg-white p-4 rounded-xl border border-slate-200/60 shadow-sm leading-relaxed whitespace-pre-wrap">
-                              {result.coachFeedback.gaps}
-                            </p>
+                            <div className="bg-white p-4.5 rounded-xl border border-slate-200/60 shadow-sm leading-relaxed">
+                              {renderBulletPoints(result.coachFeedback.gaps, 'No gap analysis available.')}
+                            </div>
                           </div>
 
                           {/* Suggestions */}
@@ -432,9 +467,9 @@ export default function TailorPage() {
                               <MessageSquare className="h-4 w-4 text-indigo-600" />
                               <span>Coaching Suggestions</span>
                             </div>
-                            <p className="text-sm text-slate-705 bg-white p-4 rounded-xl border border-slate-200/60 shadow-sm leading-relaxed whitespace-pre-wrap font-medium">
-                              {result.coachFeedback.suggestions}
-                            </p>
+                            <div className="bg-white p-4.5 rounded-xl border border-slate-200/60 shadow-sm leading-relaxed">
+                              {renderBulletPoints(result.coachFeedback.suggestions, 'No suggestions available.')}
+                            </div>
                           </div>
                         </div>
                       ) : (
@@ -502,7 +537,7 @@ export default function TailorPage() {
                         </h5>
                         <div className="flex flex-wrap gap-1.5">
                           {result.atsAnalysis.missingKeywords.map((kw, i) => (
-                            <span key={i} className="px-2.5 py-1 rounded bg-amber-50 text-amber-700 text-sm font-semibold border border-amber-100">
+                            <span key={i} className="px-2.5 py-1 rounded bg-amber-50 text-amber-700 text-sm font-semibold border border-amber-155">
                               {kw}
                             </span>
                           ))}
