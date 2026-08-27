@@ -122,28 +122,49 @@ export default function CVPage() {
         if (uniqueLinks.length > 0) {
           const embeddedUrls = new Set<string>();
           
+          // Define mappings for common social/professional websites
+          const mappingRules = [
+            {
+              domain: 'linkedin.com',
+              label: 'LinkedIn',
+              regex: /\b(LinkedIn)\b(?!\])/gi
+            },
+            {
+              domain: 'github.com',
+              label: 'GitHub',
+              regex: /\b(GitHub)\b(?!\])/gi
+            },
+            {
+              domain: 'scholar.google',
+              label: 'Google Scholar',
+              regex: /\b(Google Scholar)\b(?!\])/gi
+            },
+            {
+              domain: 'medium.com',
+              label: 'Blog',
+              regex: /\b(Blog)\b(?!\])/gi
+            }
+          ];
+
           for (const link of uniqueLinks) {
             const url = link.url;
-            
-            // Map common social/email hyperlinks to text occurrences
-            if (url.includes('linkedin.com')) {
-              const regex = /\b(LinkedIn)\b(?!\])/gi;
-              if (regex.test(cleanedText)) {
-                cleanedText = cleanedText.replace(regex, `[LinkedIn](${url})`);
-                embeddedUrls.add(url);
-                continue;
-              }
-            }
-            
-            if (url.includes('github.com')) {
-              const regex = /\b(GitHub)\b(?!\])/gi;
-              if (regex.test(cleanedText)) {
-                cleanedText = cleanedText.replace(regex, `[GitHub](${url})`);
-                embeddedUrls.add(url);
-                continue;
+            let matched = false;
+
+            // 1. Try to match predefined rules
+            for (const rule of mappingRules) {
+              if (url.includes(rule.domain)) {
+                if (rule.regex.test(cleanedText)) {
+                  cleanedText = cleanedText.replace(rule.regex, `[${rule.label}](${url})`);
+                  embeddedUrls.add(url);
+                  matched = true;
+                  break;
+                }
               }
             }
 
+            if (matched) continue;
+
+            // 2. Handle email mailto links specifically
             if (url.startsWith('mailto:')) {
               const email = url.replace('mailto:', '');
               const emailRegex = new RegExp(`\\b(${email})\\b(?!\\\])`, 'gi');
@@ -166,7 +187,14 @@ export default function CVPage() {
           if (remainingLinks.length > 0) {
             let linksHeader = '';
             remainingLinks.forEach(link => {
-              const label = link.title || (link.url.includes('linkedin.com') ? 'LinkedIn' : link.url.includes('github.com') ? 'GitHub' : 'Website');
+              let label = link.title;
+              if (!label) {
+                if (link.url.includes('linkedin.com')) label = 'LinkedIn';
+                else if (link.url.includes('github.com')) label = 'GitHub';
+                else if (link.url.includes('scholar.google')) label = 'Google Scholar';
+                else if (link.url.includes('medium.com')) label = 'Blog';
+                else label = 'Website';
+              }
               linksHeader += `[${label}](${link.url}) | `;
             });
             if (linksHeader.endsWith(' | ')) {
