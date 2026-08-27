@@ -226,11 +226,11 @@ export default function TailorPage() {
           <meta charset="utf-8" />
           <style>
             @page {
-              size: A4;
-              margin: 20mm 20mm 20mm 20mm;
+              margin: 20mm;
             }
             @media print {
               body {
+                margin: 0;
                 -webkit-print-color-adjust: exact;
                 print-color-adjust: exact;
               }
