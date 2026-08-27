@@ -85,6 +85,52 @@ const renderBulletPoints = (items: string[] | string | undefined, defaultMsg: st
   );
 };
 
+// Converts standard Markdown of the Tailored CV into print-friendly HTML styling
+const convertMarkdownToHtml = (markdown: string): string => {
+  let html = markdown;
+
+  // Escape HTML tags to prevent cross-site scripting (but allow our own tags)
+  html = html
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
+
+  // 1. Headers
+  html = html.replace(/^# (.*?)$/gm, '<h1 style="font-size: 18pt; font-weight: bold; border-bottom: 2px solid #334155; padding-bottom: 5px; margin-top: 0px; margin-bottom: 8px; color: #1e293b; text-align: center; font-family: \'Georgia\', serif;">$1</h1>');
+  html = html.replace(/^## (.*?)$/gm, '<h2 style="font-size: 11.5pt; font-weight: bold; border-bottom: 1px solid #94a3b8; padding-bottom: 2px; margin-top: 16px; margin-bottom: 8px; color: #1e293b; text-transform: uppercase; letter-spacing: 0.5px; page-break-after: avoid; break-after: avoid;">$1</h2>');
+  html = html.replace(/^### (.*?)$/gm, '<h3 style="font-size: 10pt; font-weight: bold; margin-top: 10px; margin-bottom: 4px; color: #334155; display: flex; justify-content: space-between; page-break-after: avoid; break-after: avoid;">$1</h3>');
+
+  // 2. Bold text
+  html = html.replace(/\*\*(.*?)\*\*/g, '<strong style="font-weight: bold; color: #0f172a;">$1</strong>');
+
+  // 3. Links
+  html = html.replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2" style="color: #2563eb; text-decoration: none; border-bottom: 1px dashed #2563eb;">$1</a>');
+
+  // 4. Bullet points - match list items first
+  html = html.replace(/^[\-\*]\s+(.*?)$/gm, '<li style="margin-bottom: 4px; line-height: 1.4; color: #334155; page-break-inside: avoid; break-inside: avoid;">$1</li>');
+  
+  // Wrap adjacent <li> tags inside <ul> containers
+  html = html.replace(/(<li.*?>[\s\S]*?<\/li>\s*)+/g, (match) => {
+    return `<ul style="list-style-type: disc; margin-top: 4px; margin-bottom: 8px; padding-left: 20px;">${match}</ul>`;
+  });
+
+  // 5. Paragraphs - clean wrapping of standard lines
+  html = html.split('\n').map(line => {
+    const trimmed = line.trim();
+    if (!trimmed) return '';
+    if (trimmed.startsWith('<h') || trimmed.startsWith('<ul') || trimmed.startsWith('<li') || trimmed.startsWith('<ol') || trimmed.startsWith('</ul')) {
+      return line;
+    }
+    // Center aligned contact info sections
+    if (trimmed.includes('|')) {
+      return `<p style="margin-top: 4px; margin-bottom: 8px; line-height: 1.4; color: #475569; text-align: center; font-size: 9.5pt;">${line}</p>`;
+    }
+    return `<p style="margin-top: 4px; margin-bottom: 6px; line-height: 1.4; color: #334155;">${line}</p>`;
+  }).join('\n');
+
+  return html;
+};
+
 export default function TailorPage() {
   const [resumeText, setResumeText] = useState('');
   const [jobTitle, setJobTitle] = useState('');
@@ -154,6 +200,88 @@ export default function TailorPage() {
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     }
+  };
+
+  const handleSaveAsPdf = () => {
+    if (!result) return;
+
+    const printWindow = window.open('', '_blank');
+    if (!printWindow) {
+      alert('Please allow popups to save the CV as a PDF.');
+      return;
+    }
+
+    const htmlContent = convertMarkdownToHtml(result.tailoredResume);
+    
+    // Extract candidate name from markdown title if possible (e.g. first # header)
+    const nameMatch = result.tailoredResume.match(/^#\s+(.+)$/m);
+    const candidateName = nameMatch ? nameMatch[1].trim() : 'Tailored';
+    const cleanFileName = (candidateName.replace(/\s+/g, '_') + '_CV').replace(/[^a-zA-Z0-9_]/g, '');
+
+    printWindow.document.write(`
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <title>${cleanFileName}</title>
+          <meta charset="utf-8" />
+          <style>
+            @page {
+              size: A4;
+              margin: 20mm 20mm 20mm 20mm;
+            }
+            @media print {
+              body {
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+              }
+            }
+            body {
+              font-family: "Calibri", "Arial", sans-serif;
+              color: #1e293b;
+              line-height: 1.4;
+              font-size: 10.5pt;
+              margin: 0;
+              padding: 0;
+            }
+            h1, h2, h3, p, ul, li {
+              margin: 0;
+              padding: 0;
+            }
+            p, li {
+              color: #334155;
+            }
+            a {
+              color: #1e3a8a;
+              text-decoration: underline;
+            }
+            h1 {
+              text-align: center;
+              font-family: "Georgia", serif;
+            }
+            li {
+              page-break-inside: avoid;
+              break-inside: avoid;
+            }
+            h2 {
+              page-break-after: avoid;
+              break-after: avoid;
+            }
+          </style>
+        </head>
+        <body>
+          <div style="width: 100%; max-width: 800px; margin: 0 auto;">
+            ${htmlContent}
+          </div>
+          <script>
+            window.onload = function() {
+              window.print();
+              setTimeout(function() { window.close(); }, 500);
+            };
+          </script>
+        </body>
+      </html>
+    `);
+    printWindow.document.close();
   };
 
   const handleSave = () => {
@@ -386,6 +514,14 @@ export default function TailorPage() {
                   >
                     <Copy className="h-4 w-4 flex-shrink-0" />
                     <span>{copied ? 'Copied!' : 'Copy markdown'}</span>
+                  </button>
+
+                  <button
+                    onClick={handleSaveAsPdf}
+                    className="flex items-center justify-center gap-1.5 text-sm font-semibold bg-white text-slate-700 hover:bg-slate-50 px-3 py-1.5 rounded-md border border-slate-200 transition-colors"
+                  >
+                    <FileText className="h-4 w-4 flex-shrink-0 text-red-500" />
+                    <span>Save as PDF</span>
                   </button>
 
                   <button
