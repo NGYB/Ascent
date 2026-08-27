@@ -32,6 +32,25 @@ export default function CVPage() {
     }
   };
 
+  // Load PDF.js dynamically from CDN
+  const loadPdfJs = (): Promise<any> => {
+    return new Promise((resolve, reject) => {
+      if ((window as any).pdfjsLib) {
+        resolve((window as any).pdfjsLib);
+        return;
+      }
+      const script = document.createElement('script');
+      script.src = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js';
+      script.onload = () => {
+        const pdfjs = (window as any).pdfjsLib;
+        pdfjs.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+        resolve(pdfjs);
+      };
+      script.onerror = (err) => reject(new Error('Failed to load PDF parsing library. Check your internet connection.'));
+      document.head.appendChild(script);
+    });
+  };
+
   const handleUpload = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!file) {
@@ -43,39 +62,57 @@ export default function CVPage() {
     setError('');
     setSuccess('');
 
-    const formData = new FormData();
-    formData.append('file', file);
-
-    try {
-      const res = await fetch('/api/parse', {
-        method: 'POST',
-        body: formData,
-      });
-
-      if (!res.ok) {
-        const errText = await res.text();
-        let errMsg = 'Failed to parse file';
-        try {
-          const errData = JSON.parse(errText);
-          errMsg = errData.error || errMsg;
-        } catch {
-          errMsg = errText || errMsg;
+    const reader = new FileReader();
+    reader.onload = async (event) => {
+      try {
+        const typedarray = new Uint8Array(event.target?.result as ArrayBuffer);
+        const pdfjs = await loadPdfJs();
+        const pdf = await pdfjs.getDocument({ data: typedarray }).promise;
+        
+        let text = '';
+        for (let i = 1; i <= pdf.numPages; i++) {
+          const page = await pdf.getPage(i);
+          const content = await page.getTextContent();
+          
+          let lastY = -1;
+          let pageText = '';
+          
+          for (const item of content.items as any[]) {
+            if (lastY !== -1 && Math.abs(item.transform[5] - lastY) > 5) {
+              pageText += '\n';
+            } else if (pageText !== '' && !pageText.endsWith('\n') && !pageText.endsWith(' ')) {
+              pageText += ' ';
+            }
+            pageText += item.str;
+            lastY = item.transform[5];
+          }
+          
+          text += pageText + '\n\n';
         }
-        throw new Error(errMsg);
-      }
 
-      const data = await res.json();
-      setResumeText(data.text);
-      setResumeName(file.name);
-      
-      setSuccess('Fantastic start! Uploading your master CV is the first critical step toward aligning your career history with your future goals. Take a moment to review the extracted text in the preview panel, make sure all your key achievements are parsed correctly, and click the green "Save CV" button. We are ready to construct a powerful trajectory from here!');
-      setFile(null);
-    } catch (err: any) {
-      console.error(err);
-      setError(err.message || 'An error occurred while uploading. Ensure it is a valid PDF.');
-    } finally {
+        const trimmedText = text.trim();
+        if (!trimmedText) {
+          throw new Error('PDF file appears to be empty or contains scanned/image-only text.');
+        }
+
+        setResumeText(trimmedText);
+        setResumeName(file.name);
+        setSuccess('Fantastic start! Uploading your master CV is the first critical step toward aligning your career history with your future goals. Take a moment to review the extracted text in the preview panel, make sure all your key achievements are parsed correctly, and click the green "Save CV" button. We are ready to construct a powerful trajectory from here!');
+        setFile(null);
+      } catch (err: any) {
+        console.error(err);
+        setError(err.message || 'An error occurred while parsing the PDF. Ensure it is a valid, text-based PDF file.');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    reader.onerror = () => {
+      setError('Failed to read PDF file.');
       setLoading(false);
-    }
+    };
+
+    reader.readAsArrayBuffer(file);
   };
 
   const handleSaveText = () => {
