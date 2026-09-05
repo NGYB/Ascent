@@ -59,7 +59,7 @@ export default function SankeyChart({ apps }: SankeyChartProps) {
 
   // Flow Math setup
   const height = 230;
-  const width = 760;
+  const width = 910;
   const topPadding = 28;
   const bottomPadding = 35;
   const nodeWidth = 14;
@@ -67,21 +67,21 @@ export default function SankeyChart({ apps }: SankeyChartProps) {
   const scale = (height - topPadding - bottomPadding) / Math.max(1, effectiveTotal);
 
   // Node heights
-  const hApplied = Math.max(effectiveTotal * scale, effectiveTotal > 0 ? 8 : 0);
-  const hInterviewing = Math.max(interviewTotal * scale, interviewTotal > 0 ? 8 : 0);
-  const hOffers = Math.max(offerTotal * scale, offerTotal > 0 ? 8 : 0);
-  const hRejected = Math.max(rejTotal * scale, rejTotal > 0 ? 8 : 0);
+  const hApplied = Math.max(effectiveTotal * scale, effectiveTotal > 0 ? 12 : 8);
+  const hInterviewing = Math.max(interviewTotal * scale, interviewTotal > 0 ? 12 : 8);
+  const hOffers = Math.max(offerTotal * scale, offerTotal > 0 ? 12 : 8);
+  const hRejected = Math.max(rejTotal * scale, rejTotal > 0 ? 12 : 8);
 
-  // Node positions
-  const xApplied = 65;
-  const xInterviewing = 260;
-  const xOffers = 460;
-  const xRejected = 640;
+  // Node positions with ample margin on both sides to prevent text clipping
+  const xApplied = 140;
+  const xInterviewing = 385;
+  const xOffers = 590;
+  const xRejected = 750;
 
   const yApplied = topPadding;
-  const yInterviewing = topPadding + (effectiveTotal - interviewTotal) * scale * 0.25;
-  const yOffers = topPadding + (effectiveTotal - offerTotal) * scale * 0.35;
-  const yRejected = topPadding + (effectiveTotal - rejTotal) * scale * 0.85;
+  const yInterviewing = topPadding + (effectiveTotal - Math.max(1, interviewTotal)) * scale * 0.25;
+  const yOffers = topPadding + (effectiveTotal - Math.max(1, offerTotal)) * scale * 0.35;
+  const yRejected = topPadding + (effectiveTotal - Math.max(1, rejTotal)) * scale * 0.85;
 
   // Helper to generate SVG cubic Bezier path between two points
   const getSankeyPath = (x1: number, y1: number, x2: number, y2: number) => {
@@ -135,7 +135,7 @@ export default function SankeyChart({ apps }: SankeyChartProps) {
           </p>
         </div>
       ) : (
-        <div className="relative overflow-x-auto select-none pt-1">
+        <div className="relative overflow-x-auto select-none pt-2 pb-2 px-2">
           {isSample && (
             <div className="mb-2 px-3 py-1.5 rounded-lg bg-amber-50 border border-amber-200 text-amber-800 text-xs flex items-center justify-between">
               <span><strong>Sample Preview Mode:</strong> Showing simulated pipeline progression until you apply to jobs.</span>
@@ -143,7 +143,11 @@ export default function SankeyChart({ apps }: SankeyChartProps) {
             </div>
           )}
 
-          <svg viewBox={`0 0 ${width} ${height}`} className="w-full min-w-[700px] h-fit">
+          <svg 
+            viewBox={`0 0 ${width} ${height}`} 
+            className="w-full min-w-[760px] h-fit"
+            style={{ overflow: 'visible' }}
+          >
             <defs>
               {/* Gradients for links */}
               <linearGradient id="applied-to-interviewing" x1="0" y1="0" x2="1" y2="0">
@@ -270,75 +274,67 @@ export default function SankeyChart({ apps }: SankeyChartProps) {
                 rx={3}
                 className="fill-blue-500 shadow-sm"
               />
-              <text x={xApplied - 8} y={yApplied + Math.min(16, hApplied / 2) + 2} className="text-xs font-bold text-slate-800" textAnchor="end">
-                Applied ({effectiveTotal})
+              <text x={xApplied - 12} y={yApplied + Math.min(16, hApplied / 2) + 2} className="text-xs font-bold text-slate-800" textAnchor="end">
+                Applied ({appliedActive})
               </text>
-              <text x={xApplied - 8} y={yApplied + Math.min(16, hApplied / 2) + 16} className="text-[10px] font-semibold text-slate-500" textAnchor="end">
-                {appliedActive} active screening
+              <text x={xApplied - 12} y={yApplied + Math.min(16, hApplied / 2) + 16} className="text-[10px] font-semibold text-slate-500" textAnchor="end">
+                {effectiveTotal} total applied
               </text>
             </g>
 
             {/* Node 2: Interviews */}
-            {interviewTotal > 0 && (
-              <g>
-                <rect
-                  x={xInterviewing}
-                  y={yInterviewing}
-                  width={nodeWidth}
-                  height={hInterviewing}
-                  rx={3}
-                  className="fill-indigo-500 shadow-sm"
-                />
-                <text x={xInterviewing - 8} y={yInterviewing + Math.min(16, hInterviewing / 2) + 2} className="text-xs font-bold text-slate-800" textAnchor="end">
-                  Interviews ({interviewTotal})
-                </text>
-                <text x={xInterviewing - 8} y={yInterviewing + Math.min(16, hInterviewing / 2) + 16} className="text-[10px] font-semibold text-indigo-600" textAnchor="end">
-                  {interviewActive} active in pipeline
-                </text>
-              </g>
-            )}
+            <g>
+              <rect
+                x={xInterviewing}
+                y={yInterviewing}
+                width={nodeWidth}
+                height={hInterviewing}
+                rx={3}
+                className={interviewTotal > 0 ? 'fill-indigo-500 shadow-sm' : 'fill-slate-200'}
+              />
+              <text x={xInterviewing - 12} y={yInterviewing + Math.min(16, hInterviewing / 2) + 2} className={`text-xs font-bold ${interviewActive > 0 ? 'text-slate-800' : 'text-slate-400'}`} textAnchor="end">
+                Interviewing ({interviewActive})
+              </text>
+              <text x={xInterviewing - 12} y={yInterviewing + Math.min(16, hInterviewing / 2) + 16} className={`text-[10px] font-semibold ${interviewTotal > 0 ? 'text-indigo-600' : 'text-slate-400'}`} textAnchor="end">
+                {interviewTotal > 0 ? `${interviewTotal} reached round` : '0 in pipeline'}
+              </text>
+            </g>
 
             {/* Node 3: Offers */}
-            {offerTotal > 0 && (
-              <g>
-                <rect
-                  x={xOffers}
-                  y={yOffers}
-                  width={nodeWidth}
-                  height={hOffers}
-                  rx={3}
-                  className="fill-emerald-500 shadow-sm"
-                />
-                <text x={xOffers + nodeWidth + 8} y={yOffers + Math.min(16, hOffers / 2) + 2} className="text-xs font-bold text-slate-800" textAnchor="start">
-                  Offers ({offerActive})
-                </text>
-                {rejOffer > 0 && (
-                  <text x={xOffers + nodeWidth + 8} y={yOffers + Math.min(16, hOffers / 2) + 16} className="text-[10px] font-semibold text-slate-500" textAnchor="start">
-                    {rejOffer} declined
-                  </text>
-                )}
-              </g>
-            )}
+            <g>
+              <rect
+                x={xOffers}
+                y={yOffers}
+                width={nodeWidth}
+                height={hOffers}
+                rx={3}
+                className={offerTotal > 0 ? 'fill-emerald-500 shadow-sm' : 'fill-slate-200'}
+              />
+              <text x={xOffers + nodeWidth + 12} y={yOffers + Math.min(16, hOffers / 2) + 2} className={`text-xs font-bold ${offerActive > 0 ? 'text-slate-800' : 'text-slate-400'}`} textAnchor="start">
+                Offers ({offerActive})
+              </text>
+              <text x={xOffers + nodeWidth + 12} y={yOffers + Math.min(16, hOffers / 2) + 16} className={`text-[10px] font-semibold ${offerTotal > 0 ? 'text-emerald-600' : 'text-slate-400'}`} textAnchor="start">
+                {rejOffer > 0 ? `${rejOffer} declined` : offerTotal > 0 ? `${offerTotal} received` : '0 offers'}
+              </text>
+            </g>
 
             {/* Node 4: Rejected / Archive */}
-            {rejTotal > 0 && (
-              <g>
-                <rect
-                  x={xRejected}
-                  y={yRejected}
-                  width={nodeWidth}
-                  height={hRejected}
-                  rx={3}
-                  className="fill-rose-500 shadow-sm"
-                />
-                <text x={xRejected + nodeWidth + 8} y={yRejected + Math.min(16, hRejected / 2) + 2} className="text-xs font-bold text-slate-800" textAnchor="start">
-                  Archived/Reject ({rejTotal})
-                </text>
-                <text x={xRejected + nodeWidth + 8} y={yRejected + Math.min(16, hRejected / 2) + 16} className="text-[10px] font-semibold text-slate-500" textAnchor="start">
-                  {rejScreen} screen • {rejInterview} interview
-                </text>
-              </g>
-            )}
+            <g>
+              <rect
+                x={xRejected}
+                y={yRejected}
+                width={nodeWidth}
+                height={hRejected}
+                rx={3}
+                className={rejTotal > 0 ? 'fill-rose-500 shadow-sm' : 'fill-slate-200'}
+              />
+              <text x={xRejected + nodeWidth + 12} y={yRejected + Math.min(16, hRejected / 2) + 2} className={`text-xs font-bold ${rejTotal > 0 ? 'text-slate-800' : 'text-slate-400'}`} textAnchor="start">
+                Archived/Reject ({rejTotal})
+              </text>
+              <text x={xRejected + nodeWidth + 12} y={yRejected + Math.min(16, hRejected / 2) + 16} className={`text-[10px] font-semibold ${rejTotal > 0 ? 'text-slate-500' : 'text-slate-400'}`} textAnchor="start">
+                {rejTotal > 0 ? `${rejScreen} screen • ${rejInterview} interview` : '0 archived'}
+              </text>
+            </g>
           </svg>
         </div>
       )}
