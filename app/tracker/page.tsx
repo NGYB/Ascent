@@ -22,6 +22,7 @@ interface Application {
   jobTitle: string;
   company: string;
   status: 'DRAFT' | 'APPLIED' | 'INTERVIEWING' | 'OFFER' | 'REJECTED';
+  rejectedFromStage?: 'APPLIED' | 'INTERVIEWING' | 'OFFER';
   tailoredResumeId?: string;
   createdAt: string;
   updatedAt: string;
@@ -52,6 +53,7 @@ export default function TrackerPage() {
   const [newTitle, setNewTitle] = useState('');
   const [newCompany, setNewCompany] = useState('');
   const [newStatus, setNewStatus] = useState<Application['status']>('DRAFT');
+  const [newRejectedStage, setNewRejectedStage] = useState<'APPLIED' | 'INTERVIEWING' | 'OFFER'>('APPLIED');
   const [selectedResume, setSelectedResume] = useState('');
 
   useEffect(() => {
@@ -79,6 +81,7 @@ export default function TrackerPage() {
       jobTitle: newTitle,
       company: newCompany,
       status: newStatus,
+      rejectedFromStage: newStatus === 'REJECTED' ? newRejectedStage : undefined,
       tailoredResumeId: selectedResume || undefined,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString()
@@ -91,6 +94,7 @@ export default function TrackerPage() {
     setNewTitle('');
     setNewCompany('');
     setNewStatus('DRAFT');
+    setNewRejectedStage('APPLIED');
     setSelectedResume('');
     setShowAddModal(false);
   };
@@ -109,20 +113,44 @@ export default function TrackerPage() {
     }
 
     if (nextIndex !== statusIndex) {
-      const updated = apps.map(a => 
-        a.id === id 
-          ? { ...a, status: COLUMNS[nextIndex].id, updatedAt: new Date().toISOString() } 
-          : a
-      );
+      const nextStatus = COLUMNS[nextIndex].id;
+      const updated = apps.map(a => {
+        if (a.id !== id) return a;
+        let rejStage = a.rejectedFromStage;
+        if (nextStatus === 'REJECTED' && !rejStage) {
+          rejStage = (a.status === 'INTERVIEWING' || a.status === 'OFFER') ? a.status : 'APPLIED';
+        }
+        return {
+          ...a,
+          status: nextStatus,
+          rejectedFromStage: nextStatus === 'REJECTED' ? rejStage : undefined,
+          updatedAt: new Date().toISOString()
+        };
+      });
       saveApps(updated);
     }
   };
 
-  const handleChangeStatus = (id: string, newStatus: Application['status']) => {
+  const handleChangeStatus = (id: string, newStatus: Application['status'], explicitRejectionStage?: 'APPLIED' | 'INTERVIEWING' | 'OFFER') => {
+    const updated = apps.map(a => {
+      if (a.id !== id) return a;
+      let rejStage = explicitRejectionStage || a.rejectedFromStage;
+      if (newStatus === 'REJECTED' && !rejStage) {
+        rejStage = (a.status === 'INTERVIEWING' || a.status === 'OFFER') ? a.status : 'APPLIED';
+      }
+      return {
+        ...a,
+        status: newStatus,
+        rejectedFromStage: newStatus === 'REJECTED' ? rejStage : undefined,
+        updatedAt: new Date().toISOString()
+      };
+    });
+    saveApps(updated);
+  };
+
+  const handleSetRejectedStage = (id: string, stage: 'APPLIED' | 'INTERVIEWING' | 'OFFER') => {
     const updated = apps.map(a => 
-      a.id === id 
-        ? { ...a, status: newStatus, updatedAt: new Date().toISOString() } 
-        : a
+      a.id === id ? { ...a, rejectedFromStage: stage, updatedAt: new Date().toISOString() } : a
     );
     saveApps(updated);
   };
@@ -204,28 +232,110 @@ export default function TrackerPage() {
                           </div>
                         )}
 
-                        <div className="flex items-center justify-between border-t border-slate-100 pt-2 text-[9px] text-slate-400">
-                          <div className="flex items-center gap-1">
-                            <Calendar className="h-3 w-3" />
-                            <span>{new Date(app.createdAt).toLocaleDateString()}</span>
+                        {/* If REJECTED, show which stage it was rejected from with interactive selector */}
+                        {app.status === 'REJECTED' && (
+                          <div className="bg-slate-50 border border-slate-200/80 rounded-lg p-2 space-y-1.5">
+                            <div className="flex items-center justify-between">
+                              <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">
+                                Rejected at:
+                              </span>
+                              <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded ${
+                                (app.rejectedFromStage === 'APPLIED' || !app.rejectedFromStage)
+                                  ? 'bg-amber-100 text-amber-800'
+                                  : app.rejectedFromStage === 'INTERVIEWING'
+                                  ? 'bg-blue-100 text-blue-800'
+                                  : 'bg-emerald-100 text-emerald-800'
+                              }`}>
+                                {(app.rejectedFromStage === 'APPLIED' || !app.rejectedFromStage) ? 'Screening' : app.rejectedFromStage === 'INTERVIEWING' ? 'Interview' : 'Offer'}
+                              </span>
+                            </div>
+                            <div className="grid grid-cols-3 gap-1">
+                              <button
+                                type="button"
+                                onClick={() => handleSetRejectedStage(app.id, 'APPLIED')}
+                                className={`px-1 py-1 text-[9px] font-semibold rounded text-center transition-all ${
+                                  (app.rejectedFromStage === 'APPLIED' || !app.rejectedFromStage)
+                                    ? 'bg-amber-500 text-white shadow-xs font-bold'
+                                    : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200'
+                                }`}
+                              >
+                                Screening
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => handleSetRejectedStage(app.id, 'INTERVIEWING')}
+                                className={`px-1 py-1 text-[9px] font-semibold rounded text-center transition-all ${
+                                  app.rejectedFromStage === 'INTERVIEWING'
+                                    ? 'bg-blue-600 text-white shadow-xs font-bold'
+                                    : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200'
+                                }`}
+                              >
+                                Interview
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => handleSetRejectedStage(app.id, 'OFFER')}
+                                className={`px-1 py-1 text-[9px] font-semibold rounded text-center transition-all ${
+                                  app.rejectedFromStage === 'OFFER'
+                                    ? 'bg-emerald-600 text-white shadow-xs font-bold'
+                                    : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200'
+                                }`}
+                              >
+                                Offer
+                              </button>
+                            </div>
                           </div>
-                          
-                          {/* Board Transitions */}
-                          <div className="flex items-center gap-1">
-                            <button
-                              onClick={() => handleMove(app.id, 'left')}
-                              className="p-1 hover:bg-slate-100 rounded text-slate-500 hover:text-slate-800"
-                              title="Move Left"
+                        )}
+
+                        {/* Card Footer: Quick status switch & Column movements */}
+                        <div className="space-y-2 border-t border-slate-100 pt-2">
+                          <div className="flex items-center justify-between gap-1.5">
+                            {/* Direct stage dropdown */}
+                            <select
+                              value={app.status}
+                              onChange={(e) => handleChangeStatus(app.id, e.target.value as Application['status'])}
+                              className="text-[10px] font-medium text-slate-600 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded px-1.5 py-0.5 outline-none cursor-pointer flex-1"
                             >
-                              <MoveLeft className="h-3 w-3" />
-                            </button>
-                            <button
-                              onClick={() => handleMove(app.id, 'right')}
-                              className="p-1 hover:bg-slate-100 rounded text-slate-500 hover:text-slate-800"
-                              title="Move Right"
-                            >
-                              <MoveRight className="h-3 w-3" />
-                            </button>
+                              {COLUMNS.map((c) => (
+                                <option key={c.id} value={c.id}>{c.name}</option>
+                              ))}
+                            </select>
+
+                            {/* Quick Reject Button if not rejected */}
+                            {app.status !== 'REJECTED' && (
+                              <button
+                                onClick={() => handleChangeStatus(app.id, 'REJECTED')}
+                                className="text-[10px] font-semibold text-rose-600 hover:bg-rose-50 border border-rose-200/60 px-1.5 py-0.5 rounded transition-colors whitespace-nowrap"
+                                title="Move directly to Archived / Reject"
+                              >
+                                Reject
+                              </button>
+                            )}
+                          </div>
+
+                          <div className="flex items-center justify-between text-[9px] text-slate-400">
+                            <div className="flex items-center gap-1">
+                              <Calendar className="h-3 w-3" />
+                              <span>{new Date(app.createdAt).toLocaleDateString()}</span>
+                            </div>
+                            
+                            {/* Board Transitions */}
+                            <div className="flex items-center gap-1">
+                              <button
+                                onClick={() => handleMove(app.id, 'left')}
+                                className="p-1 hover:bg-slate-100 rounded text-slate-500 hover:text-slate-800"
+                                title="Move Left"
+                              >
+                                <MoveLeft className="h-3 w-3" />
+                              </button>
+                              <button
+                                onClick={() => handleMove(app.id, 'right')}
+                                className="p-1 hover:bg-slate-100 rounded text-slate-500 hover:text-slate-800"
+                                title="Move Right"
+                              >
+                                <MoveRight className="h-3 w-3" />
+                              </button>
+                            </div>
                           </div>
                         </div>
 
@@ -298,6 +408,22 @@ export default function TrackerPage() {
                   ))}
                 </select>
               </div>
+
+              {newStatus === 'REJECTED' && (
+                <div className="space-y-1 bg-slate-50 p-3 rounded-lg border border-slate-200">
+                  <label className="text-xs font-bold text-slate-700">Rejected at Stage</label>
+                  <select
+                    value={newRejectedStage}
+                    onChange={(e) => setNewRejectedStage(e.target.value as 'APPLIED' | 'INTERVIEWING' | 'OFFER')}
+                    className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm bg-white focus:ring-2 focus:ring-indigo-500 outline-none cursor-pointer"
+                  >
+                    <option value="APPLIED">Screening / Resume</option>
+                    <option value="INTERVIEWING">Interview Stage</option>
+                    <option value="OFFER">Offer Stage</option>
+                  </select>
+                  <p className="text-[11px] text-slate-400">Specifies at which funnel step the application was archived.</p>
+                </div>
+              )}
 
               <div className="space-y-1">
                 <label className="text-xs font-bold text-slate-600">Linked Tailored CV (Optional)</label>
