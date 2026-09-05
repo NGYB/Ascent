@@ -26,7 +26,8 @@ import {
   Lightbulb,
   Info,
   HelpCircle,
-  ChevronDown
+  ChevronDown,
+  Building2
 } from 'lucide-react';
 
 interface TransferableSkill {
@@ -329,7 +330,7 @@ export default function TailorPage() {
       const newTailoredVersion = {
         id: crypto.randomUUID(),
         jobTitle,
-        company: company.trim() || 'Target Company',
+        company: company.trim(),
         jobDescription,
         tailoredResume: result.tailoredResume,
         atsAnalysis: result.atsAnalysis,
@@ -365,7 +366,7 @@ export default function TailorPage() {
 
   const handleLoadHistory = (item: any) => {
     setJobTitle(item.jobTitle);
-    setCompany(item.company || '');
+    setCompany(item.company && item.company !== 'Target Company' ? item.company : '');
     setJobDescription(item.jobDescription || '');
     setResult({
       id: item.id,
@@ -1164,11 +1165,19 @@ export default function TailorPage() {
                   }`}
                 >
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between flex-1 gap-2 min-w-0">
-                    <h4 className={`font-bold text-sm truncate max-w-md ${
-                      isCurrent ? 'text-indigo-900 font-extrabold' : 'text-slate-800'
-                    }`}>
-                      {item.jobTitle}
-                    </h4>
+                    <div className="flex items-center gap-2 min-w-0 flex-wrap">
+                      <h4 className={`font-bold text-sm truncate ${
+                        isCurrent ? 'text-indigo-900 font-extrabold' : 'text-slate-800'
+                      }`}>
+                        {item.jobTitle}
+                      </h4>
+                      {item.company && item.company.trim() !== '' && item.company !== 'Target Company' && (
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-semibold bg-slate-100 text-slate-700 border border-slate-200 truncate max-w-[180px]">
+                          <Building2 className="h-3 w-3 text-slate-400 flex-shrink-0" />
+                          <span className="truncate">{item.company}</span>
+                        </span>
+                      )}
+                    </div>
                     <div className="flex items-center gap-4 text-xs flex-shrink-0">
                       <span className="text-slate-500 font-medium">
                         Fit Score: <span className="font-extrabold text-indigo-600">{item.coachFeedback?.alignmentScore ?? 0}%</span>
