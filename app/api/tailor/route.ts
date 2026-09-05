@@ -34,6 +34,15 @@ Your task is to:
    (a) strengths: An array of strings describing their top transferable skills and areas of alignment.
    (b) gaps: An array of strings describing the structural, experience, or skill gaps they face.
    (c) suggestions: An array of strings describing strategic, actionable coaching suggestions and positioning recommendations to bridge those gaps.
+6. Perform a "JD Deflator" analysis using a 4-layer recruiter heuristic model to separate non-negotiable dealbreakers from recruiter wishlist fluff:
+   - Layer 1 (Structural Cues): Look for explicit "Minimum/Basic Qualifications" vs "Preferred/Bonus Qualifications".
+   - Layer 2 (Linguistic Modality): Distinguish obligatory language ("must have", "proven track record", "5+ years", "required") from flexible language ("familiarity with", "nice to have", "exposure to", "plus").
+   - Layer 3 (Learnability Horizon): Categorize core foundational competencies (requiring 6+ months of experience) as Must-Haves, while interchangeable tool syntax/libraries (learnable within 1-2 weeks on the job) should be Good-to-Haves.
+   - Layer 4 (Centrality): Check if the skill is central to core daily deliverables vs peripheral requirements.
+   - Identify 3 to 6 true "mustHaves" (dealbreakers). For each, assess if the candidate matches from their CV, explain the recruiter's rationale for why it's a hard filter, and provide candidate evidence or explanation.
+   - Identify 3 to 6 "goodToHaves" (wishlist/learnable). For each, assess match status, explain why it's flexible, and provide actionable substitute advice (how their existing skills compensate or how quickly they can ramp up).
+   - Calculate mustHavesMatchRate (0-100) and goodToHavesMatchRate (0-100).
+   - Provide a confidence-boosting, realistic recruiter "verdict" string (e.g. "Green Light to Apply: You satisfy 100% of the core dealbreakers. The missing items are learnable on the job.").
 
 Input Resume:
 """
@@ -45,7 +54,7 @@ Input Job Description:
 ${jobDescription}
 """
 
-Generate the tailored resume in clean markdown format, perform the ATS gap analysis, and provide the career coach evaluation.
+Generate the tailored resume in clean markdown format, perform the ATS gap analysis, provide the career coach evaluation, and complete the JD Deflator analysis.
 `;
 
     const response = await ai.models.generateContent({
@@ -141,9 +150,55 @@ Generate the tailored resume in clean markdown format, perform the ATS gap analy
                 }
               },
               required: ['alignmentScore', 'strengths', 'gaps', 'suggestions']
+            },
+            jdDeflator: {
+              type: Type.OBJECT,
+              properties: {
+                verdict: {
+                  type: Type.STRING,
+                  description: 'An encouraging, empowering recruiter summary verdict explaining whether they should apply (e.g., "Green Light to Apply: You satisfy 100% of the core dealbreakers...").'
+                },
+                mustHavesMatchRate: {
+                  type: Type.INTEGER,
+                  description: 'Percentage (0 to 100) of must-have requirements the candidate satisfies.'
+                },
+                goodToHavesMatchRate: {
+                  type: Type.INTEGER,
+                  description: 'Percentage (0 to 100) of good-to-have wishlist requirements the candidate satisfies.'
+                },
+                mustHaves: {
+                  type: Type.ARRAY,
+                  items: {
+                    type: Type.OBJECT,
+                    properties: {
+                      skill: { type: Type.STRING, description: 'The core non-negotiable requirement or capability.' },
+                      matched: { type: Type.BOOLEAN, description: 'Whether the candidate meets this requirement.' },
+                      recruiterRationale: { type: Type.STRING, description: 'Why the recruiter considers this a hard filter or day-1 expectation.' },
+                      candidateEvidence: { type: Type.STRING, description: 'Proof from candidate CV or why it is met/unmet.' }
+                    },
+                    required: ['skill', 'matched', 'recruiterRationale', 'candidateEvidence']
+                  },
+                  description: 'Array of 3 to 6 true dealbreaker requirements extracted from the JD.'
+                },
+                goodToHaves: {
+                  type: Type.ARRAY,
+                  items: {
+                    type: Type.OBJECT,
+                    properties: {
+                      skill: { type: Type.STRING, description: 'Tool, specific syntax, or wishlist requirement.' },
+                      matched: { type: Type.BOOLEAN, description: 'Whether the candidate matches this specific tool or preference.' },
+                      recruiterRationale: { type: Type.STRING, description: 'Why this is flexible, secondary, or learnable on the job within 1-2 weeks.' },
+                      substituteAdvice: { type: Type.STRING, description: 'Transferable skill or experience the candidate has that substitutes for this.' }
+                    },
+                    required: ['skill', 'matched', 'recruiterRationale', 'substituteAdvice']
+                  },
+                  description: 'Array of 3 to 6 wishlist or learnable-on-the-job requirements.'
+                }
+              },
+              required: ['verdict', 'mustHavesMatchRate', 'goodToHavesMatchRate', 'mustHaves', 'goodToHaves']
             }
           },
-          required: ['tailoredResume', 'atsAnalysis', 'coachFeedback'],
+          required: ['tailoredResume', 'atsAnalysis', 'coachFeedback', 'jdDeflator'],
         },
       },
     });

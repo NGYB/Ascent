@@ -17,7 +17,16 @@ import {
   FolderPlus,
   Save,
   MessageSquare,
-  Trash2
+  Trash2,
+  Target,
+  ShieldCheck,
+  CheckCircle2,
+  XCircle,
+  Zap,
+  Lightbulb,
+  Info,
+  HelpCircle,
+  ChevronDown
 } from 'lucide-react';
 
 interface TransferableSkill {
@@ -43,11 +52,34 @@ interface CoachFeedback {
   feedbackText?: string;
 }
 
+interface JdMustHave {
+  skill: string;
+  matched: boolean;
+  recruiterRationale: string;
+  candidateEvidence: string;
+}
+
+interface JdGoodToHave {
+  skill: string;
+  matched: boolean;
+  recruiterRationale: string;
+  substituteAdvice: string;
+}
+
+interface JdDeflator {
+  verdict: string;
+  mustHavesMatchRate: number;
+  goodToHavesMatchRate: number;
+  mustHaves: JdMustHave[];
+  goodToHaves: JdGoodToHave[];
+}
+
 interface TailorResponse {
   id?: string;
   tailoredResume: string;
   atsAnalysis: AtsAnalysis;
   coachFeedback: CoachFeedback;
+  jdDeflator?: JdDeflator;
 }
 
 // Renders either a JSON array or parses a legacy/concatenated bulleted string
@@ -140,7 +172,8 @@ export default function TailorPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [result, setResult] = useState<TailorResponse | null>(null);
-  const [activeTab, setActiveTab] = useState<'coach' | 'resume' | 'scorecard' | 'skills'>('coach');
+  const [activeTab, setActiveTab] = useState<'deflator' | 'coach' | 'resume' | 'scorecard' | 'skills'>('deflator');
+  const [showExplainer, setShowExplainer] = useState(false);
   const [copied, setCopied] = useState(false);
   const [saved, setSaved] = useState(false);
   const [historyList, setHistoryList] = useState<any[]>([]);
@@ -186,6 +219,11 @@ export default function TailorPage() {
 
       const data = await res.json();
       setResult(data);
+      if (data.jdDeflator) {
+        setActiveTab('deflator');
+      } else {
+        setActiveTab('coach');
+      }
     } catch (err: any) {
       console.error(err);
       setError(err.message || 'An error occurred during CV tailoring.');
@@ -296,6 +334,7 @@ export default function TailorPage() {
         tailoredResume: result.tailoredResume,
         atsAnalysis: result.atsAnalysis,
         coachFeedback: result.coachFeedback,
+        jdDeflator: result.jdDeflator,
         createdAt: new Date().toISOString()
       };
 
@@ -332,8 +371,14 @@ export default function TailorPage() {
       id: item.id,
       tailoredResume: item.tailoredResume,
       atsAnalysis: item.atsAnalysis,
-      coachFeedback: item.coachFeedback
+      coachFeedback: item.coachFeedback,
+      jdDeflator: item.jdDeflator
     });
+    if (item.jdDeflator) {
+      setActiveTab('deflator');
+    } else {
+      setActiveTab('coach');
+    }
     setSaved(true);
     setError('');
   };
@@ -466,6 +511,26 @@ export default function TailorPage() {
               <div className="px-6 py-4 border-b border-slate-200 bg-slate-50/50 flex flex-wrap items-center justify-between gap-4">
                 <div className="flex gap-2">
                   <button
+                    onClick={() => setActiveTab('deflator')}
+                    className={`px-3.5 py-2 rounded-lg text-sm font-bold transition-colors flex items-center gap-1.5 ${
+                      activeTab === 'deflator'
+                        ? 'bg-slate-900 text-white shadow-sm'
+                        : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-100'
+                    }`}
+                  >
+                    <Target className="h-4 w-4 text-amber-500" />
+                    <span>JD Deflator</span>
+                    {result.jdDeflator && (
+                      <span className={`ml-1 px-1.5 py-0.5 rounded text-[10px] font-extrabold ${
+                        result.jdDeflator.mustHavesMatchRate >= 80 
+                          ? 'bg-emerald-500 text-white' 
+                          : 'bg-amber-500 text-white'
+                      }`}>
+                        {result.jdDeflator.mustHavesMatchRate}%
+                      </span>
+                    )}
+                  </button>
+                  <button
                     onClick={() => setActiveTab('coach')}
                     className={`px-4 py-2 rounded-lg text-sm font-bold transition-colors ${
                       activeTab === 'coach'
@@ -546,6 +611,312 @@ export default function TailorPage() {
 
               {/* Tab Contents */}
               <div className="flex-1 p-6 font-sans">
+                {activeTab === 'deflator' && (
+                  <div className="space-y-6 overflow-y-auto max-h-[800px] pr-2">
+                    {result.jdDeflator ? (
+                      <>
+                        {/* Recruiter Verdict Hero Banner */}
+                        <div className={`p-5 rounded-2xl border shadow-sm space-y-3 ${
+                          result.jdDeflator.mustHavesMatchRate >= 80
+                            ? 'bg-gradient-to-br from-emerald-50/80 via-white to-emerald-50/40 border-emerald-200 text-emerald-950'
+                            : result.jdDeflator.mustHavesMatchRate >= 60
+                            ? 'bg-gradient-to-br from-amber-50/80 via-white to-amber-50/40 border-amber-200 text-amber-950'
+                            : 'bg-gradient-to-br from-slate-50 via-white to-rose-50/40 border-slate-200 text-slate-900'
+                        }`}>
+                          <div className="flex items-center justify-between flex-wrap gap-2">
+                            <div className="flex items-center gap-2">
+                              <span className={`p-1.5 rounded-lg flex items-center justify-center ${
+                                result.jdDeflator.mustHavesMatchRate >= 80
+                                  ? 'bg-emerald-600 text-white'
+                                  : result.jdDeflator.mustHavesMatchRate >= 60
+                                  ? 'bg-amber-600 text-white'
+                                  : 'bg-slate-700 text-white'
+                              }`}>
+                                <ShieldCheck className="h-5 w-5" />
+                              </span>
+                              <span className="text-xs font-extrabold tracking-wider uppercase">
+                                {result.jdDeflator.mustHavesMatchRate >= 80
+                                  ? 'Recruiter Verdict: Green Light to Apply'
+                                  : result.jdDeflator.mustHavesMatchRate >= 60
+                                  ? 'Recruiter Verdict: Viable with Strategic Positioning'
+                                  : 'Recruiter Verdict: Significant Structural Gap'}
+                              </span>
+                            </div>
+                            <span className={`px-2.5 py-0.5 rounded-full text-xs font-bold ${
+                              result.jdDeflator.mustHavesMatchRate >= 80
+                                ? 'bg-emerald-100 text-emerald-800'
+                                : result.jdDeflator.mustHavesMatchRate >= 60
+                                ? 'bg-amber-100 text-amber-800'
+                                : 'bg-slate-200 text-slate-700'
+                            }`}>
+                              Must-Have Fit: {result.jdDeflator.mustHavesMatchRate}%
+                            </span>
+                          </div>
+
+                          <p className="text-sm font-medium leading-relaxed">
+                            {result.jdDeflator.verdict}
+                          </p>
+                        </div>
+
+                        {/* 2-Metric Comparison Cards */}
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                          {/* Must Haves Card */}
+                          <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm space-y-1.5">
+                            <div className="flex items-center justify-between">
+                              <span className="text-xs font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
+                                <span className="h-2 w-2 rounded-full bg-rose-500"></span>
+                                <span>Core Must-Haves (Dealbreakers)</span>
+                              </span>
+                              <span className={`text-xl font-black ${
+                                result.jdDeflator.mustHavesMatchRate >= 80 ? 'text-emerald-600' : 'text-slate-800'
+                              }`}>
+                                {result.jdDeflator.mustHavesMatchRate}%
+                              </span>
+                            </div>
+                            <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
+                              <div 
+                                className={`h-full rounded-full transition-all duration-500 ${
+                                  result.jdDeflator.mustHavesMatchRate >= 80 ? 'bg-emerald-500' : 'bg-amber-500'
+                                }`}
+                                style={{ width: `${result.jdDeflator.mustHavesMatchRate}%` }}
+                              />
+                            </div>
+                            <p className="text-[11px] text-slate-400">
+                              {result.jdDeflator.mustHaves.filter(m => m.matched).length} of {result.jdDeflator.mustHaves.length} non-negotiable requirements satisfied
+                            </p>
+                          </div>
+
+                          {/* Good To Haves Card */}
+                          <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm space-y-1.5">
+                            <div className="flex items-center justify-between">
+                              <span className="text-xs font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
+                                <span className="h-2 w-2 rounded-full bg-amber-400"></span>
+                                <span>Recruiter Wishlist (Learnable)</span>
+                              </span>
+                              <span className="text-xl font-black text-slate-700">
+                                {result.jdDeflator.goodToHavesMatchRate}%
+                              </span>
+                            </div>
+                            <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
+                              <div 
+                                className="h-full bg-amber-400 rounded-full transition-all duration-500"
+                                style={{ width: `${result.jdDeflator.goodToHavesMatchRate}%` }}
+                              />
+                            </div>
+                            <p className="text-[11px] text-slate-400">
+                              {result.jdDeflator.goodToHaves.filter(g => g.matched).length} of {result.jdDeflator.goodToHaves.length} wishlist preferences matched
+                            </p>
+                          </div>
+                        </div>
+
+                        {/* 4-Layer Recruiter Model Explainer */}
+                        <div className="bg-slate-50/80 border border-slate-200/90 rounded-xl overflow-hidden text-xs">
+                          <button
+                            type="button"
+                            onClick={() => setShowExplainer(!showExplainer)}
+                            className="w-full px-4 py-3 flex items-center justify-between text-left font-bold text-slate-700 hover:bg-slate-100/70 transition-colors"
+                          >
+                            <div className="flex items-center gap-2">
+                              <HelpCircle className="h-4 w-4 text-indigo-600 flex-shrink-0" />
+                              <span>How does the JD Deflator classify requirements? (The 4-Layer Recruiter Model)</span>
+                            </div>
+                            <span className="text-slate-500 text-[11px] font-semibold flex items-center gap-1">
+                              <span>{showExplainer ? 'Hide Model' : 'View 4-Layer Model'}</span>
+                              <ChevronDown className={`h-3.5 w-3.5 transition-transform duration-200 ${showExplainer ? 'rotate-180' : ''}`} />
+                            </span>
+                          </button>
+
+                          {showExplainer && (
+                            <div className="p-4 pt-0 border-t border-slate-200/60 bg-white space-y-3.5 animate-in fade-in duration-150">
+                              <p className="text-slate-500 leading-relaxed text-xs pt-3">
+                                Recruiters frequently write inflated job descriptions listing dozens of &quot;requirements&quot;. Ascent applies a 4-layer heuristic model to separate true screening dealbreakers from flexible wishlist preferences:
+                              </p>
+
+                              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                {/* Layer 1 */}
+                                <div className="p-3 bg-slate-50/80 rounded-lg border border-slate-200/80 space-y-1.5">
+                                  <div className="flex items-center gap-1.5 font-bold text-slate-800 text-xs">
+                                    <span className="h-5 w-5 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center text-[10px] font-black">1</span>
+                                    <span>Structural Section Cues</span>
+                                  </div>
+                                  <p className="text-slate-600 text-[11px] leading-relaxed">
+                                    Parses explicit structural boundaries like <em>&quot;Basic / Minimum Qualifications&quot;</em> (Must-Haves) versus <em>&quot;Preferred / Bonus Pluses&quot;</em> (Wishlist).
+                                  </p>
+                                </div>
+
+                                {/* Layer 2 */}
+                                <div className="p-3 bg-slate-50/80 rounded-lg border border-slate-200/80 space-y-1.5">
+                                  <div className="flex items-center gap-1.5 font-bold text-slate-800 text-xs">
+                                    <span className="h-5 w-5 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center text-[10px] font-black">2</span>
+                                    <span>Linguistic Modality &amp; Verbs</span>
+                                  </div>
+                                  <p className="text-slate-600 text-[11px] leading-relaxed">
+                                    Evaluates urgency: <em>&quot;5+ years required&quot;</em> and <em>&quot;proven track record&quot;</em> signal hard filters; <em>&quot;familiarity with&quot;</em> or <em>&quot;working knowledge&quot;</em> are flexible.
+                                  </p>
+                                </div>
+
+                                {/* Layer 3 */}
+                                <div className="p-3 bg-slate-50/80 rounded-lg border border-slate-200/80 space-y-1.5">
+                                  <div className="flex items-center gap-1.5 font-bold text-slate-800 text-xs">
+                                    <span className="h-5 w-5 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center text-[10px] font-black">3</span>
+                                    <span>Learnability Horizon</span>
+                                  </div>
+                                  <p className="text-slate-600 text-[11px] leading-relaxed">
+                                    Core foundations (systems architecture, stakeholder alignment) take 6+ months to master &rarr; <strong>Must-Have</strong>. Interchangeable tools (Snowflake, React, Jira) ramp up in 1–2 weeks &rarr; <strong>Good-to-Have</strong>.
+                                  </p>
+                                </div>
+
+                                {/* Layer 4 */}
+                                <div className="p-3 bg-slate-50/80 rounded-lg border border-slate-200/80 space-y-1.5">
+                                  <div className="flex items-center gap-1.5 font-bold text-slate-800 text-xs">
+                                    <span className="h-5 w-5 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center text-[10px] font-black">4</span>
+                                    <span>Centrality to Deliverables</span>
+                                  </div>
+                                  <p className="text-slate-600 text-[11px] leading-relaxed">
+                                    Maps requirements directly against the daily responsibilities listed in the role. Core deliverables take precedence over auxiliary stack wishlists.
+                                  </p>
+                                </div>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Requirements Breakdown: 2 Columns */}
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
+                          {/* Column 1: Must-Haves */}
+                          <div className="space-y-3">
+                            <div className="flex items-center justify-between pb-1 border-b border-slate-200">
+                              <h4 className="text-sm font-bold text-slate-800 flex items-center gap-1.5">
+                                <span className="px-1.5 py-0.5 rounded text-[10px] font-black bg-rose-100 text-rose-800 uppercase">
+                                  Dealbreakers
+                                </span>
+                                <span>Day-1 Non-Negotiables</span>
+                              </h4>
+                              <span className="text-xs font-bold text-slate-400">
+                                {result.jdDeflator.mustHaves.length} items
+                              </span>
+                            </div>
+
+                            <div className="space-y-3">
+                              {result.jdDeflator.mustHaves.map((item, idx) => (
+                                <div 
+                                  key={idx} 
+                                  className={`p-3.5 rounded-xl border transition-all ${
+                                    item.matched 
+                                      ? 'bg-white border-slate-200 shadow-sm hover:border-emerald-200' 
+                                      : 'bg-rose-50/40 border-rose-200 shadow-sm'
+                                  }`}
+                                >
+                                  <div className="flex items-start justify-between gap-2">
+                                    <div className="space-y-0.5">
+                                      <div className="flex items-center gap-1.5">
+                                        {item.matched ? (
+                                          <CheckCircle2 className="h-4 w-4 text-emerald-600 flex-shrink-0" />
+                                        ) : (
+                                          <XCircle className="h-4 w-4 text-rose-600 flex-shrink-0" />
+                                        )}
+                                        <span className="text-xs font-bold text-slate-800 leading-snug">
+                                          {item.skill}
+                                        </span>
+                                      </div>
+                                    </div>
+                                    <span className={`px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider flex-shrink-0 ${
+                                      item.matched 
+                                        ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' 
+                                        : 'bg-rose-100 text-rose-700 border border-rose-200'
+                                    }`}>
+                                      {item.matched ? 'Verified' : 'Gap'}
+                                    </span>
+                                  </div>
+
+                                  <div className="mt-2.5 pt-2 border-t border-slate-100 space-y-1 text-[11px]">
+                                    <div className="text-slate-500">
+                                      <strong className="text-slate-700">Why Recruiter Cares: </strong>
+                                      <span>{item.recruiterRationale}</span>
+                                    </div>
+                                    <div className="text-slate-600 bg-slate-50 p-2 rounded border border-slate-100">
+                                      <strong className="text-slate-700">CV Evidence: </strong>
+                                      <span>{item.candidateEvidence}</span>
+                                    </div>
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+
+                          {/* Column 2: Good-To-Haves */}
+                          <div className="space-y-3">
+                            <div className="flex items-center justify-between pb-1 border-b border-slate-200">
+                              <h4 className="text-sm font-bold text-slate-800 flex items-center gap-1.5">
+                                <span className="px-1.5 py-0.5 rounded text-[10px] font-black bg-amber-100 text-amber-800 uppercase">
+                                  Wishlist
+                                </span>
+                                <span>Learnable on the Job</span>
+                              </h4>
+                              <span className="text-xs font-bold text-slate-400">
+                                {result.jdDeflator.goodToHaves.length} items
+                              </span>
+                            </div>
+
+                            <div className="space-y-3">
+                              {result.jdDeflator.goodToHaves.map((item, idx) => (
+                                <div 
+                                  key={idx} 
+                                  className={`p-3.5 rounded-xl border transition-all ${
+                                    item.matched 
+                                      ? 'bg-white border-slate-200 shadow-sm' 
+                                      : 'bg-amber-50/30 border-amber-200/80 shadow-sm'
+                                  }`}
+                                >
+                                  <div className="flex items-start justify-between gap-2">
+                                    <div className="space-y-0.5">
+                                      <div className="flex items-center gap-1.5">
+                                        {item.matched ? (
+                                          <CheckCircle2 className="h-4 w-4 text-emerald-600 flex-shrink-0" />
+                                        ) : (
+                                          <Zap className="h-4 w-4 text-amber-500 flex-shrink-0" />
+                                        )}
+                                        <span className="text-xs font-bold text-slate-800 leading-snug">
+                                          {item.skill}
+                                        </span>
+                                      </div>
+                                    </div>
+                                    <span className={`px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider flex-shrink-0 ${
+                                      item.matched 
+                                        ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' 
+                                        : 'bg-amber-100 text-amber-800 border border-amber-200'
+                                    }`}>
+                                      {item.matched ? 'Bonus Match' : 'Learnable'}
+                                    </span>
+                                  </div>
+
+                                  <div className="mt-2.5 pt-2 border-t border-slate-100 space-y-1 text-[11px]">
+                                    <div className="text-slate-500">
+                                      <strong className="text-slate-700">Why It&apos;s Flexible: </strong>
+                                      <span>{item.recruiterRationale}</span>
+                                    </div>
+                                    <div className="text-amber-900 bg-amber-50/60 p-2 rounded border border-amber-100">
+                                      <strong className="text-amber-950">💡 Bridge / Substitute: </strong>
+                                      <span>{item.substituteAdvice}</span>
+                                    </div>
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        </div>
+                      </>
+                    ) : (
+                      <div className="p-8 text-center bg-slate-50 rounded-xl border border-slate-200 space-y-3">
+                        <Info className="h-8 w-8 text-slate-400 mx-auto" />
+                        <h4 className="font-bold text-slate-700 text-sm">JD Deflator Data Not Available for this Record</h4>
+                        <p className="text-xs text-slate-500 max-w-md mx-auto leading-relaxed">
+                          This tailored resume was generated before the JD Deflator analysis was added. Re-tailor this job description to view the dealbreaker vs. wishlist breakdown.
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                )}
                 {activeTab === 'resume' && (
                   <div className="space-y-4 h-full">
                     <pre className="whitespace-pre-wrap font-mono text-sm text-slate-600 leading-relaxed bg-slate-50 p-4 rounded-lg border border-slate-100 h-[800px] overflow-y-auto">
@@ -556,6 +927,25 @@ export default function TailorPage() {
 
                 {activeTab === 'coach' && (
                   <div className="space-y-6 overflow-y-auto max-h-[800px] pr-2">
+                    {result.jdDeflator && (
+                      <div 
+                        onClick={() => setActiveTab('deflator')}
+                        className="bg-gradient-to-r from-amber-50 to-orange-50 hover:from-amber-100 hover:to-orange-100 cursor-pointer border border-amber-200/80 rounded-xl p-3.5 flex items-center justify-between transition-all shadow-xs group"
+                      >
+                        <div className="flex items-center gap-2.5">
+                          <Target className="h-5 w-5 text-amber-600 flex-shrink-0" />
+                          <div className="text-xs">
+                            <span className="font-bold text-amber-950">JD Deflator Assessment: </span>
+                            <span className="text-amber-800">{result.jdDeflator.mustHavesMatchRate}% of core dealbreakers matched.</span>
+                          </div>
+                        </div>
+                        <span className="flex items-center gap-1 text-xs font-bold text-amber-700 group-hover:translate-x-0.5 transition-transform">
+                          <span>View Dealbreaker Radar</span>
+                          <ChevronRight className="h-4 w-4" />
+                        </span>
+                      </div>
+                    )}
+
                     {/* Coach Score & Evaluation Card */}
                     <div className="bg-indigo-50/30 border border-indigo-100 rounded-2xl p-6 space-y-6">
                       <div className="flex flex-col sm:flex-row items-center gap-6 pb-4 border-b border-indigo-100/50">
