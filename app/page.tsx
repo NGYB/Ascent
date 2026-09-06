@@ -12,7 +12,8 @@ import {
   TrendingUp,
   Clock,
   Briefcase,
-  AlertCircle
+  AlertCircle,
+  Radar
 } from 'lucide-react';
 
 export default function Home() {
@@ -137,14 +138,39 @@ export default function Home() {
             </Link>
           </div>
 
-          {/* Card 2: CV Tailoring & ATS */}
+          {/* Card 2: Smart Job Radar */}
+          <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm hover:shadow-md transition-shadow flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 group">
+            <div className="flex items-start gap-4 flex-1">
+              <div className="h-12 w-12 rounded-lg bg-indigo-50 flex items-center justify-center text-indigo-600 flex-shrink-0 mt-1">
+                <Radar className="h-6 w-6" />
+              </div>
+              <div className="space-y-1">
+                <div className="flex items-center gap-2">
+                  <h4 className="text-lg font-bold text-slate-800">2. Smart Job Radar</h4>
+                  <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-indigo-50 text-indigo-700 border border-indigo-200 uppercase">New</span>
+                </div>
+                <p className="text-sm text-slate-500 leading-relaxed max-w-2xl">
+                  Scan active job postings across LinkedIn, Indeed, Greenhouse, and Google Jobs with SerpAPI. Get instant AI fit scoring against your Master CV and 1-click tailoring.
+                </p>
+              </div>
+            </div>
+            <Link 
+              href="/radar" 
+              className="flex items-center gap-2 text-sm font-bold text-indigo-600 hover:text-indigo-700 transition-colors group-hover:gap-3 flex-shrink-0 self-end sm:self-center"
+            >
+              <span>Scan Radar</span>
+              <ArrowRight className="h-4 w-4" />
+            </Link>
+          </div>
+
+          {/* Card 3: CV Tailoring & ATS */}
           <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm hover:shadow-md transition-shadow flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 group">
             <div className="flex items-start gap-4 flex-1">
               <div className="h-12 w-12 rounded-lg bg-amber-50 flex items-center justify-center text-amber-600 flex-shrink-0 mt-1">
                 <Sparkles className="h-6 w-6" />
               </div>
               <div className="space-y-1">
-                <h4 className="text-lg font-bold text-slate-800">2. Tailor & ATS Scorecard</h4>
+                <h4 className="text-lg font-bold text-slate-800">3. Tailor & ATS Scorecard</h4>
                 <p className="text-sm text-slate-500 leading-relaxed max-w-2xl">
                   Enter a target job description. Our AI will automatically rewrite experience achievements, perform a keyword gap analysis, and output an ATS-optimized CV.
                 </p>
@@ -159,14 +185,14 @@ export default function Home() {
             </Link>
           </div>
 
-          {/* Card 3: Interview Prep */}
+          {/* Card 4: Interview Prep */}
           <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm hover:shadow-md transition-shadow flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 group">
             <div className="flex items-start gap-4 flex-1">
               <div className="h-12 w-12 rounded-lg bg-emerald-50 flex items-center justify-center text-emerald-600 flex-shrink-0 mt-1">
                 <MessageSquare className="h-6 w-6" />
               </div>
               <div className="space-y-1">
-                <h4 className="text-lg font-bold text-slate-800">3. Mock Interview Simulator</h4>
+                <h4 className="text-lg font-bold text-slate-800">4. Mock Interview Simulator</h4>
                 <p className="text-sm text-slate-500 leading-relaxed max-w-2xl">
                   Practice answering customized behavioral and domain-specific questions tailored to your target role. Get immediate feedback, scores, and improved answers.
                 </p>
@@ -181,14 +207,14 @@ export default function Home() {
             </Link>
           </div>
 
-          {/* Card 4: Job Tracker */}
+          {/* Card 5: Job Tracker */}
           <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm hover:shadow-md transition-shadow flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 group">
             <div className="flex items-start gap-4 flex-1">
               <div className="h-12 w-12 rounded-lg bg-slate-100 flex items-center justify-center text-slate-700 flex-shrink-0 mt-1">
                 <Kanban className="h-6 w-6" />
               </div>
               <div className="space-y-1">
-                <h4 className="text-lg font-bold text-slate-800">4. Application Tracker</h4>
+                <h4 className="text-lg font-bold text-slate-800">5. Application Tracker</h4>
                 <p className="text-sm text-slate-500 leading-relaxed max-w-2xl">
                   Organize your job search. Keep track of which CV versions you sent to each position and manage interview stages with a simple Kanban pipeline.
                 </p>

@@ -12,13 +12,15 @@ import {
   PanelLeftClose,
   PanelLeftOpen,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  Radar
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useSidebar } from '@/context/SidebarContext';
 
 const navItems = [
   { name: 'CV Workspace', href: '/cv', icon: FileText },
+  { name: 'Smart Job Radar', href: '/radar', icon: Radar },
   { name: 'Tailoring & ATS', href: '/tailor', icon: Sparkles },
   { name: 'Interview Prep', href: '/interview', icon: MessageSquare },
   { name: 'Job Tracker', href: '/tracker', icon: Kanban },

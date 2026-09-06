@@ -188,6 +188,18 @@ export default function TailorPage() {
 
     const list = JSON.parse(localStorage.getItem('ascent_tailored_resumes') || '[]');
     setHistoryList(list);
+
+    // Check if imported from Smart Job Radar
+    try {
+      const imported = sessionStorage.getItem('ascent_import_job');
+      if (imported) {
+        const parsed = JSON.parse(imported);
+        if (parsed.jobTitle) setJobTitle(parsed.jobTitle);
+        if (parsed.company) setCompany(parsed.company);
+        if (parsed.jobDescription) setJobDescription(parsed.jobDescription);
+        sessionStorage.removeItem('ascent_import_job');
+      }
+    } catch {}
   }, []);
 
   const handleTailor = async (e: React.FormEvent) => {

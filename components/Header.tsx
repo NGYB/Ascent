@@ -11,6 +11,7 @@ export default function Header() {
   // Map pathnames to clean titles
   const getTitle = () => {
     if (pathname.startsWith('/cv')) return 'CV Workspace';
+    if (pathname.startsWith('/radar')) return 'Smart Job Radar';
     if (pathname.startsWith('/tailor')) return 'Tailoring & ATS Scorecard';
     if (pathname.startsWith('/interview')) return 'Mock Interview Room';
     if (pathname.startsWith('/tracker')) return 'Application Pipeline';
