@@ -63,8 +63,9 @@ export default function RadarPage() {
 
   // Initial load
   useEffect(() => {
+    let savedResume = '';
     try {
-      const savedResume = localStorage.getItem('ascent_master_resume');
+      savedResume = localStorage.getItem('ascent_master_resume') || '';
       if (savedResume) {
         setHasMasterResume(true);
         setResumeText(savedResume);
@@ -86,13 +87,23 @@ export default function RadarPage() {
       setSavedJobIds(savedTitles);
     } catch {}
 
-    // Run initial scan
-    fetchRadarJobs('Product Manager', 'Singapore', false);
+    // Run initial scan with saved resume immediately
+    fetchRadarJobs('Product Manager', 'Singapore', false, savedResume);
   }, []);
 
-  const fetchRadarJobs = async (q: string, loc: string, remote: boolean) => {
+  const fetchRadarJobs = async (q: string, loc: string, remote: boolean, explicitResume?: string) => {
     setLoading(true);
     try {
+      // Ensure we always capture the resume text, even before state re-renders
+      let activeResume = explicitResume !== undefined ? explicitResume : resumeText;
+      if (!activeResume && typeof window !== 'undefined') {
+        activeResume = localStorage.getItem('ascent_master_resume') || '';
+        if (activeResume && !resumeText) {
+          setResumeText(activeResume);
+          setHasMasterResume(true);
+        }
+      }
+
       const res = await fetch('/api/radar', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -100,7 +111,7 @@ export default function RadarPage() {
           query: q,
           location: loc,
           remoteOnly: remote,
-          resumeText: resumeText || undefined
+          resumeText: activeResume || undefined
         })
       });
 
@@ -166,7 +177,8 @@ export default function RadarPage() {
 
   // Auto scan based on resume using AI role & domain extraction
   const handleScanFromCV = async () => {
-    if (!resumeText) {
+    const activeCv = resumeText || (typeof window !== 'undefined' ? localStorage.getItem('ascent_master_resume') || '' : '');
+    if (!activeCv) {
       alert('Please upload a Master CV first in the CV Workspace to enable AI auto-matching.');
       return;
     }
@@ -176,7 +188,7 @@ export default function RadarPage() {
       const res = await fetch('/api/radar/extract-roles', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ resumeText })
+        body: JSON.stringify({ resumeText: activeCv })
       });
 
       if (res.ok) {
@@ -196,7 +208,7 @@ export default function RadarPage() {
           if (domain) localStorage.setItem('ascent_radar_domain', domain);
         } catch {}
 
-        fetchRadarJobs(primary, locationQuery, remoteOnly);
+        fetchRadarJobs(primary, locationQuery, remoteOnly, activeCv);
       } else {
         alert('Could not extract roles from CV. Please try searching manually.');
       }
@@ -397,10 +409,15 @@ export default function RadarPage() {
             </span>
           )}
         </div>
-        {hasMasterResume && (
+        {hasMasterResume ? (
           <span className="text-indigo-600 font-semibold flex items-center gap-1">
             <Sparkles className="h-3.5 w-3.5" />
             AI Fit Score matched against your Master CV
+          </span>
+        ) : (
+          <span className="text-slate-500 font-medium flex items-center gap-1">
+            <Sparkles className="h-3.5 w-3.5 text-slate-400" />
+            Search Relevance Score (Upload Master CV in CV Workspace for personalized AI fit scoring)
           </span>
         )}
       </div>

@@ -127,7 +127,7 @@ export async function POST(req: NextRequest) {
         // Take up to 10 jobs for AI scoring to rank the entire primary radar view
         const topJobs = jobs.slice(0, 10);
         const jobSnippets = topJobs.map((j, i) => 
-          `[Job ${i + 1}] ID: "${j.id}", Title: "${j.title}", Company: "${j.company}", Description: "${(j.description || '').slice(0, 450)}"`
+          `[Job ${i}] Title: "${j.title}", Company: "${j.company}", Description: "${(j.description || '').slice(0, 400)}"`
         ).join('\n\n');
 
         const prompt = `
@@ -135,22 +135,23 @@ You are an expert career transition and talent recruitment advisor.
 Evaluate the candidate's Master Resume against the following job opportunities.
 Candidate Resume Snippet:
 """
-${resumeText.slice(0, 3000)}
+${resumeText.slice(0, 3500)}
 """
 
 Target Jobs:
 ${jobSnippets}
 
 For each job, evaluate:
-1. matchScore: integer between 45 and 95 (realistic percentage of alignment based on transferable skills and experience)
-2. matchRationale: 1 concise sentence explaining why this candidate is a fit or what transferable skills match.
-3. topMatches: array of 2-3 key transferable skills / qualifications found in both.
+1. index: integer matching the [Job index] number (0 to ${topJobs.length - 1})
+2. matchScore: integer between 42 and 96 (realistic percentage of alignment based on transferable skills, seniority, and domain relevance)
+3. matchRationale: 1 concise sentence explaining why this candidate is a fit or what transferable skills match.
+4. topMatches: array of 2-3 key transferable skills / qualifications found in both.
 
 Respond strictly in valid JSON format matching this array:
 [
   {
-    "id": "job-id",
-    "matchScore": 85,
+    "index": 0,
+    "matchScore": 88,
     "matchRationale": "Strong alignment in stakeholder management, team leadership, and domain operations.",
     "topMatches": ["Leadership", "Stakeholder Engagement", "Operational Strategy"]
   }
@@ -161,48 +162,49 @@ Respond strictly in valid JSON format matching this array:
           model: 'gemini-2.5-flash',
           contents: prompt,
           config: {
-            responseMimeType: 'application/json'
+            responseMimeType: 'application/json',
+            temperature: 0.2
           }
         });
 
         if (geminiRes.text) {
-          const matchData: Array<{ id: string; matchScore: number; matchRationale: string; topMatches: string[] }> = JSON.parse(geminiRes.text);
-          const matchMap = new Map(matchData.map(m => [m.id, m]));
+          const matchData: Array<{ index: number; matchScore: number; matchRationale: string; topMatches: string[] }> = JSON.parse(geminiRes.text);
+          const matchMap = new Map(matchData.map(m => [Number(m.index), m]));
 
-          jobs = jobs.map(j => {
-            const match = matchMap.get(j.id);
-            if (match) {
+          jobs = jobs.map((j, idx) => {
+            const match = matchMap.get(idx);
+            if (match && typeof match.matchScore === 'number') {
               return {
                 ...j,
                 matchScore: match.matchScore,
                 matchRationale: match.matchRationale,
-                topMatches: match.topMatches
+                topMatches: match.topMatches || ['Core Competency']
               };
             }
             // Baseline for extra jobs beyond scored batch
             return {
               ...j,
-              matchScore: 55,
-              matchRationale: 'Potentially matching opportunity based on general search keywords.',
+              matchScore: Math.max(50, 70 - idx * 2),
+              matchRationale: 'Opportunity matching broader industry keywords.',
               topMatches: ['Domain Skills']
             };
           });
         }
       } catch (geminiErr) {
         console.warn('Gemini match scoring failed or timed out:', geminiErr);
-        // Fallback to heuristic keyword matching
-        jobs = jobs.map(j => ({
+        // Fallback to dynamic keyword relevance matching
+        jobs = jobs.map((j, idx) => ({
           ...j,
-          matchScore: 75,
-          matchRationale: 'Potentially matching role based on title and functional keywords.'
+          matchScore: computeRelevanceScore(j, searchQuery, idx),
+          matchRationale: `Potentially matching opportunity for ${searchQuery}.`
         }));
       }
     } else {
-      // Default heuristic scores if resume not analyzed
-      jobs = jobs.map(j => ({
+      // Dynamic query relevance scores if resume is not analyzed yet
+      jobs = jobs.map((j, idx) => ({
         ...j,
-        matchScore: j.matchScore || 70,
-        matchRationale: j.matchRationale || 'Scan role requirements to evaluate personalized fit.'
+        matchScore: j.matchScore || computeRelevanceScore(j, searchQuery, idx),
+        matchRationale: j.matchRationale || `Search relevance for "${searchQuery}". Upload Master CV for personalized AI fit scoring.`
       }));
     }
 
@@ -226,6 +228,23 @@ Respond strictly in valid JSON format matching this array:
       { status: 500 }
     );
   }
+}
+
+// Dynamic keyword relevance calculation when resume is not provided or Gemini is unavailable
+function computeRelevanceScore(job: any, query: string, index: number) {
+  const qWords = (query || '').toLowerCase().split(/\s+/).filter(w => w.length > 2);
+  const titleLower = (job.title || '').toLowerCase();
+  const descLower = (job.description || '').slice(0, 500).toLowerCase();
+
+  let matches = 0;
+  for (const w of qWords) {
+    if (titleLower.includes(w)) matches += 2;
+    else if (descLower.includes(w)) matches += 1;
+  }
+
+  // Realistic scored distribution from ~88% down to ~62%
+  const baseScore = Math.min(91, Math.max(58, 68 + matches * 6 - index * 2));
+  return baseScore;
 }
 
 // Curated realistic demo jobs for testing without an active API key

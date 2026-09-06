@@ -206,7 +206,11 @@ export default function CVPage() {
 
         setResumeText(cleanedText);
         setResumeName(file.name);
-        setSuccess('Fantastic start! Uploading your master CV is the first critical step toward aligning your career history with your future goals. Take a moment to review the extracted text in the preview panel, make sure all your key achievements are parsed correctly, and click the green "Save CV" button. We are ready to construct a powerful trajectory from here!');
+        try {
+          localStorage.setItem('ascent_master_resume', cleanedText);
+          localStorage.setItem('ascent_resume_name', file.name);
+        } catch {}
+        setSuccess('Fantastic start! Your Master CV has been extracted and saved to your session. You can review the parsed text below or edit it anytime.');
         setFile(null);
       } catch (err: any) {
         console.error(err);
