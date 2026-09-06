@@ -124,25 +124,25 @@ export async function POST(req: NextRequest) {
       try {
         const ai = new GoogleGenAI({ apiKey: geminiKey });
         
-        // Take the top 5 jobs for AI scoring to keep latency fast
-        const topJobs = jobs.slice(0, 5);
+        // Take up to 10 jobs for AI scoring to rank the entire primary radar view
+        const topJobs = jobs.slice(0, 10);
         const jobSnippets = topJobs.map((j, i) => 
-          `[Job ${i + 1}] ID: "${j.id}", Title: "${j.title}", Company: "${j.company}", Description: "${j.description.slice(0, 500)}"`
+          `[Job ${i + 1}] ID: "${j.id}", Title: "${j.title}", Company: "${j.company}", Description: "${(j.description || '').slice(0, 450)}"`
         ).join('\n\n');
 
         const prompt = `
-You are a career transition advisor.
+You are an expert career transition and talent recruitment advisor.
 Evaluate the candidate's Master Resume against the following job opportunities.
 Candidate Resume Snippet:
 """
-${resumeText.slice(0, 2500)}
+${resumeText.slice(0, 3000)}
 """
 
 Target Jobs:
 ${jobSnippets}
 
 For each job, evaluate:
-1. matchScore: integer between 45 and 95 (realistic percentage of alignment)
+1. matchScore: integer between 45 and 95 (realistic percentage of alignment based on transferable skills and experience)
 2. matchRationale: 1 concise sentence explaining why this candidate is a fit or what transferable skills match.
 3. topMatches: array of 2-3 key transferable skills / qualifications found in both.
 
@@ -151,8 +151,8 @@ Respond strictly in valid JSON format matching this array:
   {
     "id": "job-id",
     "matchScore": 85,
-    "matchRationale": "Strong alignment in enterprise agile delivery and multi-stakeholder management.",
-    "topMatches": ["Product Strategy", "Agile Transformation", "Stakeholder Management"]
+    "matchRationale": "Strong alignment in stakeholder management, team leadership, and domain operations.",
+    "topMatches": ["Leadership", "Stakeholder Engagement", "Operational Strategy"]
   }
 ]
 `;
@@ -179,12 +179,12 @@ Respond strictly in valid JSON format matching this array:
                 topMatches: match.topMatches
               };
             }
-            // Heuristic baseline if not in top 5
+            // Baseline for extra jobs beyond scored batch
             return {
               ...j,
-              matchScore: Math.floor(Math.random() * 20) + 65,
-              matchRationale: 'Relevant role matching your core functional domain.',
-              topMatches: ['Domain Experience', 'Leadership']
+              matchScore: 55,
+              matchRationale: 'Potentially matching opportunity based on general search keywords.',
+              topMatches: ['Domain Skills']
             };
           });
         }
@@ -205,6 +205,9 @@ Respond strictly in valid JSON format matching this array:
         matchRationale: j.matchRationale || 'Scan role requirements to evaluate personalized fit.'
       }));
     }
+
+    // Sort jobs strictly from highest match score to lowest match score (highest on top)
+    jobs.sort((a, b) => (b.matchScore ?? 0) - (a.matchScore ?? 0));
 
     return NextResponse.json({
       jobs,

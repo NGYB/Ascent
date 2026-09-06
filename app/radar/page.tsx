@@ -18,7 +18,8 @@ import {
   Zap, 
   DollarSign,
   Building2,
-  Filter
+  Filter,
+  ArrowDownWideNarrow
 } from 'lucide-react';
 
 interface RadarJob {
@@ -105,7 +106,10 @@ export default function RadarPage() {
 
       if (res.ok) {
         const data = await res.json();
-        setJobs(data.jobs || []);
+        const returnedJobs: RadarJob[] = data.jobs || [];
+        // Ensure sorted by matchScore descending (highest match on top)
+        returnedJobs.sort((a, b) => (b.matchScore ?? 0) - (a.matchScore ?? 0));
+        setJobs(returnedJobs);
         setIsDemo(data.isDemo || false);
         setHasApiKey(data.hasApiKey ?? true);
         setDemoMessage(data.message || '');
@@ -381,10 +385,18 @@ export default function RadarPage() {
       </form>
 
       {/* Results Header */}
-      <div className="flex items-center justify-between text-xs text-slate-500 px-1">
-        <span>
-          Showing <strong>{jobs.length}</strong> active opportunities for <strong>"{roleQuery}"</strong> in <strong>{locationQuery || 'Anywhere'}</strong>
-        </span>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs text-slate-500 px-1">
+        <div className="flex items-center gap-2.5 flex-wrap">
+          <span>
+            Showing <strong>{jobs.length}</strong> active opportunities for <strong>"{roleQuery}"</strong> in <strong>{locationQuery || 'Anywhere'}</strong>
+          </span>
+          {jobs.length > 1 && (
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-indigo-50/90 text-indigo-700 border border-indigo-200/80 font-semibold text-[11px]">
+              <ArrowDownWideNarrow className="h-3 w-3 text-indigo-600" />
+              Highest Match on Top
+            </span>
+          )}
+        </div>
         {hasMasterResume && (
           <span className="text-indigo-600 font-semibold flex items-center gap-1">
             <Sparkles className="h-3.5 w-3.5" />
