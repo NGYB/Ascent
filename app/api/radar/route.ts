@@ -38,58 +38,77 @@ export async function POST(req: NextRequest) {
     let isDemo = false;
     let message = '';
 
-    if (!serpApiKey || serpApiKey === 'your-serpapi-api-key-here') {
+    let hasApiKey = Boolean(serpApiKey && serpApiKey !== 'your-serpapi-api-key-here');
+
+    if (!hasApiKey) {
       isDemo = true;
-      message = 'SerpAPI key not configured. Displaying curated sample radar results. Add SERPAPI_API_KEY to .env.local to activate live real-time job feeds.';
+      message = 'SerpAPI key not configured in .env or Vercel Environment Variables. Displaying curated sample radar results.';
       jobs = getDemoJobs(searchQuery, searchLocation);
     } else {
       try {
-        const fullQuery = remoteOnly ? `${searchQuery} remote` : searchQuery;
-        const url = new URL('https://serpapi.com/search.json');
-        url.searchParams.set('engine', 'google_jobs');
-        url.searchParams.set('q', fullQuery);
-        if (searchLocation) {
-          url.searchParams.set('location', searchLocation);
+        // Formulate natural language query for Google Jobs (e.g. "Product Manager in Singapore")
+        // Google Jobs engine reliably parses locations inside the query text, whereas a separate `location` parameter often returns 0 results outside the US.
+        let fullQuery = searchQuery;
+        if (searchLocation && !fullQuery.toLowerCase().includes(searchLocation.toLowerCase())) {
+          fullQuery = `${fullQuery} in ${searchLocation}`;
         }
-        url.searchParams.set('hl', 'en');
-        url.searchParams.set('api_key', serpApiKey);
+        if (remoteOnly && !fullQuery.toLowerCase().includes('remote')) {
+          fullQuery = `${fullQuery} remote`;
+        }
 
-        const serpRes = await fetch(url.toString(), {
-          next: { revalidate: 300 } // Cache for 5 mins
+        const buildUrl = (q: string) => {
+          const u = new URL('https://serpapi.com/search.json');
+          u.searchParams.set('engine', 'google_jobs');
+          u.searchParams.set('q', q);
+          u.searchParams.set('hl', 'en');
+          u.searchParams.set('api_key', serpApiKey!);
+          return u.toString();
+        };
+
+        let serpRes = await fetch(buildUrl(fullQuery), {
+          next: { revalidate: 300 }
         });
 
-        if (!serpRes.ok) {
-          const errText = await serpRes.text();
-          console.warn('SerpAPI error response:', errText);
+        let serpData: any = {};
+        if (serpRes.ok) {
+          serpData = await serpRes.json();
+        }
+
+        // If no jobs returned with "in [Location]", retry with "[Role] [Location]" or just "[Role]"
+        let rawJobs: SerpJob[] = serpData.jobs_results || [];
+        if (rawJobs.length === 0 && searchLocation) {
+          const retryQuery = `${searchQuery} ${searchLocation}`;
+          const retryRes = await fetch(buildUrl(retryQuery));
+          if (retryRes.ok) {
+            const retryData = await retryRes.json();
+            if (retryData.jobs_results && retryData.jobs_results.length > 0) {
+              rawJobs = retryData.jobs_results;
+            }
+          }
+        }
+
+        if (rawJobs.length === 0) {
           isDemo = true;
-          message = 'SerpAPI search returned an error (or monthly quota reached). Falling back to sample radar results.';
+          message = `No live Google Jobs found for "${fullQuery}". Showing sample opportunities. Try broadening your keywords.`;
           jobs = getDemoJobs(searchQuery, searchLocation);
         } else {
-          const serpData = await serpRes.json();
-          const rawJobs: SerpJob[] = serpData.jobs_results || [];
-
-          if (rawJobs.length === 0) {
-            isDemo = true;
-            message = `No active postings found for "${searchQuery}". Showing related sample postings.`;
-            jobs = getDemoJobs(searchQuery, searchLocation);
-          } else {
-            jobs = rawJobs.map((j, idx) => {
-              const directApply = j.apply_options?.[0]?.link || j.related_links?.[0]?.link || '';
-              return {
-                id: j.job_id || `serp-${idx}-${Date.now()}`,
-                title: j.title || 'Untitled Role',
-                company: j.company_name || 'Target Company',
-                location: j.location || searchLocation || 'Remote / Flexible',
-                via: j.via || 'via Job Board',
-                description: j.description || 'No description provided.',
-                postedAt: j.detected_extensions?.posted_at || j.extensions?.[0] || 'Recently',
-                scheduleType: j.detected_extensions?.schedule_type || j.extensions?.[1] || 'Full-time',
-                salary: j.detected_extensions?.salary || undefined,
-                applyLink: directApply,
-                thumbnail: j.thumbnail || undefined
-              };
-            });
-          }
+          isDemo = false;
+          jobs = rawJobs.map((j, idx) => {
+            const directApply = j.apply_options?.[0]?.link || j.related_links?.[0]?.link || '';
+            return {
+              id: j.job_id || `serp-${idx}-${Date.now()}`,
+              title: j.title || 'Untitled Role',
+              company: j.company_name || 'Target Company',
+              location: j.location || searchLocation || 'Remote / Flexible',
+              via: j.via || 'via Job Board',
+              description: j.description || 'No description provided.',
+              postedAt: j.detected_extensions?.posted_at || j.extensions?.[0] || 'Recently',
+              scheduleType: j.detected_extensions?.schedule_type || j.extensions?.[1] || 'Full-time',
+              salary: j.detected_extensions?.salary || undefined,
+              applyLink: directApply,
+              thumbnail: j.thumbnail || undefined
+            };
+          });
         }
       } catch (fetchErr: any) {
         console.error('Failed to call SerpAPI:', fetchErr);
@@ -190,6 +209,7 @@ Respond strictly in valid JSON format matching this array:
     return NextResponse.json({
       jobs,
       isDemo,
+      hasApiKey,
       message,
       query: searchQuery,
       location: searchLocation,

@@ -50,6 +50,7 @@ export default function RadarPage() {
   const [jobs, setJobs] = useState<RadarJob[]>([]);
   const [loading, setLoading] = useState(false);
   const [isDemo, setIsDemo] = useState(false);
+  const [hasApiKey, setHasApiKey] = useState(true);
   const [demoMessage, setDemoMessage] = useState('');
   const [expandedJobId, setExpandedJobId] = useState<string | null>(null);
   const [savedJobIds, setSavedJobIds] = useState<Set<string>>(new Set());
@@ -93,6 +94,7 @@ export default function RadarPage() {
         const data = await res.json();
         setJobs(data.jobs || []);
         setIsDemo(data.isDemo || false);
+        setHasApiKey(data.hasApiKey ?? true);
         setDemoMessage(data.message || '');
       }
     } catch (err) {
@@ -196,16 +198,18 @@ export default function RadarPage() {
         )}
       </div>
 
-      {/* Demo Notice Banner if SerpAPI key is not configured */}
+      {/* Demo Notice Banner if SerpAPI key is not configured or no live results returned */}
       {isDemo && (
         <div className="p-4 bg-amber-50/80 rounded-xl border border-amber-200 text-amber-900 flex items-start gap-3 shadow-xs">
           <Info className="h-5 w-5 text-amber-600 flex-shrink-0 mt-0.5" />
           <div className="text-xs leading-relaxed space-y-1">
-            <p className="font-bold">SerpAPI Live Feed Notice</p>
+            <p className="font-bold">{!hasApiKey ? 'SerpAPI Setup' : 'Search Notice'}</p>
             <p>{demoMessage}</p>
-            <p className="text-[11px] text-amber-700">
-              To activate real-time web searches, add <code className="px-1.5 py-0.5 bg-amber-100/80 rounded font-mono font-bold">SERPAPI_API_KEY</code> in your <code className="px-1.5 py-0.5 bg-amber-100/80 rounded font-mono font-bold">.env.local</code> file (or in Vercel Environment Variables).
-            </p>
+            {!hasApiKey && (
+              <p className="text-[11px] text-amber-700">
+                To activate real-time web searches, add <code className="px-1.5 py-0.5 bg-amber-100/80 rounded font-mono font-bold">SERPAPI_API_KEY</code> in your <code className="px-1.5 py-0.5 bg-amber-100/80 rounded font-mono font-bold">.env</code> file (or in Vercel Environment Variables).
+              </p>
+            )}
           </div>
         </div>
       )}
