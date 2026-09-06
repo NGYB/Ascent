@@ -49,6 +49,9 @@ export default function RadarPage() {
   // App state
   const [jobs, setJobs] = useState<RadarJob[]>([]);
   const [loading, setLoading] = useState(false);
+  const [isExtractingRoles, setIsExtractingRoles] = useState(false);
+  const [suggestedRoles, setSuggestedRoles] = useState<string[]>([]);
+  const [detectedDomain, setDetectedDomain] = useState<string | null>(null);
   const [isDemo, setIsDemo] = useState(false);
   const [hasApiKey, setHasApiKey] = useState(true);
   const [demoMessage, setDemoMessage] = useState('');
@@ -64,6 +67,16 @@ export default function RadarPage() {
       if (savedResume) {
         setHasMasterResume(true);
         setResumeText(savedResume);
+      }
+
+      // Load cached suggestions if available
+      const cachedSuggestions = localStorage.getItem('ascent_radar_suggested_roles');
+      if (cachedSuggestions) {
+        setSuggestedRoles(JSON.parse(cachedSuggestions));
+      }
+      const cachedDomain = localStorage.getItem('ascent_radar_domain');
+      if (cachedDomain) {
+        setDetectedDomain(cachedDomain);
       }
 
       // Load already saved applications to show checkmark
@@ -147,21 +160,48 @@ export default function RadarPage() {
     }
   };
 
-  // Auto scan based on resume
-  const handleScanFromCV = () => {
+  // Auto scan based on resume using AI role & domain extraction
+  const handleScanFromCV = async () => {
     if (!resumeText) {
-      alert('Please upload a Master CV first in the CV Workspace to enable auto-matching.');
+      alert('Please upload a Master CV first in the CV Workspace to enable AI auto-matching.');
       return;
     }
-    // Simple heuristic or prompt to derive top title
-    const firstLines = resumeText.slice(0, 500);
-    let detectedRole = 'Lead Product Manager';
-    if (firstLines.toLowerCase().includes('director')) detectedRole = 'Director of Operations';
-    else if (firstLines.toLowerCase().includes('engineer')) detectedRole = 'Engineering Manager';
-    else if (firstLines.toLowerCase().includes('marketing')) detectedRole = 'Head of Marketing';
 
-    setRoleQuery(detectedRole);
-    fetchRadarJobs(detectedRole, locationQuery, remoteOnly);
+    setIsExtractingRoles(true);
+    try {
+      const res = await fetch('/api/radar/extract-roles', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ resumeText })
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        const primary = data.primaryRole || 'Strategic Consultant';
+        const suggestions = data.suggestedRoles && data.suggestedRoles.length > 0 
+          ? data.suggestedRoles 
+          : [primary];
+        const domain = data.domain || null;
+
+        setRoleQuery(primary);
+        setSuggestedRoles(suggestions);
+        setDetectedDomain(domain);
+
+        try {
+          localStorage.setItem('ascent_radar_suggested_roles', JSON.stringify(suggestions));
+          if (domain) localStorage.setItem('ascent_radar_domain', domain);
+        } catch {}
+
+        fetchRadarJobs(primary, locationQuery, remoteOnly);
+      } else {
+        alert('Could not extract roles from CV. Please try searching manually.');
+      }
+    } catch (err) {
+      console.error('Error extracting roles from CV:', err);
+      alert('Network error while analyzing CV with AI.');
+    } finally {
+      setIsExtractingRoles(false);
+    }
   };
 
   return (
@@ -189,11 +229,21 @@ export default function RadarPage() {
           <button
             type="button"
             onClick={handleScanFromCV}
-            className="flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-700 hover:to-indigo-800 text-white rounded-lg shadow-sm font-semibold text-xs transition-all flex-shrink-0 cursor-pointer"
-            title="Scan market based on your uploaded Master CV"
+            disabled={isExtractingRoles || loading}
+            className="flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-700 hover:to-indigo-800 text-white rounded-lg shadow-sm font-semibold text-xs transition-all flex-shrink-0 cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
+            title="Intelligently analyze your CV with AI to scan target roles in your specific domain"
           >
-            <Zap className="h-4 w-4 text-amber-300" />
-            <span>Auto-Scan for My CV</span>
+            {isExtractingRoles ? (
+              <>
+                <Sparkles className="h-4 w-4 animate-spin text-amber-300" />
+                <span>Analyzing CV with AI...</span>
+              </>
+            ) : (
+              <>
+                <Zap className="h-4 w-4 text-amber-300" />
+                <span>Auto-Scan for My CV</span>
+              </>
+            )}
           </button>
         )}
       </div>
@@ -224,7 +274,7 @@ export default function RadarPage() {
               type="text"
               value={roleQuery}
               onChange={(e) => setRoleQuery(e.target.value)}
-              placeholder="e.g. Senior Product Manager, VP of Operations..."
+              placeholder="e.g. Sales Director, Patent Counsel, Operations Lead, Product Manager..."
               className="w-full pl-10 pr-4 py-2.5 text-sm border border-slate-200 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500 bg-slate-50/50 hover:bg-white transition-colors"
             />
           </div>
@@ -245,7 +295,7 @@ export default function RadarPage() {
           <div className="md:col-span-2">
             <button
               type="submit"
-              disabled={loading}
+              disabled={loading || isExtractingRoles}
               className="w-full py-2.5 px-4 bg-slate-900 hover:bg-slate-800 text-white rounded-lg font-semibold text-sm transition-colors flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
             >
               {loading ? (
@@ -263,13 +313,40 @@ export default function RadarPage() {
           </div>
         </div>
 
-        {/* Filters and Quick Selects */}
-        <div className="flex items-center justify-between flex-wrap gap-2 pt-1 border-t border-slate-100 text-xs text-slate-500">
+        {/* AI Suggested Roles from CV Analysis */}
+        {suggestedRoles.length > 0 && (
+          <div className="flex items-center gap-2 flex-wrap pt-2 border-t border-slate-100 text-xs">
+            <span className="font-semibold text-indigo-800 flex items-center gap-1.5 bg-indigo-50/90 px-2.5 py-1 rounded-md border border-indigo-200/70">
+              <Sparkles className="h-3.5 w-3.5 text-indigo-600" />
+              <span>{detectedDomain ? `Target Roles (${detectedDomain}):` : 'AI Suggested Roles:'}</span>
+            </span>
+            {suggestedRoles.map((tag) => (
+              <button
+                key={tag}
+                type="button"
+                onClick={() => {
+                  setRoleQuery(tag);
+                  fetchRadarJobs(tag, locationQuery, remoteOnly);
+                }}
+                className={`px-2.5 py-1 rounded-md text-xs font-medium border transition-colors cursor-pointer ${
+                  roleQuery.toLowerCase() === tag.toLowerCase()
+                    ? 'bg-indigo-600 text-white border-indigo-600 font-bold shadow-xs'
+                    : 'bg-white hover:bg-slate-50 text-slate-700 border-slate-200'
+                }`}
+              >
+                {tag}
+              </button>
+            ))}
+          </div>
+        )}
+
+        {/* Quick Roles & Remote Toggle */}
+        <div className="flex items-center justify-between flex-wrap gap-2 pt-2 border-t border-slate-100 text-xs text-slate-500">
           <div className="flex items-center gap-2 flex-wrap">
             <span className="font-semibold text-slate-700 flex items-center gap-1">
               <Filter className="h-3 w-3" /> Quick Roles:
             </span>
-            {['Product Manager', 'Operations Director', 'Engineering Lead', 'Strategy Lead'].map((tag) => (
+            {['Product Manager', 'Operations Director', 'Sales Director', 'Patent & IP Counsel', 'Finance Director'].map((tag) => (
               <button
                 key={tag}
                 type="button"
