@@ -49,7 +49,7 @@ export default function Home() {
   }, []);
 
   return (
-    <div className="max-w-5xl mx-auto space-y-8">
+    <div className="max-w-6xl w-full mx-auto space-y-8">
       {/* Welcome Banner */}
       <div className="bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white rounded-2xl p-8 shadow-md relative overflow-hidden">
         <div className="absolute right-0 bottom-0 opacity-10 pointer-events-none">
