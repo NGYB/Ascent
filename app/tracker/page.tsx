@@ -56,8 +56,7 @@ export default function TrackerPage() {
   const [newRejectedStage, setNewRejectedStage] = useState<'APPLIED' | 'INTERVIEWING' | 'OFFER'>('APPLIED');
   const [selectedResume, setSelectedResume] = useState('');
 
-  useEffect(() => {
-    // Load from local storage
+  const loadTrackerData = () => {
     try {
       const savedApps = JSON.parse(localStorage.getItem('ascent_applications') || '[]');
       setApps(savedApps);
@@ -65,6 +64,12 @@ export default function TrackerPage() {
       const savedResumes = JSON.parse(localStorage.getItem('ascent_tailored_resumes') || '[]');
       setTailoredResumes(savedResumes);
     } catch {}
+  };
+
+  useEffect(() => {
+    loadTrackerData();
+    window.addEventListener('ascent-storage-cleared', loadTrackerData);
+    return () => window.removeEventListener('ascent-storage-cleared', loadTrackerData);
   }, []);
 
   const saveApps = (newApps: Application[]) => {

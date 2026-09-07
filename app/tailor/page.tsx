@@ -179,15 +179,17 @@ export default function TailorPage() {
   const [saved, setSaved] = useState(false);
   const [historyList, setHistoryList] = useState<any[]>([]);
 
-  // Load master resume text and history on mount
-  useEffect(() => {
+  const loadStoredTailorData = () => {
     const savedResume = localStorage.getItem('ascent_master_resume');
-    if (savedResume) {
-      setResumeText(savedResume);
-    }
+    setResumeText(savedResume || '');
 
     const list = JSON.parse(localStorage.getItem('ascent_tailored_resumes') || '[]');
     setHistoryList(list);
+  };
+
+  // Load master resume text and history on mount
+  useEffect(() => {
+    loadStoredTailorData();
 
     // Check if imported from Smart Job Radar
     try {
@@ -200,6 +202,9 @@ export default function TailorPage() {
         sessionStorage.removeItem('ascent_import_job');
       }
     } catch {}
+
+    window.addEventListener('ascent-storage-cleared', loadStoredTailorData);
+    return () => window.removeEventListener('ascent-storage-cleared', loadStoredTailorData);
   }, []);
 
   const handleTailor = async (e: React.FormEvent) => {

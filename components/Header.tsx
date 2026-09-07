@@ -1,12 +1,15 @@
 'use client';
 
+import { useState } from 'react';
 import { usePathname } from 'next/navigation';
-import { UserCheck, PanelLeftClose, PanelLeftOpen } from 'lucide-react';
+import { UserCheck, PanelLeftClose, PanelLeftOpen, HardDrive } from 'lucide-react';
 import { useSidebar } from '@/context/SidebarContext';
+import StorageManagerModal from '@/components/StorageManagerModal';
 
 export default function Header() {
   const pathname = usePathname();
   const { isCollapsed, toggleCollapse } = useSidebar();
+  const [isStorageModalOpen, setIsStorageModalOpen] = useState(false);
 
   // Map pathnames to clean titles
   const getTitle = () => {
@@ -49,10 +52,25 @@ export default function Header() {
       </div>
 
       <div className="flex items-center gap-3">
+        <button
+          type="button"
+          onClick={() => setIsStorageModalOpen(true)}
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600 hover:text-indigo-600 bg-slate-50 hover:bg-indigo-50/70 border border-slate-200 hover:border-indigo-200 transition-all cursor-pointer shadow-2xs group"
+          title="Manage locally stored data & privacy"
+        >
+          <HardDrive className="h-3.5 w-3.5 text-slate-500 group-hover:text-indigo-600 transition-colors" />
+          <span>Storage</span>
+        </button>
+
         <span className="hidden lg:inline-block text-[11px] text-slate-400 font-medium">
           Press <kbd className="px-1.5 py-0.5 bg-slate-100 border border-slate-200 rounded text-slate-500 text-[10px] font-mono">⌘B</kbd> to toggle panel
         </span>
       </div>
+
+      <StorageManagerModal 
+        isOpen={isStorageModalOpen} 
+        onClose={() => setIsStorageModalOpen(false)} 
+      />
     </header>
   );
 }

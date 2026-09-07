@@ -21,7 +21,8 @@ import {
   Clock,
   Trash2,
   History,
-  Eye
+  Eye,
+  HardDrive
 } from 'lucide-react';
 
 interface TailoredResumeItem {
@@ -102,13 +103,15 @@ export default function InterviewPage() {
   const [copiedAnswer, setCopiedAnswer] = useState(false);
   const [sessionSavedNotice, setSessionSavedNotice] = useState(false);
 
-  useEffect(() => {
+  const loadStoredData = () => {
     try {
       // 1. Load tailored resumes from localStorage
       const list: TailoredResumeItem[] = JSON.parse(localStorage.getItem('ascent_tailored_resumes') || '[]');
       setTailoredList(list);
       if (list.length > 0) {
-        setSelectedResumeId(list[0].id);
+        setSelectedResumeId(prev => prev || list[0].id);
+      } else {
+        setSelectedResumeId('');
       }
 
       // 2. Load ongoing session if exists
@@ -117,7 +120,11 @@ export default function InterviewPage() {
         const parsed: InterviewSession = JSON.parse(saved);
         if (parsed && parsed.questions && parsed.questions.length > 0) {
           setSavedSession(parsed);
+        } else {
+          setSavedSession(null);
         }
+      } else {
+        setSavedSession(null);
       }
 
       // 3. Load completed session history
@@ -126,6 +133,12 @@ export default function InterviewPage() {
     } catch (err) {
       console.error('Error loading stored interview data:', err);
     }
+  };
+
+  useEffect(() => {
+    loadStoredData();
+    window.addEventListener('ascent-storage-cleared', loadStoredData);
+    return () => window.removeEventListener('ascent-storage-cleared', loadStoredData);
   }, []);
 
   // Sync jobDescription with the selected profile
@@ -591,9 +604,25 @@ export default function InterviewPage() {
           {/* Past Completed Sessions Drawer */}
           {pastSessions.length > 0 && (
             <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-3">
-              <div className="flex items-center gap-2 text-xs font-bold text-slate-700 uppercase tracking-wider">
-                <History className="h-4 w-4 text-indigo-600" />
-                <span>Previous Practice Sessions ({pastSessions.length})</span>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2 text-xs font-bold text-slate-700 uppercase tracking-wider">
+                  <History className="h-4 w-4 text-indigo-600" />
+                  <span>Previous Practice Sessions ({pastSessions.length})</span>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (confirm('Delete all past completed interview sessions? This action cannot be undone.')) {
+                      localStorage.removeItem('ascent_interview_history');
+                      setPastSessions([]);
+                    }
+                  }}
+                  className="text-[11px] font-semibold text-slate-400 hover:text-rose-600 flex items-center gap-1 transition-colors cursor-pointer"
+                  title="Clear past practice history"
+                >
+                  <Trash2 className="h-3 w-3" />
+                  <span>Clear All History</span>
+                </button>
               </div>
               <div className="divide-y divide-slate-100">
                 {pastSessions.map((session) => (
@@ -610,32 +639,79 @@ export default function InterviewPage() {
                         <span>{session.totalQuestions} questions</span>
                       </div>
                     </div>
-                    <button
-                      type="button"
-                      onClick={() => handleResumeSession({
-                        id: session.id,
-                        selectedResumeId: '',
-                        jobTitle: session.jobTitle,
-                        company: session.company,
-                        jobDescription: '',
-                        questions: session.questions,
-                        currentIndex: 0,
-                        feedbacks: session.feedbacks,
-                        userAnswers: session.userAnswers,
-                        started: true,
-                        isDone: true,
-                        updatedAt: session.completedAt
-                      })}
-                      className="px-3 py-1.5 bg-slate-50 hover:bg-indigo-50 text-slate-700 hover:text-indigo-700 border border-slate-200 hover:border-indigo-200 text-xs font-bold rounded-lg transition-colors flex items-center gap-1.5 cursor-pointer"
-                    >
-                      <Eye className="h-3.5 w-3.5" />
-                      <span>Review</span>
-                    </button>
+                    <div className="flex items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={() => handleResumeSession({
+                          id: session.id,
+                          selectedResumeId: '',
+                          jobTitle: session.jobTitle,
+                          company: session.company,
+                          jobDescription: '',
+                          questions: session.questions,
+                          currentIndex: 0,
+                          feedbacks: session.feedbacks,
+                          userAnswers: session.userAnswers,
+                          started: true,
+                          isDone: true,
+                          updatedAt: session.completedAt
+                        })}
+                        className="px-3 py-1.5 bg-slate-50 hover:bg-indigo-50 text-slate-700 hover:text-indigo-700 border border-slate-200 hover:border-indigo-200 text-xs font-bold rounded-lg transition-colors flex items-center gap-1.5 cursor-pointer"
+                      >
+                        <Eye className="h-3.5 w-3.5" />
+                        <span>Review</span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          if (confirm(`Delete this session for ${session.jobTitle}?`)) {
+                            const updated = pastSessions.filter(s => s.id !== session.id);
+                            localStorage.setItem('ascent_interview_history', JSON.stringify(updated));
+                            setPastSessions(updated);
+                          }
+                        }}
+                        className="p-1.5 text-slate-400 hover:text-rose-600 rounded-lg hover:bg-rose-50 transition-colors cursor-pointer"
+                        title="Delete this session"
+                      >
+                        <Trash2 className="h-3.5 w-3.5" />
+                      </button>
+                    </div>
                   </div>
                 ))}
               </div>
             </div>
           )}
+
+          {/* Local Storage Quick Control Bar */}
+          <div className="flex items-center justify-between text-xs text-slate-400 px-2 py-1">
+            <span className="flex items-center gap-1.5">
+              <HardDrive className="h-3.5 w-3.5 text-slate-400" />
+              <span>Interview data is kept in your private browser storage</span>
+            </span>
+            {(savedSession || pastSessions.length > 0) && (
+              <button
+                type="button"
+                onClick={() => {
+                  if (confirm('Delete all active and past interview prep data from this browser?')) {
+                    localStorage.removeItem('ascent_interview_session');
+                    localStorage.removeItem('ascent_interview_history');
+                    setSavedSession(null);
+                    setPastSessions([]);
+                    setStarted(false);
+                    setIsDone(false);
+                    setQuestions([]);
+                    setCurrentIndex(0);
+                    setFeedbacks({});
+                    setUserAnswers({});
+                    setUserAnswer('');
+                  }
+                }}
+                className="font-semibold text-slate-400 hover:text-rose-600 transition-colors cursor-pointer underline"
+              >
+                Clear Interview Storage
+              </button>
+            )}
+          </div>
         </div>
       ) : isDone ? (
         /* Final Scorecard Screen */

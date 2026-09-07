@@ -12,16 +12,18 @@ export default function CVPage() {
   const [resumeName, setResumeName] = useState('');
   const [isEditing, setIsEditing] = useState(false);
 
-  // Load from localStorage on mount
-  useEffect(() => {
+  const loadStoredCV = () => {
     const savedText = localStorage.getItem('ascent_master_resume');
     const savedName = localStorage.getItem('ascent_resume_name');
-    if (savedText) {
-      setResumeText(savedText);
-    }
-    if (savedName) {
-      setResumeName(savedName);
-    }
+    setResumeText(savedText || '');
+    setResumeName(savedName || '');
+  };
+
+  // Load from localStorage on mount
+  useEffect(() => {
+    loadStoredCV();
+    window.addEventListener('ascent-storage-cleared', loadStoredCV);
+    return () => window.removeEventListener('ascent-storage-cleared', loadStoredCV);
   }, []);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
