@@ -339,17 +339,17 @@ export default function StorageManagerModal({ isOpen, onClose, onStorageCleared 
                 <div>
                   <strong className="text-slate-800">Google Chrome / Microsoft Edge:</strong>
                   <p className="mt-0.5">
-                    1. Press <kbd className="px-1.5 py-0.5 bg-slate-100 border border-slate-200 rounded font-mono text-[10px]">F12</kbd> (or Right-Click $\rightarrow$ <em>Inspect</em>).<br/>
+                    1. Press <kbd className="px-1.5 py-0.5 bg-slate-100 border border-slate-200 rounded font-mono text-[10px]">F12</kbd> (or Right-Click → <em>Inspect</em>).<br/>
                     2. Switch to the <strong>Application</strong> tab at the top.<br/>
-                    3. Expand <strong>Storage</strong> $\rightarrow$ <strong>Local Storage</strong> on the left panel.<br/>
-                    4. Click on your Ascent website URL, then right-click $\rightarrow$ <strong>Clear</strong>, or click the clear icon (<Trash2 className="h-3 w-3 inline" />).
+                    3. Expand <strong>Storage</strong> → <strong>Local Storage</strong> on the left panel.<br/>
+                    4. Click on your Ascent website URL, then right-click → <strong>Clear</strong>, or click the clear icon (<Trash2 className="h-3 w-3 inline text-slate-500" />).
                   </p>
                 </div>
 
                 <div>
                   <strong className="text-slate-800">Apple Safari (Mac):</strong>
                   <p className="mt-0.5">
-                    1. Open Safari $\rightarrow$ <strong>Settings (or Preferences)</strong> $\rightarrow$ <strong>Privacy</strong> tab.<br/>
+                    1. Open Safari → <strong>Settings (or Preferences)</strong> → <strong>Privacy</strong> tab.<br/>
                     2. Click <strong>Manage Website Data...</strong><br/>
                     3. Search for your domain or Vercel URL, select it, and click <strong>Remove</strong>.
                   </p>
@@ -358,8 +358,8 @@ export default function StorageManagerModal({ isOpen, onClose, onStorageCleared 
                 <div>
                   <strong className="text-slate-800">Mozilla Firefox:</strong>
                   <p className="mt-0.5">
-                    1. Press <kbd className="px-1.5 py-0.5 bg-slate-100 border border-slate-200 rounded font-mono text-[10px]">F12</kbd> $\rightarrow$ select the <strong>Storage</strong> tab.<br/>
-                    2. Expand <strong>Local Storage</strong> $\rightarrow$ right-click your domain and select <strong>Delete All</strong>.
+                    1. Press <kbd className="px-1.5 py-0.5 bg-slate-100 border border-slate-200 rounded font-mono text-[10px]">F12</kbd> → select the <strong>Storage</strong> tab.<br/>
+                    2. Expand <strong>Local Storage</strong> → right-click your domain and select <strong>Delete All</strong>.
                   </p>
                 </div>
               </div>
