@@ -58,7 +58,7 @@ SERPAPI_API_KEY="your_serpapi_api_key_here"
 RESEND_API_KEY="re_your_resend_api_key_here"
 
 # 5. RECIPIENT EMAIL FOR FEEDBACK
-FEEDBACK_RECIPIENT_EMAIL="ngyibin@gmail.com"
+FEEDBACK_RECIPIENT_EMAIL="your_email@example.com"
 ```
 
 ---

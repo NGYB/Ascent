@@ -24,7 +24,15 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const recipient = process.env.FEEDBACK_RECIPIENT_EMAIL?.trim() || 'ngyibin@gmail.com';
+    const recipient = process.env.FEEDBACK_RECIPIENT_EMAIL?.trim();
+    if (!recipient) {
+      return NextResponse.json(
+        { 
+          error: 'Feedback delivery is temporarily unavailable because FEEDBACK_RECIPIENT_EMAIL is not configured yet in .env.' 
+        },
+        { status: 503 }
+      );
+    }
     const cleanType = ['bug', 'feature', 'general'].includes(feedbackType) ? feedbackType : 'general';
     const cleanMessage = message.trim();
     const cleanUserEmail = (typeof userEmail === 'string' && userEmail.trim().includes('@')) ? userEmail.trim() : null;
