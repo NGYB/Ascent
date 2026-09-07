@@ -2,14 +2,16 @@
 
 import { useState } from 'react';
 import { usePathname } from 'next/navigation';
-import { UserCheck, PanelLeftClose, PanelLeftOpen, HardDrive } from 'lucide-react';
+import { UserCheck, PanelLeftClose, PanelLeftOpen, HardDrive, MessageSquarePlus } from 'lucide-react';
 import { useSidebar } from '@/context/SidebarContext';
 import StorageManagerModal from '@/components/StorageManagerModal';
+import FeedbackModal from '@/components/FeedbackModal';
 
 export default function Header() {
   const pathname = usePathname();
   const { isCollapsed, toggleCollapse } = useSidebar();
   const [isStorageModalOpen, setIsStorageModalOpen] = useState(false);
+  const [isFeedbackModalOpen, setIsFeedbackModalOpen] = useState(false);
 
   // Map pathnames to clean titles
   const getTitle = () => {
@@ -51,7 +53,19 @@ export default function Header() {
         </div>
       </div>
 
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-2 sm:gap-3">
+        {/* Feedback Button */}
+        <button
+          type="button"
+          onClick={() => setIsFeedbackModalOpen(true)}
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600 hover:text-indigo-600 bg-slate-50 hover:bg-indigo-50/70 border border-slate-200 hover:border-indigo-200 transition-all cursor-pointer shadow-2xs group"
+          title="Share feedback or report an issue"
+        >
+          <MessageSquarePlus className="h-3.5 w-3.5 text-slate-500 group-hover:text-indigo-600 transition-colors" />
+          <span>Feedback</span>
+        </button>
+
+        {/* Storage Manager Button */}
         <button
           type="button"
           onClick={() => setIsStorageModalOpen(true)}
@@ -70,6 +84,11 @@ export default function Header() {
       <StorageManagerModal 
         isOpen={isStorageModalOpen} 
         onClose={() => setIsStorageModalOpen(false)} 
+      />
+
+      <FeedbackModal
+        isOpen={isFeedbackModalOpen}
+        onClose={() => setIsFeedbackModalOpen(false)}
       />
     </header>
   );
