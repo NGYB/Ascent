@@ -1,40 +1,110 @@
-# Ascent
+# Ascent — AI Career Accelerator & Job Acquisition Platform
 
-Ascent is a privacy-first, client-side career accelerator that uses AI to tailor CVs for target roles, analyze ATS keyword compatibility, generate strategic career coach insights, and simulate customized mock interviews.
+Ascent is a privacy-first, client-side career accelerator built with Next.js, React, and Tailwind CSS. It empowers job seekers across all career disciplines to scan live market opportunities, tailor resumes with precision, deconstruct job requirements, practice AI-evaluated mock interviews, and manage application pipelines with interactive analytics.
 
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+---
+
+## Core Features
+
+- **CV Workspace**: Upload master resumes in PDF or plain text with dynamic client-side extraction.
+- **Smart Job Radar**: Real-time role discovery powered by SerpAPI and Google Jobs with domain-agnostic AI role matching (Product, Sales, IP & Patents, Operations, Finance, etc.).
+- **Tailoring & ATS Scorecard**:
+  - Context-aware resume tailoring for target roles.
+  - **Must-Have vs. Good-to-Have JD Deflator**: Separates rigid recruiter requirements from negotiable wishlists.
+  - Keyword density breakdown and transferable skills mapping.
+- **Mock Interview Room**:
+  - Auto-generated role-specific questions.
+  - STAR framework answer evaluations (Situation, Task, Action, Result).
+  - Formatted exemplar responses with section headers.
+  - Complete session persistence so candidates can pause and resume practice anytime.
+- **Job Tracker & Pipeline Analytics**: Visual Kanban pipeline with Sankey conversion flow tracking from applied to offer.
+- **Data & Storage Manager**: Client-side privacy-first architecture with live storage meters and 1-click granular deletion.
+- **In-App Feedback System**: Built-in modal sending bug reports and feature ideas directly to your inbox via Resend without exposing your email address.
+
+---
 
 ## Getting Started
 
-First, run the development server:
-
+### 1. Clone the Repository
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git clone https://github.com/NGYB/Ascent.git
+cd Ascent
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### 2. Configure Environment Variables & API Keys
+Ascent includes a template file with documented configuration settings. Copy the template to create your local `.env` file:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+cp .env.example .env
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Open the newly created `.env` file in your editor and populate the API keys:
 
-## Learn More
+```env
+# ==============================================================================
+# ASCENT PLATFORM CONFIGURATION & API KEYS
+# ==============================================================================
 
-To learn more about Next.js, take a look at the following resources:
+# 1. DATABASE CONNECTION
+DATABASE_URL="postgresql://postgres:postgres@localhost:5432/ascent?schema=public"
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+# 2. GOOGLE GEMINI AI (https://aistudio.google.com/)
+GEMINI_API_KEY="your_gemini_api_key_here"
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+# 3. SERPAPI GOOGLE JOBS ENGINE (https://serpapi.com/)
+SERPAPI_API_KEY="your_serpapi_api_key_here"
 
-## Deploy on Vercel
+# 4. RESEND EMAIL SERVICE (https://resend.com/)
+RESEND_API_KEY="re_your_resend_api_key_here"
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+# 5. RECIPIENT EMAIL FOR FEEDBACK
+FEEDBACK_RECIPIENT_EMAIL="ngyibin@gmail.com"
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+---
+
+## API Keys Overview
+
+| Variable | Provider / Signup | Purpose in Ascent |
+| :--- | :--- | :--- |
+| `GEMINI_API_KEY` | [Google AI Studio](https://aistudio.google.com/) *(Free)* | Powers all AI features: CV parsing, ATS scorecard analysis, JD Deflator, resume rewriting, mock interview evaluation, and role suggestions. |
+| `SERPAPI_API_KEY` | [SerpAPI](https://serpapi.com/) *(Free tier)* | Powers the **Smart Job Radar** by querying real-time Google Jobs listings based on title and location. |
+| `RESEND_API_KEY` | [Resend](https://resend.com/) *(Free tier: 3,000 emails/mo)* | Powers the in-app **Feedback Form** by securely dispatching user submissions to your inbox. |
+| `FEEDBACK_RECIPIENT_EMAIL` | Personal / Admin Email | Destination email for user feedback. Handled strictly on the server (`/api/feedback`) and **never exposed** to the client. |
+| `DATABASE_URL` | PostgreSQL | Connection string for Prisma ORM schema migrations and backend storage. |
+
+---
+
+### 3. Install Dependencies
+```bash
+npm install
+```
+
+### 4. Run the Development Server
+```bash
+npm run dev
+```
+
+Open [http://localhost:3000](http://localhost:3000) in your browser to view the application.
+
+---
+
+## Production Deployment (Vercel)
+
+1. Push your repository to GitHub.
+2. Import the repository into your [Vercel Dashboard](https://vercel.com).
+3. Under **Project Settings** $\rightarrow$ **Environment Variables**, add the keys defined in `.env`:
+   - `GEMINI_API_KEY`
+   - `SERPAPI_API_KEY`
+   - `RESEND_API_KEY`
+   - `FEEDBACK_RECIPIENT_EMAIL`
+   - `DATABASE_URL` (optional if using local database, or set to your hosted Postgres URL)
+4. Click **Deploy**. Vercel will automatically build and publish the app.
+
+---
+
+## Privacy Architecture
+
+- **Private by Design**: Master CVs, tailored resumes, interview transcripts, and application pipelines are saved locally in the candidate's browser (`localStorage`).
+- **No Third-Party Resume Retention**: Candidate resumes are never stored in external public databases.
+- **Data Deletion**: Users can inspect exact storage usage or wipe their data with one click using the built-in **Data & Storage Manager**.
