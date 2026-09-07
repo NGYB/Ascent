@@ -44,7 +44,35 @@ ${tailoredResumeText || 'N/A'}
 
 Evaluate the answer. Score it out of 100.
 Identify exactly what they did well (strengths) and specific areas of improvement (e.g. using the STAR method, adding metrics, clarifying scope).
-Provide a "suggestedAnswer" demonstrating how they could write a polished, professional, high-scoring response to this question utilizing their resume credentials where applicable.
+
+Provide a "suggestedAnswer" demonstrating how they could write a polished, professional, high-scoring exemplar response to this question utilizing their resume credentials where applicable.
+
+CRITICAL FORMATTING INSTRUCTIONS FOR "suggestedAnswer":
+- The response MUST be formatted in clean Markdown with clear section headers and separate, readable paragraphs. It must NEVER be output as a single unbroken wall or block of text.
+- If this is a behavioral or situational question, organize it into the STAR framework with markdown section headers:
+  ### Situation & Context
+  [Set the scene, background context, and specific challenge in 1-2 focused paragraphs]
+
+  ### Action Taken
+  [Detail the strategic actions, ownership, cross-functional collaboration, and technical/operational execution in 1-2 focused paragraphs]
+
+  ### Measurable Result & Impact
+  [Quantify business impact, metrics, efficiencies, revenue, or team outcomes achieved]
+
+  ### Key Strategic Takeaway
+  [1-2 concluding sentences highlighting leadership philosophy, learnings, or transferable value]
+
+- If this is a technical, domain, or strategic question, organize it logically with markdown section headers:
+  ### Core Strategy & Framework
+  [Conceptual foundation, principles, or approach in 1-2 focused paragraphs]
+
+  ### Practical Execution & Implementation
+  [Specific steps, tools, risk mitigation, and workflows in 1-2 focused paragraphs]
+
+  ### Impact & Business Trade-offs
+  [Long-term outcomes, governance, scalability, and measurable results]
+
+- Always use double line breaks (\n\n) between paragraphs and section headings to ensure clean visual spacing and readability.
 `;
 
     const response = await ai.models.generateContent({
@@ -68,7 +96,7 @@ Provide a "suggestedAnswer" demonstrating how they could write a polished, profe
             },
             suggestedAnswer: {
               type: Type.STRING,
-              description: 'An exemplar rewritten answer that demonstrates how to answer this question effectively using the candidate\'s background.'
+              description: 'An exemplar rewritten answer formatted in clean Markdown with distinct section headers (e.g. ### Situation & Context, ### Action Taken, ### Measurable Result & Impact) and separate paragraphs separated by double line breaks.'
             }
           },
           required: ['score', 'strengths', 'improvements', 'suggestedAnswer']
