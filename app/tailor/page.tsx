@@ -27,7 +27,8 @@ import {
   Info,
   HelpCircle,
   ChevronDown,
-  Building2
+  Building2,
+  ArrowUpDown
 } from 'lucide-react';
 
 interface TransferableSkill {
@@ -178,6 +179,28 @@ export default function TailorPage() {
   const [copied, setCopied] = useState(false);
   const [saved, setSaved] = useState(false);
   const [historyList, setHistoryList] = useState<any[]>([]);
+  type HistorySortOption = 'date-desc' | 'date-asc' | 'score-desc' | 'score-asc';
+  const [historySortBy, setHistorySortBy] = useState<HistorySortOption>('date-desc');
+
+  const sortedHistoryList = [...historyList].sort((a, b) => {
+    if (historySortBy === 'date-desc') {
+      return new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime();
+    }
+    if (historySortBy === 'date-asc') {
+      return new Date(a.createdAt || 0).getTime() - new Date(b.createdAt || 0).getTime();
+    }
+    if (historySortBy === 'score-desc') {
+      const scoreA = a.coachFeedback?.alignmentScore ?? a.atsAnalysis?.afterScore ?? 0;
+      const scoreB = b.coachFeedback?.alignmentScore ?? b.atsAnalysis?.afterScore ?? 0;
+      return scoreB - scoreA;
+    }
+    if (historySortBy === 'score-asc') {
+      const scoreA = a.coachFeedback?.alignmentScore ?? a.atsAnalysis?.afterScore ?? 0;
+      const scoreB = b.coachFeedback?.alignmentScore ?? b.atsAnalysis?.afterScore ?? 0;
+      return scoreA - scoreB;
+    }
+    return 0;
+  });
 
   const loadStoredTailorData = () => {
     const savedResume = localStorage.getItem('ascent_master_resume');
@@ -1156,20 +1179,42 @@ export default function TailorPage() {
 
       {/* Full-Width Tailoring History Panel */}
       <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-4 animate-in fade-in duration-300">
-        <div className="flex items-center justify-between border-b border-slate-100 pb-3">
-          <h3 className="font-bold text-slate-805 text-sm uppercase tracking-wider">
-            Tailoring History
-          </h3>
-          <span className="px-2.5 py-0.5 rounded-full text-sm bg-indigo-50 text-indigo-700 font-bold border border-indigo-100">
-            {historyList.length}
-          </span>
+        <div className="flex items-center justify-between border-b border-slate-100 pb-3 flex-wrap gap-3">
+          <div className="flex items-center gap-2.5">
+            <h3 className="font-bold text-slate-800 text-sm uppercase tracking-wider">
+              Tailoring History
+            </h3>
+            <span className="px-2.5 py-0.5 rounded-full text-xs bg-indigo-50 text-indigo-700 font-bold border border-indigo-100">
+              {historyList.length}
+            </span>
+          </div>
+
+          {historyList.length > 0 && (
+            <div className="flex items-center gap-2">
+              <label htmlFor="history-sort" className="text-xs text-slate-500 font-medium flex items-center gap-1.5">
+                <ArrowUpDown className="h-3.5 w-3.5 text-indigo-600" />
+                <span className="hidden sm:inline">Sort by:</span>
+              </label>
+              <select
+                id="history-sort"
+                value={historySortBy}
+                onChange={(e) => setHistorySortBy(e.target.value as HistorySortOption)}
+                className="text-xs font-semibold text-slate-700 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-lg px-2.5 py-1.5 focus:ring-2 focus:ring-indigo-500 outline-none cursor-pointer transition-colors shadow-2xs"
+              >
+                <option value="date-desc">Date: Newest first</option>
+                <option value="date-asc">Date: Oldest first</option>
+                <option value="score-desc">Fit Score: Highest first</option>
+                <option value="score-asc">Fit Score: Lowest first</option>
+              </select>
+            </div>
+          )}
         </div>
 
         {historyList.length === 0 ? (
           <p className="text-sm text-slate-400 italic">No past versions tailored yet.</p>
         ) : (
           <div className="flex flex-col gap-2 max-h-[400px] overflow-y-auto pr-1">
-            {historyList.map((item) => {
+            {sortedHistoryList.map((item) => {
               const isCurrent = result?.id === item.id;
               return (
                 <div
@@ -1197,7 +1242,7 @@ export default function TailorPage() {
                     </div>
                     <div className="flex items-center gap-4 text-xs flex-shrink-0">
                       <span className="text-slate-500 font-medium">
-                        Fit Score: <span className="font-extrabold text-indigo-600">{item.coachFeedback?.alignmentScore ?? 0}%</span>
+                        Fit Score: <span className="font-extrabold text-indigo-600">{item.coachFeedback?.alignmentScore ?? item.atsAnalysis?.afterScore ?? 0}%</span>
                       </span>
                       <span className="text-slate-350 hidden sm:inline">•</span>
                       <span className="text-slate-400">
