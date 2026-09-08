@@ -123,7 +123,7 @@ export default function TrackerPage() {
         if (a.id !== id) return a;
         let rejStage = a.rejectedFromStage;
         if (nextStatus === 'REJECTED' && !rejStage) {
-          rejStage = (a.status === 'INTERVIEWING' || a.status === 'OFFER') ? a.status : 'APPLIED';
+          rejStage = (a.status === 'INTERVIEWING' || a.status === 'OFFER') ? 'INTERVIEWING' : 'APPLIED';
         }
         return {
           ...a,
@@ -141,7 +141,7 @@ export default function TrackerPage() {
       if (a.id !== id) return a;
       let rejStage = explicitRejectionStage || a.rejectedFromStage;
       if (newStatus === 'REJECTED' && !rejStage) {
-        rejStage = (a.status === 'INTERVIEWING' || a.status === 'OFFER') ? a.status : 'APPLIED';
+        rejStage = (a.status === 'INTERVIEWING' || a.status === 'OFFER') ? 'INTERVIEWING' : 'APPLIED';
       }
       return {
         ...a,
@@ -242,51 +242,40 @@ export default function TrackerPage() {
                           <div className="bg-slate-50 border border-slate-200/80 rounded-lg p-2 space-y-1.5">
                             <div className="flex items-center justify-between">
                               <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">
-                                Rejected at:
+                                Rejection stage:
                               </span>
                               <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded ${
                                 (app.rejectedFromStage === 'APPLIED' || !app.rejectedFromStage)
                                   ? 'bg-amber-100 text-amber-800'
-                                  : app.rejectedFromStage === 'INTERVIEWING'
-                                  ? 'bg-blue-100 text-blue-800'
-                                  : 'bg-emerald-100 text-emerald-800'
+                                  : 'bg-rose-100 text-rose-800'
                               }`}>
-                                {(app.rejectedFromStage === 'APPLIED' || !app.rejectedFromStage) ? 'Screening' : app.rejectedFromStage === 'INTERVIEWING' ? 'Interview' : 'Offer'}
+                                {(app.rejectedFromStage === 'APPLIED' || !app.rejectedFromStage) ? 'Rejected after applied' : 'Rejected after interviewing'}
                               </span>
                             </div>
-                            <div className="grid grid-cols-3 gap-1">
+                            <div className="grid grid-cols-2 gap-1.5">
                               <button
                                 type="button"
                                 onClick={() => handleSetRejectedStage(app.id, 'APPLIED')}
-                                className={`px-1 py-1 text-[9px] font-semibold rounded text-center transition-all ${
+                                className={`px-2 py-1 text-[10px] font-semibold rounded text-center transition-all ${
                                   (app.rejectedFromStage === 'APPLIED' || !app.rejectedFromStage)
                                     ? 'bg-amber-500 text-white shadow-xs font-bold'
                                     : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200'
                                 }`}
+                                title="Mark as rejected after applied"
                               >
-                                Screening
+                                After applied
                               </button>
                               <button
                                 type="button"
                                 onClick={() => handleSetRejectedStage(app.id, 'INTERVIEWING')}
-                                className={`px-1 py-1 text-[9px] font-semibold rounded text-center transition-all ${
-                                  app.rejectedFromStage === 'INTERVIEWING'
-                                    ? 'bg-blue-600 text-white shadow-xs font-bold'
+                                className={`px-2 py-1 text-[10px] font-semibold rounded text-center transition-all ${
+                                  (app.rejectedFromStage === 'INTERVIEWING' || app.rejectedFromStage === 'OFFER')
+                                    ? 'bg-rose-600 text-white shadow-xs font-bold'
                                     : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200'
                                 }`}
+                                title="Mark as rejected after interviewing"
                               >
-                                Interview
-                              </button>
-                              <button
-                                type="button"
-                                onClick={() => handleSetRejectedStage(app.id, 'OFFER')}
-                                className={`px-1 py-1 text-[9px] font-semibold rounded text-center transition-all ${
-                                  app.rejectedFromStage === 'OFFER'
-                                    ? 'bg-emerald-600 text-white shadow-xs font-bold'
-                                    : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200'
-                                }`}
-                              >
-                                Offer
+                                After interviewing
                               </button>
                             </div>
                           </div>
@@ -416,17 +405,16 @@ export default function TrackerPage() {
 
               {newStatus === 'REJECTED' && (
                 <div className="space-y-1 bg-slate-50 p-3 rounded-lg border border-slate-200">
-                  <label className="text-xs font-bold text-slate-700">Rejected at Stage</label>
+                  <label className="text-xs font-bold text-slate-700">Rejection Stage</label>
                   <select
-                    value={newRejectedStage}
-                    onChange={(e) => setNewRejectedStage(e.target.value as 'APPLIED' | 'INTERVIEWING' | 'OFFER')}
+                    value={newRejectedStage === 'OFFER' ? 'INTERVIEWING' : newRejectedStage}
+                    onChange={(e) => setNewRejectedStage(e.target.value as 'APPLIED' | 'INTERVIEWING')}
                     className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm bg-white focus:ring-2 focus:ring-indigo-500 outline-none cursor-pointer"
                   >
-                    <option value="APPLIED">Screening / Resume</option>
-                    <option value="INTERVIEWING">Interview Stage</option>
-                    <option value="OFFER">Offer Stage</option>
+                    <option value="APPLIED">Rejected after applied</option>
+                    <option value="INTERVIEWING">Rejected after interviewing</option>
                   </select>
-                  <p className="text-[11px] text-slate-400">Specifies at which funnel step the application was archived.</p>
+                  <p className="text-[11px] text-slate-400">Specifies whether rejection occurred after application or after interviewing.</p>
                 </div>
               )}
 

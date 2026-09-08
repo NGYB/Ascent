@@ -27,20 +27,25 @@ export default function SankeyChart({ apps }: SankeyChartProps) {
   const cInterviewing = activeApps.filter((a) => a.status === 'INTERVIEWING').length;
   const cOffer = activeApps.filter((a) => a.status === 'OFFER').length;
 
-  // Breakdown of rejections by origin stage
-  const cRejectedScreen = activeApps.filter(
+  // Breakdown of rejections by origin stage:
+  // 1. Rejected after applied
+  const cRejectedApplied = activeApps.filter(
     (a) => a.status === 'REJECTED' && (a.rejectedFromStage === 'APPLIED' || !a.rejectedFromStage)
   ).length;
+
+  // 2. Rejected after interviewing (includes any offer-stage rejections)
   const cRejectedInterview = activeApps.filter(
     (a) => a.status === 'REJECTED' && a.rejectedFromStage === 'INTERVIEWING'
   ).length;
   const cRejectedOffer = activeApps.filter(
     (a) => a.status === 'REJECTED' && a.rejectedFromStage === 'OFFER'
   ).length;
-  const totalRejected = cRejectedScreen + cRejectedInterview + cRejectedOffer;
 
-  const totalInterviewStage = cInterviewing + cOffer + cRejectedInterview + cRejectedOffer;
-  const totalApplied = cApplied + totalInterviewStage + cRejectedScreen;
+  const totalRejectedInterview = cRejectedInterview + cRejectedOffer;
+  const totalRejected = cRejectedApplied + totalRejectedInterview;
+
+  const totalInterviewStage = cInterviewing + cOffer + totalRejectedInterview;
+  const totalApplied = cApplied + totalInterviewStage + cRejectedApplied;
 
   const hasRealData = totalApplied > 0;
   const isSample = !hasRealData && showSample;
@@ -52,36 +57,41 @@ export default function SankeyChart({ apps }: SankeyChartProps) {
   const interviewActive = isSample ? 2 : cInterviewing;
   const offerActive = isSample ? 2 : cOffer;
   const offerTotal = isSample ? 2 : (cOffer + cRejectedOffer);
-  const rejScreen = isSample ? 3 : cRejectedScreen;
-  const rejInterview = isSample ? 1 : cRejectedInterview;
+  const rejApplied = isSample ? 3 : cRejectedApplied;
+  const rejInterviewOnly = isSample ? 1 : cRejectedInterview;
   const rejOffer = isSample ? 0 : cRejectedOffer;
-  const rejTotal = isSample ? 4 : totalRejected;
+  const rejInterviewTotal = isSample ? 1 : totalRejectedInterview;
 
   // Flow Math setup
-  const height = 230;
-  const width = 910;
+  const height = 300;
+  const width = 980;
   const topPadding = 28;
-  const bottomPadding = 35;
+  const bottomPadding = 32;
   const nodeWidth = 14;
 
-  const scale = (height - topPadding - bottomPadding) / Math.max(1, effectiveTotal);
+  const totalActive = Math.max(1, effectiveTotal);
+  const scale = (height - topPadding - bottomPadding) / Math.max(totalActive * 1.25, 8);
 
   // Node heights
-  const hApplied = Math.max(effectiveTotal * scale, effectiveTotal > 0 ? 12 : 8);
-  const hInterviewing = Math.max(interviewTotal * scale, interviewTotal > 0 ? 12 : 8);
-  const hOffers = Math.max(offerTotal * scale, offerTotal > 0 ? 12 : 8);
-  const hRejected = Math.max(rejTotal * scale, rejTotal > 0 ? 12 : 8);
+  const hApplied = Math.max(effectiveTotal * scale, effectiveTotal > 0 ? 14 : 8);
+  const hInterviewing = Math.max(interviewTotal * scale, interviewTotal > 0 ? 14 : 8);
+  const hOffers = Math.max(offerTotal * scale, offerTotal > 0 ? 14 : 8);
+  const hRejInterview = Math.max(rejInterviewTotal * scale, rejInterviewTotal > 0 ? 14 : 8);
+  const hRejApplied = Math.max(rejApplied * scale, rejApplied > 0 ? 14 : 8);
 
-  // Node positions with ample margin on both sides to prevent text clipping
+  // Node positions
   const xApplied = 140;
   const xInterviewing = 385;
-  const xOffers = 590;
+  const xOffers = 610;
   const xRejected = 750;
 
   const yApplied = topPadding;
-  const yInterviewing = topPadding + (effectiveTotal - Math.max(1, interviewTotal)) * scale * 0.25;
-  const yOffers = topPadding + (effectiveTotal - Math.max(1, offerTotal)) * scale * 0.35;
-  const yRejected = topPadding + (effectiveTotal - Math.max(1, rejTotal)) * scale * 0.85;
+  const yInterviewing = topPadding + (appliedActive * scale * 0.3);
+  const yOffers = yInterviewing + (interviewActive * scale * 0.3);
+
+  // Staggered rejection stages to ensure completely separate, non-overlapping paths
+  const yRejInterview = Math.max(yOffers + hOffers + 28, topPadding + hApplied * 0.55);
+  const yRejApplied = yRejInterview + Math.max(hRejInterview, 24) + 26;
 
   // Helper to generate SVG cubic Bezier path between two points
   const getSankeyPath = (x1: number, y1: number, x2: number, y2: number) => {
@@ -95,7 +105,7 @@ export default function SankeyChart({ apps }: SankeyChartProps) {
         <div>
           <h3 className="font-bold text-slate-800 text-base">Application Funnel (Sankey Flow)</h3>
           <p className="text-xs text-slate-500 leading-relaxed">
-            Visualizing status progression from initial application to interviews, offers, and archive.
+            Visualizing status progression from initial application to interviews, offers, and rejections.
           </p>
         </div>
         
@@ -155,8 +165,8 @@ export default function SankeyChart({ apps }: SankeyChartProps) {
                 <stop offset="100%" stopColor="#6366f1" stopOpacity="0.3" />
               </linearGradient>
               <linearGradient id="applied-to-rejected" x1="0" y1="0" x2="1" y2="0">
-                <stop offset="0%" stopColor="#3b82f6" stopOpacity="0.2" />
-                <stop offset="100%" stopColor="#f43f5e" stopOpacity="0.2" />
+                <stop offset="0%" stopColor="#3b82f6" stopOpacity="0.25" />
+                <stop offset="100%" stopColor="#f43f5e" stopOpacity="0.25" />
               </linearGradient>
               <linearGradient id="interviewing-to-offers" x1="0" y1="0" x2="1" y2="0">
                 <stop offset="0%" stopColor="#6366f1" stopOpacity="0.35" />
@@ -164,11 +174,11 @@ export default function SankeyChart({ apps }: SankeyChartProps) {
               </linearGradient>
               <linearGradient id="interviewing-to-rejected" x1="0" y1="0" x2="1" y2="0">
                 <stop offset="0%" stopColor="#6366f1" stopOpacity="0.25" />
-                <stop offset="100%" stopColor="#f43f5e" stopOpacity="0.25" />
+                <stop offset="100%" stopColor="#e11d48" stopOpacity="0.25" />
               </linearGradient>
               <linearGradient id="offers-to-rejected" x1="0" y1="0" x2="1" y2="0">
                 <stop offset="0%" stopColor="#10b981" stopOpacity="0.25" />
-                <stop offset="100%" stopColor="#f43f5e" stopOpacity="0.25" />
+                <stop offset="100%" stopColor="#e11d48" stopOpacity="0.25" />
               </linearGradient>
             </defs>
 
@@ -191,25 +201,7 @@ export default function SankeyChart({ apps }: SankeyChartProps) {
               </path>
             )}
 
-            {/* Link 2: Applied -> Rejected (Screening Stage) */}
-            {rejScreen > 0 && (
-              <path
-                d={getSankeyPath(
-                  xApplied + nodeWidth,
-                  yApplied + (appliedActive + interviewTotal) * scale + (rejScreen * scale / 2),
-                  xRejected,
-                  yRejected + (rejScreen * scale / 2)
-                )}
-                fill="none"
-                stroke="url(#applied-to-rejected)"
-                strokeWidth={Math.max(2, rejScreen * scale)}
-                className="hover:stroke-rose-500/40 transition-colors cursor-pointer"
-              >
-                <title>{`Rejected at Screening: ${rejScreen}`}</title>
-              </path>
-            )}
-
-            {/* Link 3: Interviewing -> Offers */}
+            {/* Link 2: Interviewing -> Offers */}
             {offerTotal > 0 && (
               <path
                 d={getSankeyPath(
@@ -227,44 +219,62 @@ export default function SankeyChart({ apps }: SankeyChartProps) {
               </path>
             )}
 
-            {/* Link 4: Interviewing -> Rejected (After Interview) */}
-            {rejInterview > 0 && (
+            {/* Link 3: Interviewing -> Rejected after interviewing */}
+            {rejInterviewOnly > 0 && (
               <path
                 d={getSankeyPath(
                   xInterviewing + nodeWidth,
-                  yInterviewing + (interviewActive + offerTotal) * scale + (rejInterview * scale / 2),
+                  yInterviewing + (interviewActive + offerTotal) * scale + (rejInterviewOnly * scale / 2),
                   xRejected,
-                  yRejected + (rejScreen * scale) + (rejInterview * scale / 2)
+                  yRejInterview + (rejInterviewOnly * scale / 2)
                 )}
                 fill="none"
                 stroke="url(#interviewing-to-rejected)"
-                strokeWidth={Math.max(2, rejInterview * scale)}
-                className="hover:stroke-rose-500/40 transition-colors cursor-pointer"
+                strokeWidth={Math.max(2, rejInterviewOnly * scale)}
+                className="hover:stroke-rose-600/50 transition-colors cursor-pointer"
               >
-                <title>{`Rejected after Interview: ${rejInterview}`}</title>
+                <title>{`Rejected after Interview: ${rejInterviewOnly}`}</title>
               </path>
             )}
 
-            {/* Link 5: Offers -> Rejected (Offer Stage) */}
+            {/* Link 4: Offers -> Rejected after interviewing (if any offer declined/rejected) */}
             {rejOffer > 0 && (
               <path
                 d={getSankeyPath(
                   xOffers + nodeWidth,
                   yOffers + (offerActive * scale) + (rejOffer * scale / 2),
                   xRejected,
-                  yRejected + (rejScreen + rejInterview) * scale + (rejOffer * scale / 2)
+                  yRejInterview + (rejInterviewOnly * scale) + (rejOffer * scale / 2)
                 )}
                 fill="none"
                 stroke="url(#offers-to-rejected)"
                 strokeWidth={Math.max(2, rejOffer * scale)}
+                className="hover:stroke-rose-600/50 transition-colors cursor-pointer"
+              >
+                <title>{`Declined / Rejected at Offer: ${rejOffer}`}</title>
+              </path>
+            )}
+
+            {/* Link 5: Applied -> Rejected after applied */}
+            {rejApplied > 0 && (
+              <path
+                d={getSankeyPath(
+                  xApplied + nodeWidth,
+                  yApplied + (appliedActive + interviewTotal) * scale + (rejApplied * scale / 2),
+                  xRejected,
+                  yRejApplied + (rejApplied * scale / 2)
+                )}
+                fill="none"
+                stroke="url(#applied-to-rejected)"
+                strokeWidth={Math.max(2, rejApplied * scale)}
                 className="hover:stroke-rose-500/40 transition-colors cursor-pointer"
               >
-                <title>{`Rejected / Declined at Offer: ${rejOffer}`}</title>
+                <title>{`Rejected after Applied: ${rejApplied}`}</title>
               </path>
             )}
 
             {/* --- NODES (Rectangles & Exact Labels) --- */}
-            {/* Node 1: Applied */}
+            {/* Node 1: Total applied */}
             <g>
               <rect
                 x={xApplied}
@@ -282,7 +292,7 @@ export default function SankeyChart({ apps }: SankeyChartProps) {
               </text>
             </g>
 
-            {/* Node 2: Interviews */}
+            {/* Node 2: Interviewed */}
             <g>
               <rect
                 x={xInterviewing}
@@ -318,21 +328,39 @@ export default function SankeyChart({ apps }: SankeyChartProps) {
               </text>
             </g>
 
-            {/* Node 4: Rejected / Archive */}
+            {/* Node 4: Rejected after interviewing */}
             <g>
               <rect
                 x={xRejected}
-                y={yRejected}
+                y={yRejInterview}
                 width={nodeWidth}
-                height={hRejected}
+                height={hRejInterview}
                 rx={3}
-                className={rejTotal > 0 ? 'fill-rose-500 shadow-sm' : 'fill-slate-200'}
+                className={rejInterviewTotal > 0 ? 'fill-rose-600 shadow-sm' : 'fill-slate-200'}
               />
-              <text x={xRejected + nodeWidth + 12} y={yRejected + Math.min(16, hRejected / 2) + 2} className={`text-xs font-bold ${rejTotal > 0 ? 'text-slate-800' : 'text-slate-400'}`} textAnchor="start">
-                Archived/Reject ({rejTotal})
+              <text x={xRejected + nodeWidth + 12} y={yRejInterview + Math.min(16, hRejInterview / 2) + 2} className={`text-xs font-bold ${rejInterviewTotal > 0 ? 'text-slate-800' : 'text-slate-400'}`} textAnchor="start">
+                Rejected after interviewing ({rejInterviewTotal})
               </text>
-              <text x={xRejected + nodeWidth + 12} y={yRejected + Math.min(16, hRejected / 2) + 16} className={`text-[10px] font-semibold ${rejTotal > 0 ? 'text-slate-500' : 'text-slate-400'}`} textAnchor="start">
-                {rejTotal > 0 ? `${rejScreen} screen • ${rejInterview} interview` : '0 archived'}
+              <text x={xRejected + nodeWidth + 12} y={yRejInterview + Math.min(16, hRejInterview / 2) + 16} className={`text-[10px] font-semibold ${rejInterviewTotal > 0 ? 'text-rose-600' : 'text-slate-400'}`} textAnchor="start">
+                {rejInterviewTotal > 0 ? `${rejInterviewTotal} after interview` : '0 after interview'}
+              </text>
+            </g>
+
+            {/* Node 5: Rejected after applied */}
+            <g>
+              <rect
+                x={xRejected}
+                y={yRejApplied}
+                width={nodeWidth}
+                height={hRejApplied}
+                rx={3}
+                className={rejApplied > 0 ? 'fill-rose-500 shadow-sm' : 'fill-slate-200'}
+              />
+              <text x={xRejected + nodeWidth + 12} y={yRejApplied + Math.min(16, hRejApplied / 2) + 2} className={`text-xs font-bold ${rejApplied > 0 ? 'text-slate-800' : 'text-slate-400'}`} textAnchor="start">
+                Rejected after applied ({rejApplied})
+              </text>
+              <text x={xRejected + nodeWidth + 12} y={yRejApplied + Math.min(16, hRejApplied / 2) + 16} className={`text-[10px] font-semibold ${rejApplied > 0 ? 'text-rose-500' : 'text-slate-400'}`} textAnchor="start">
+                {rejApplied > 0 ? `${rejApplied} after applied` : '0 after applied'}
               </text>
             </g>
           </svg>
