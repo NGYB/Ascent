@@ -292,11 +292,11 @@ export default function SankeyChart({ apps }: SankeyChartProps) {
                 rx={3}
                 className={interviewTotal > 0 ? 'fill-indigo-500 shadow-sm' : 'fill-slate-200'}
               />
-              <text x={xInterviewing - 12} y={yInterviewing + Math.min(16, hInterviewing / 2) + 2} className={`text-xs font-bold ${interviewActive > 0 ? 'text-slate-800' : 'text-slate-400'}`} textAnchor="end">
-                Interviewing ({interviewActive})
+              <text x={xInterviewing - 12} y={yInterviewing + Math.min(16, hInterviewing / 2) + 2} className={`text-xs font-bold ${interviewTotal > 0 ? 'text-slate-800' : 'text-slate-400'}`} textAnchor="end">
+                Interviewed ({interviewTotal})
               </text>
-              <text x={xInterviewing - 12} y={yInterviewing + Math.min(16, hInterviewing / 2) + 16} className={`text-[10px] font-semibold ${interviewTotal > 0 ? 'text-indigo-600' : 'text-slate-400'}`} textAnchor="end">
-                {interviewTotal > 0 ? `${interviewTotal} reached round` : '0 in pipeline'}
+              <text x={xInterviewing - 12} y={yInterviewing + Math.min(16, hInterviewing / 2) + 16} className={`text-[10px] font-semibold ${interviewActive > 0 ? 'text-slate-500' : 'text-slate-400'}`} textAnchor="end">
+                {interviewActive} pending reply
               </text>
             </g>
 
