@@ -275,10 +275,10 @@ export default function SankeyChart({ apps }: SankeyChartProps) {
                 className="fill-blue-500 shadow-sm"
               />
               <text x={xApplied - 12} y={yApplied + Math.min(16, hApplied / 2) + 2} className="text-xs font-bold text-slate-800" textAnchor="end">
-                Applied ({appliedActive})
+                Total applied ({effectiveTotal})
               </text>
               <text x={xApplied - 12} y={yApplied + Math.min(16, hApplied / 2) + 16} className="text-[10px] font-semibold text-slate-500" textAnchor="end">
-                {effectiveTotal} total applied
+                {appliedActive} pending reply
               </text>
             </g>
 
