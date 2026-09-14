@@ -17,6 +17,7 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useSidebar } from '@/context/SidebarContext';
+import { APP_VERSION, APP_STAGE } from '@/lib/version';
 
 const navItems = [
   { name: 'CV Workspace', href: '/cv', icon: FileText },
@@ -45,15 +46,25 @@ export default function Sidebar() {
             "flex items-center gap-2.5 hover:opacity-90 transition-opacity cursor-pointer truncate",
             isCollapsed && "justify-center w-full px-0"
           )}
-          title="Ascent - Home"
+          title={`Ascent (${APP_STAGE} v${APP_VERSION}) - Home`}
         >
           <div className="h-9 w-9 rounded-lg bg-indigo-600/20 border border-indigo-500/30 flex items-center justify-center flex-shrink-0">
             <ChevronsUp className="h-5 w-5 text-indigo-400" />
           </div>
           {!isCollapsed && (
-            <span className="font-bold text-xl tracking-wider bg-gradient-to-r from-white via-slate-100 to-indigo-300 bg-clip-text text-transparent truncate">
-              ASCENT
-            </span>
+            <div className="flex flex-col min-w-0">
+              <span className="font-extrabold text-lg tracking-wider bg-gradient-to-r from-white via-slate-100 to-indigo-300 bg-clip-text text-transparent truncate leading-none">
+                ASCENT
+              </span>
+              <div className="flex items-center gap-1.5 mt-1">
+                <span className="px-1.5 py-0.5 rounded text-[9px] font-extrabold tracking-wider bg-amber-400/15 text-amber-300 border border-amber-400/30 leading-none">
+                  {APP_STAGE}
+                </span>
+                <span className="text-[10px] font-mono text-slate-400 leading-none">
+                  v{APP_VERSION}
+                </span>
+              </div>
+            </div>
           )}
         </Link>
 
@@ -114,7 +125,7 @@ export default function Sidebar() {
               </div>
               <div className="truncate">
                 <p className="text-xs font-semibold text-slate-300 truncate">Trial / Guest Mode</p>
-                <p className="text-[10px] text-slate-500 truncate">Progress saved locally</p>
+                <p className="text-[10px] text-slate-500 truncate">Progress saved locally • v{APP_VERSION}</p>
               </div>
             </div>
 
@@ -132,7 +143,7 @@ export default function Sidebar() {
           <div className="flex flex-col items-center gap-2 group relative">
             <div 
               className="h-8 w-8 rounded-full bg-indigo-500/20 border border-indigo-500/30 flex items-center justify-center cursor-pointer"
-              title="Trial / Guest Mode: Progress saved locally"
+              title={`Trial / Guest Mode: Progress saved locally (v${APP_VERSION})`}
             >
               <Compass className="h-4 w-4 text-indigo-400" />
             </div>

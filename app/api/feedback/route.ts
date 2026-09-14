@@ -4,7 +4,7 @@ import { Resend } from 'resend';
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { feedbackType, message, userEmail, currentPage } = body;
+    const { feedbackType, message, userEmail, currentPage, appVersion } = body;
 
     // Validate message
     if (!message || typeof message !== 'string' || !message.trim()) {
@@ -37,6 +37,7 @@ export async function POST(request: NextRequest) {
     const cleanMessage = message.trim();
     const cleanUserEmail = (typeof userEmail === 'string' && userEmail.trim().includes('@')) ? userEmail.trim() : null;
     const cleanPage = typeof currentPage === 'string' ? currentPage.trim() : 'App';
+    const cleanVersion = typeof appVersion === 'string' ? appVersion.trim() : '0.2.0';
 
     const typeDetails: Record<string, { label: string; badgeBg: string; badgeColor: string; emoji: string }> = {
       bug: { label: 'Bug Report', badgeBg: '#fee2e2', badgeColor: '#991b1b', emoji: '🐛' },
@@ -88,6 +89,9 @@ export async function POST(request: NextRequest) {
               </div>
               <div class="meta-row">
                 <strong>Submitted From Page:</strong> <code>${cleanPage}</code>
+              </div>
+              <div class="meta-row">
+                <strong>App Version:</strong> <code>Ascent Beta v${cleanVersion}</code>
               </div>
               <div class="meta-row" style="margin-bottom: 0;">
                 <strong>Received At:</strong> ${new Date().toUTCString()}

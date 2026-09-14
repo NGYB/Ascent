@@ -18,6 +18,7 @@ import {
   ChevronDown,
   ChevronUp
 } from 'lucide-react';
+import { APP_VERSION, APP_STAGE } from '@/lib/version';
 
 interface StorageCategory {
   id: string;
@@ -378,6 +379,10 @@ export default function StorageManagerModal({ isOpen, onClose, onStorageCleared 
             <AlertTriangle className="h-3.5 w-3.5" />
             <span>Reset All Ascent Data</span>
           </button>
+
+          <span className="text-[11px] font-mono text-slate-400">
+            Ascent {APP_STAGE} v{APP_VERSION}
+          </span>
 
           <button
             type="button"
