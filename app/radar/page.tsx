@@ -47,6 +47,10 @@ export default function RadarPage() {
   const [locationQuery, setLocationQuery] = useState('Singapore');
   const [remoteOnly, setRemoteOnly] = useState(false);
   
+  // Actively searched / displayed parameters
+  const [searchedRole, setSearchedRole] = useState('Product Manager');
+  const [searchedLocation, setSearchedLocation] = useState('Singapore');
+  
   // App state
   const [jobs, setJobs] = useState<RadarJob[]>([]);
   const [loading, setLoading] = useState(false);
@@ -92,7 +96,20 @@ export default function RadarPage() {
   }, []);
 
   const fetchRadarJobs = async (q: string, loc: string, remote: boolean, explicitResume?: string) => {
+    const trimmedQuery = q.trim();
+    const trimmedLocation = loc.trim();
+
+    if (!trimmedQuery) {
+      setJobs([]);
+      setSearchedRole('');
+      setSearchedLocation(trimmedLocation);
+      return;
+    }
+
     setLoading(true);
+    setSearchedRole(trimmedQuery);
+    setSearchedLocation(trimmedLocation);
+
     try {
       // Ensure we always capture the resume text, even before state re-renders
       let activeResume = explicitResume !== undefined ? explicitResume : resumeText;
@@ -108,8 +125,8 @@ export default function RadarPage() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          query: q,
-          location: loc,
+          query: trimmedQuery,
+          location: trimmedLocation,
           remoteOnly: remote,
           resumeText: activeResume || undefined
         })
@@ -124,9 +141,12 @@ export default function RadarPage() {
         setIsDemo(data.isDemo || false);
         setHasApiKey(data.hasApiKey ?? true);
         setDemoMessage(data.message || '');
+      } else {
+        setJobs([]);
       }
     } catch (err) {
       console.error('Failed to fetch radar jobs:', err);
+      setJobs([]);
     } finally {
       setLoading(false);
     }
@@ -134,7 +154,46 @@ export default function RadarPage() {
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    fetchRadarJobs(roleQuery, locationQuery, remoteOnly);
+    if (!roleQuery.trim()) {
+      setJobs([]);
+      setSearchedRole('');
+      setSearchedLocation(locationQuery.trim());
+      return;
+    }
+    fetchRadarJobs(roleQuery.trim(), locationQuery.trim(), remoteOnly);
+  };
+
+  const handleToggleQuickRole = (tag: string) => {
+    const isCurrentlyChecked = 
+      searchedRole.trim().toLowerCase() === tag.toLowerCase() && 
+      roleQuery.trim().toLowerCase() === tag.toLowerCase() && 
+      jobs.length > 0;
+
+    if (isCurrentlyChecked) {
+      // Uncheck it and clear opportunities
+      setRoleQuery('');
+      setSearchedRole('');
+      setJobs([]);
+    } else {
+      setRoleQuery(tag);
+      fetchRadarJobs(tag, locationQuery, remoteOnly);
+    }
+  };
+
+  const handleToggleSuggestedRole = (tag: string) => {
+    const isCurrentlyChecked = 
+      searchedRole.trim().toLowerCase() === tag.toLowerCase() && 
+      roleQuery.trim().toLowerCase() === tag.toLowerCase() && 
+      jobs.length > 0;
+
+    if (isCurrentlyChecked) {
+      setRoleQuery('');
+      setSearchedRole('');
+      setJobs([]);
+    } else {
+      setRoleQuery(tag);
+      fetchRadarJobs(tag, locationQuery, remoteOnly);
+    }
   };
 
   // 1-Click Tailor CV: transfers role info directly into Tailoring workspace
@@ -336,23 +395,34 @@ export default function RadarPage() {
               <Sparkles className="h-3.5 w-3.5 text-indigo-600" />
               <span>{detectedDomain ? `Target Roles (${detectedDomain}):` : 'AI Suggested Roles:'}</span>
             </span>
-            {suggestedRoles.map((tag) => (
-              <button
-                key={tag}
-                type="button"
-                onClick={() => {
-                  setRoleQuery(tag);
-                  fetchRadarJobs(tag, locationQuery, remoteOnly);
-                }}
-                className={`px-2.5 py-1 rounded-md text-xs font-medium border transition-colors cursor-pointer ${
-                  roleQuery.toLowerCase() === tag.toLowerCase()
-                    ? 'bg-indigo-600 text-white border-indigo-600 font-bold shadow-xs'
-                    : 'bg-white hover:bg-slate-50 text-slate-700 border-slate-200'
-                }`}
-              >
-                {tag}
-              </button>
-            ))}
+            {suggestedRoles.map((tag) => {
+              const isSuggestedChecked = 
+                searchedRole.trim().toLowerCase() === tag.toLowerCase() && 
+                roleQuery.trim().toLowerCase() === tag.toLowerCase() && 
+                jobs.length > 0;
+
+              return (
+                <button
+                  key={tag}
+                  type="button"
+                  onClick={() => handleToggleSuggestedRole(tag)}
+                  className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium border transition-colors cursor-pointer ${
+                    isSuggestedChecked
+                      ? 'bg-indigo-600 text-white border-indigo-600 font-bold shadow-xs'
+                      : 'bg-white hover:bg-slate-50 text-slate-700 border-slate-200'
+                  }`}
+                >
+                  <span className={`w-3.5 h-3.5 rounded border flex items-center justify-center transition-colors ${
+                    isSuggestedChecked 
+                      ? 'bg-white border-white text-indigo-600' 
+                      : 'border-slate-300 bg-white'
+                  }`}>
+                    {isSuggestedChecked && <Check className="h-2.5 w-2.5 stroke-[3]" />}
+                  </span>
+                  <span>{tag}</span>
+                </button>
+              );
+            })}
           </div>
         )}
 
@@ -362,23 +432,34 @@ export default function RadarPage() {
             <span className="font-semibold text-slate-700 flex items-center gap-1">
               <Filter className="h-3 w-3" /> Quick Roles:
             </span>
-            {['Product Manager', 'Operations Director', 'Sales Director', 'Patent & IP Counsel', 'Finance Director'].map((tag) => (
-              <button
-                key={tag}
-                type="button"
-                onClick={() => {
-                  setRoleQuery(tag);
-                  fetchRadarJobs(tag, locationQuery, remoteOnly);
-                }}
-                className={`px-2.5 py-1 rounded-md text-xs font-medium border transition-colors cursor-pointer ${
-                  roleQuery === tag 
-                    ? 'bg-indigo-50 text-indigo-700 border-indigo-200 font-bold' 
-                    : 'bg-slate-50 hover:bg-slate-100 text-slate-600 border-slate-200'
-                }`}
-              >
-                {tag}
-              </button>
-            ))}
+            {['Product Manager', 'Operations Director', 'Sales Director', 'Patent & IP Counsel', 'Finance Director'].map((tag) => {
+              const isChecked = 
+                searchedRole.trim().toLowerCase() === tag.toLowerCase() && 
+                roleQuery.trim().toLowerCase() === tag.toLowerCase() && 
+                jobs.length > 0;
+
+              return (
+                <button
+                  key={tag}
+                  type="button"
+                  onClick={() => handleToggleQuickRole(tag)}
+                  className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium border transition-all cursor-pointer ${
+                    isChecked 
+                      ? 'bg-indigo-50 text-indigo-700 border-indigo-300 font-bold shadow-xs ring-1 ring-indigo-200' 
+                      : 'bg-slate-50 hover:bg-slate-100 text-slate-600 border-slate-200'
+                  }`}
+                >
+                  <span className={`w-3.5 h-3.5 rounded border flex items-center justify-center transition-colors ${
+                    isChecked 
+                      ? 'bg-indigo-600 border-indigo-600 text-white' 
+                      : 'bg-white border-slate-300'
+                  }`}>
+                    {isChecked && <Check className="h-2.5 w-2.5 stroke-[3]" />}
+                  </span>
+                  <span>{tag}</span>
+                </button>
+              );
+            })}
           </div>
 
           <label className="flex items-center gap-2 cursor-pointer select-none">
@@ -386,8 +467,11 @@ export default function RadarPage() {
               type="checkbox"
               checked={remoteOnly}
               onChange={(e) => {
-                setRemoteOnly(e.target.checked);
-                fetchRadarJobs(roleQuery, locationQuery, e.target.checked);
+                const nextRemote = e.target.checked;
+                setRemoteOnly(nextRemote);
+                if (searchedRole.trim()) {
+                  fetchRadarJobs(searchedRole, locationQuery, nextRemote);
+                }
               }}
               className="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500"
             />
@@ -399,10 +483,24 @@ export default function RadarPage() {
       {/* Results Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs text-slate-500 px-1">
         <div className="flex items-center gap-2.5 flex-wrap">
-          <span>
-            Showing <strong>{jobs.length}</strong> active opportunities for <strong>"{roleQuery}"</strong> in <strong>{locationQuery || 'Anywhere'}</strong>
-          </span>
-          {jobs.length > 1 && (
+          {loading ? (
+            <span>
+              Scanning radar for <strong>"{searchedRole || roleQuery}"</strong> in <strong>{searchedLocation || locationQuery || 'Anywhere'}</strong>...
+            </span>
+          ) : searchedRole && jobs.length > 0 ? (
+            <span>
+              Showing <strong>{jobs.length}</strong> active opportunities for <strong>"{searchedRole}"</strong> in <strong>{searchedLocation || 'Anywhere'}</strong>
+            </span>
+          ) : searchedRole && jobs.length === 0 ? (
+            <span>
+              Showing <strong>0</strong> active opportunities for <strong>"{searchedRole}"</strong> in <strong>{searchedLocation || 'Anywhere'}</strong>
+            </span>
+          ) : (
+            <span>
+              Showing <strong>0</strong> active opportunities
+            </span>
+          )}
+          {jobs.length > 1 && !loading && (
             <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-indigo-50/90 text-indigo-700 border border-indigo-200/80 font-semibold text-[11px]">
               <ArrowDownWideNarrow className="h-3 w-3 text-indigo-600" />
               Highest Match on Top
@@ -424,12 +522,24 @@ export default function RadarPage() {
 
       {/* Jobs Feed Grid */}
       <div className="space-y-4">
-        {jobs.length === 0 && !loading ? (
+        {loading && jobs.length === 0 ? (
+          <div className="p-12 text-center bg-white rounded-xl border border-dashed border-slate-200 space-y-3">
+            <Radar className="h-10 w-10 text-indigo-600 mx-auto animate-spin" />
+            <h4 className="text-base font-bold text-slate-700">Scanning Radar...</h4>
+            <p className="text-xs text-slate-500 max-w-sm mx-auto">
+              Gathering active listings and evaluating AI fit scores.
+            </p>
+          </div>
+        ) : jobs.length === 0 && !loading ? (
           <div className="p-12 text-center bg-white rounded-xl border border-dashed border-slate-200 space-y-3">
             <Radar className="h-10 w-10 text-slate-300 mx-auto animate-pulse" />
-            <h4 className="text-base font-bold text-slate-700">No Postings Detected</h4>
+            <h4 className="text-base font-bold text-slate-700">
+              {searchedRole ? 'No Postings Detected' : 'No Active Opportunities'}
+            </h4>
             <p className="text-xs text-slate-500 max-w-sm mx-auto">
-              Try adjusting your target role or location keywords to broaden the radar scan.
+              {searchedRole 
+                ? 'Try adjusting your target role or location keywords to broaden the radar scan.' 
+                : 'Select a quick role above or enter a target role in the search box and click "Scan Radar".'}
             </p>
           </div>
         ) : (
