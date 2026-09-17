@@ -347,7 +347,7 @@ export default function RadarPage() {
               type="text"
               value={roleQuery}
               onChange={(e) => setRoleQuery(e.target.value)}
-              placeholder="e.g. Sales Director, Patent Counsel, Operations Lead, Product Manager..."
+              placeholder="e.g. Product Manager, Data Scientist, AI Engineer, Operations Director..."
               className="w-full pl-10 pr-4 py-2.5 text-sm border border-slate-200 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500 bg-slate-50/50 hover:bg-white transition-colors"
             />
           </div>
@@ -430,7 +430,7 @@ export default function RadarPage() {
             <span className="font-semibold text-slate-700 flex items-center gap-1">
               <Filter className="h-3 w-3" /> Quick Roles:
             </span>
-            {['Product Manager', 'Operations Director', 'Sales Director', 'Patent & IP Counsel', 'Finance Director'].map((tag) => {
+            {['Product Manager', 'Data Scientist', 'AI Engineer', 'Operations Director', 'Sales Director'].map((tag) => {
               const isChecked = 
                 searchedRole.trim().toLowerCase() === tag.toLowerCase() && 
                 roleQuery.trim().toLowerCase() === tag.toLowerCase() && 
