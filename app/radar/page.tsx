@@ -43,12 +43,12 @@ export default function RadarPage() {
   const router = useRouter();
   
   // Search inputs
-  const [roleQuery, setRoleQuery] = useState('Product Manager');
+  const [roleQuery, setRoleQuery] = useState('');
   const [locationQuery, setLocationQuery] = useState('Singapore');
   const [remoteOnly, setRemoteOnly] = useState(false);
   
   // Actively searched / displayed parameters
-  const [searchedRole, setSearchedRole] = useState('Product Manager');
+  const [searchedRole, setSearchedRole] = useState('');
   const [searchedLocation, setSearchedLocation] = useState('Singapore');
   
   // App state
@@ -67,9 +67,8 @@ export default function RadarPage() {
 
   // Initial load
   useEffect(() => {
-    let savedResume = '';
     try {
-      savedResume = localStorage.getItem('ascent_master_resume') || '';
+      const savedResume = localStorage.getItem('ascent_master_resume') || '';
       if (savedResume) {
         setHasMasterResume(true);
         setResumeText(savedResume);
@@ -91,8 +90,7 @@ export default function RadarPage() {
       setSavedJobIds(savedTitles);
     } catch {}
 
-    // Run initial scan with saved resume immediately
-    fetchRadarJobs('Product Manager', 'Singapore', false, savedResume);
+    // Do NOT run automatic initial scan on page entry.
   }, []);
 
   const fetchRadarJobs = async (q: string, loc: string, remote: boolean, explicitResume?: string) => {
@@ -370,7 +368,7 @@ export default function RadarPage() {
           <div className="md:col-span-2">
             <button
               type="submit"
-              disabled={loading || isExtractingRoles}
+              disabled={loading || isExtractingRoles || !roleQuery.trim()}
               className="w-full py-2.5 px-4 bg-slate-900 hover:bg-slate-800 text-white rounded-lg font-semibold text-sm transition-colors flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
             >
               {loading ? (
@@ -539,7 +537,7 @@ export default function RadarPage() {
             <p className="text-xs text-slate-500 max-w-sm mx-auto">
               {searchedRole 
                 ? 'Try adjusting your target role or location keywords to broaden the radar scan.' 
-                : 'Select a quick role above or enter a target role in the search box and click "Scan Radar".'}
+                : 'Select a quick role above, click "Auto-Scan for My CV", or enter a target role in the search box and click "Scan Radar".'}
             </p>
           </div>
         ) : (
