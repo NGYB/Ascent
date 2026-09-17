@@ -1,7 +1,19 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Upload, FileText, CheckCircle, AlertCircle, Edit3, Save } from 'lucide-react';
+import Link from 'next/link';
+import { 
+  Upload, 
+  FileText, 
+  CheckCircle, 
+  AlertCircle, 
+  Edit3, 
+  Save,
+  Radar,
+  ArrowRight,
+  Sparkles,
+  ChevronRight
+} from 'lucide-react';
 
 export default function CVPage() {
   const [file, setFile] = useState<File | null>(null);
@@ -212,7 +224,7 @@ export default function CVPage() {
           localStorage.setItem('ascent_master_resume', cleanedText);
           localStorage.setItem('ascent_resume_name', file.name);
         } catch {}
-        setSuccess('Fantastic start! Your Master CV has been extracted and saved to your session. You can review the parsed text below or edit it anytime.');
+        setSuccess('Master CV uploaded and saved! Head to Smart Job Radar to scan target roles, or review your parsed text on the right.');
         setFile(null);
       } catch (err: any) {
         console.error(err);
@@ -233,7 +245,7 @@ export default function CVPage() {
   const handleSaveText = () => {
     localStorage.setItem('ascent_master_resume', resumeText);
     localStorage.setItem('ascent_resume_name', resumeName);
-    setSuccess('Master CV saved successfully to your session.');
+    setSuccess('Master CV saved successfully! Head to Smart Job Radar to discover matching opportunities.');
     setIsEditing(false);
   };
 
@@ -264,59 +276,108 @@ export default function CVPage() {
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {/* Upload Column */}
-        <div className="md:col-span-1 bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-6 h-fit">
-          <h3 className="font-bold text-slate-800 text-sm uppercase tracking-wider">Upload Master CV</h3>
-          
-          <form onSubmit={handleUpload} className="space-y-4">
-            <div className="border-2 border-dashed border-slate-200 rounded-xl p-4 text-center hover:border-indigo-500 transition-colors cursor-pointer relative bg-slate-50">
-              <input 
-                type="file" 
-                accept=".pdf" 
-                onChange={handleFileChange}
-                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-              />
-              <div className="flex flex-col items-center gap-2">
-                <Upload className="h-8 w-8 text-slate-400" />
-                <span className="text-sm font-semibold text-indigo-600">Choose PDF file</span>
-                <span className="text-xs text-slate-400">PDF up to 5MB</span>
+        <div className="md:col-span-1 space-y-5 h-fit">
+          <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-6">
+            <h3 className="font-bold text-slate-800 text-sm uppercase tracking-wider">Upload Master CV</h3>
+            
+            <form onSubmit={handleUpload} className="space-y-4">
+              <div className="border-2 border-dashed border-slate-200 rounded-xl p-4 text-center hover:border-indigo-500 transition-colors cursor-pointer relative bg-slate-50">
+                <input 
+                  type="file" 
+                  accept=".pdf" 
+                  onChange={handleFileChange}
+                  className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                />
+                <div className="flex flex-col items-center gap-2">
+                  <Upload className="h-8 w-8 text-slate-400" />
+                  <span className="text-sm font-semibold text-indigo-600">Choose PDF file</span>
+                  <span className="text-xs text-slate-400">PDF up to 5MB</span>
+                </div>
               </div>
-            </div>
 
-            {file && (
-              <div className="flex items-center gap-2 p-2.5 rounded-lg bg-indigo-50 text-indigo-700 text-sm border border-indigo-100 font-medium">
-                <FileText className="h-5 w-5 flex-shrink-0" />
-                <span className="truncate">{file.name}</span>
+              {file && (
+                <div className="flex items-center gap-2 p-2.5 rounded-lg bg-indigo-50 text-indigo-700 text-sm border border-indigo-100 font-medium">
+                  <FileText className="h-5 w-5 flex-shrink-0" />
+                  <span className="truncate">{file.name}</span>
+                </div>
+              )}
+
+              <button
+                type="submit"
+                disabled={!file || loading}
+                className="w-full py-2.5 px-4 bg-slate-900 hover:bg-slate-800 text-white rounded-lg text-sm font-semibold transition-colors disabled:opacity-50 flex items-center justify-center gap-2 cursor-pointer"
+              >
+                {loading ? (
+                  <>
+                    <span className="h-4 w-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
+                    <span>Parsing Document...</span>
+                  </>
+                ) : (
+                  'Upload & Extract'
+                )}
+              </button>
+            </form>
+
+            {/* Feedback alerts */}
+            {error && (
+              <div className="p-3 bg-rose-50 text-rose-800 text-sm rounded-lg border border-rose-100 flex gap-2">
+                <AlertCircle className="h-5 w-5 flex-shrink-0" />
+                <span>{error}</span>
               </div>
             )}
 
-            <button
-              type="submit"
-              disabled={!file || loading}
-              className="w-full py-2.5 px-4 bg-slate-900 hover:bg-slate-800 text-white rounded-lg text-sm font-semibold transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
-            >
-              {loading ? (
-                <>
-                  <span className="h-4 w-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
-                  <span>Parsing Document...</span>
-                </>
-              ) : (
-                'Upload & Extract'
-              )}
-            </button>
-          </form>
+            {success && (
+              <div className="p-3.5 bg-emerald-50 text-emerald-800 text-sm rounded-lg border border-emerald-100 flex gap-2 leading-relaxed">
+                <CheckCircle className="h-5 w-5 flex-shrink-0 animate-bounce text-emerald-600 mt-0.5" />
+                <span>{success}</span>
+              </div>
+            )}
+          </div>
 
-          {/* Feedback alerts */}
-          {error && (
-            <div className="p-3 bg-rose-50 text-rose-800 text-sm rounded-lg border border-rose-100 flex gap-2">
-              <AlertCircle className="h-5 w-5 flex-shrink-0" />
-              <span>{error}</span>
-            </div>
-          )}
+          {/* Next Step Guidance Card */}
+          {resumeText && (
+            <div className="p-5 bg-gradient-to-br from-indigo-50/90 via-white to-indigo-50/50 rounded-xl border border-indigo-200 shadow-sm space-y-4 animate-in fade-in slide-in-from-top-2 duration-300">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2 text-indigo-900 font-bold text-xs uppercase tracking-wider">
+                  <span className="p-1.5 bg-indigo-600 text-white rounded-md shadow-2xs">
+                    <Radar className="h-3.5 w-3.5" />
+                  </span>
+                  <span>Next Step</span>
+                </div>
+                <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-indigo-100 text-indigo-700 border border-indigo-200">
+                  CV Ready
+                </span>
+              </div>
 
-          {success && (
-            <div className="p-3.5 bg-emerald-50 text-emerald-800 text-sm rounded-lg border border-emerald-100 flex gap-2 leading-relaxed">
-              <CheckCircle className="h-5 w-5 flex-shrink-0 animate-bounce text-emerald-600 mt-0.5" />
-              <span>{success}</span>
+              <div className="space-y-1.5">
+                <h4 className="font-extrabold text-slate-800 text-sm">
+                  Find Target Roles on Smart Job Radar
+                </h4>
+                <p className="text-xs text-slate-600 leading-relaxed">
+                  Your Master CV is saved! Head over to the Smart Job Radar to scan live job listings across LinkedIn and Google Jobs, and view AI fit scores matched to your profile.
+                </p>
+              </div>
+
+              <div className="space-y-2 pt-1">
+                <Link
+                  href="/radar"
+                  className="w-full py-2.5 px-3.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-bold transition-all shadow-xs flex items-center justify-between group cursor-pointer"
+                >
+                  <span className="flex items-center gap-1.5">
+                    <Sparkles className="h-3.5 w-3.5 text-amber-300" />
+                    <span>Go to Smart Job Radar</span>
+                  </span>
+                  <ArrowRight className="h-4 w-4 group-hover:translate-x-0.5 transition-transform" />
+                </Link>
+
+                <Link
+                  href="/tailor"
+                  className="w-full py-2 px-3 bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 rounded-lg text-xs font-semibold transition-colors flex items-center justify-between cursor-pointer"
+                >
+                  <span>Already have a Job Description? Tailor CV</span>
+                  <ChevronRight className="h-3.5 w-3.5 text-slate-400" />
+                </Link>
+              </div>
             </div>
           )}
         </div>
