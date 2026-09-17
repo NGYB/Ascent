@@ -39,6 +39,14 @@ interface RadarJob {
   topMatches?: string[];
 }
 
+const QUICK_ROLES = [
+  'Product Manager',
+  'Data Scientist',
+  'AI Engineer',
+  'Operations Director',
+  'Sales Director'
+] as const;
+
 export default function RadarPage() {
   const router = useRouter();
   
@@ -430,7 +438,7 @@ export default function RadarPage() {
             <span className="font-semibold text-slate-700 flex items-center gap-1">
               <Filter className="h-3 w-3" /> Quick Roles:
             </span>
-            {['Product Manager', 'Data Scientist', 'AI Engineer', 'Operations Director', 'Sales Director'].map((tag) => {
+            {QUICK_ROLES.map((tag) => {
               const isChecked = 
                 searchedRole.trim().toLowerCase() === tag.toLowerCase() && 
                 roleQuery.trim().toLowerCase() === tag.toLowerCase() && 
