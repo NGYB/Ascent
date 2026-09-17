@@ -236,7 +236,9 @@ export default function RadarPage() {
   const handleScanFromCV = async () => {
     const activeCv = resumeText || (typeof window !== 'undefined' ? localStorage.getItem('ascent_master_resume') || '' : '');
     if (!activeCv) {
-      alert('Please upload a Master CV first in the CV Workspace to enable AI auto-matching.');
+      if (confirm('No Master CV found yet. Would you like to go to the CV Workspace to upload your CV now?')) {
+        router.push('/cv');
+      }
       return;
     }
 
@@ -298,27 +300,25 @@ export default function RadarPage() {
           </p>
         </div>
 
-        {hasMasterResume && (
-          <button
-            type="button"
-            onClick={handleScanFromCV}
-            disabled={isExtractingRoles || loading}
-            className="flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-700 hover:to-indigo-800 text-white rounded-lg shadow-sm font-semibold text-xs transition-all flex-shrink-0 cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
-            title="Intelligently analyze your CV with AI to scan target roles in your specific domain"
-          >
-            {isExtractingRoles ? (
-              <>
-                <Sparkles className="h-4 w-4 animate-spin text-amber-300" />
-                <span>Analyzing CV with AI...</span>
-              </>
-            ) : (
-              <>
-                <Zap className="h-4 w-4 text-amber-300" />
-                <span>Auto-Scan for My CV</span>
-              </>
-            )}
-          </button>
-        )}
+        <button
+          type="button"
+          onClick={handleScanFromCV}
+          disabled={isExtractingRoles || loading}
+          className="flex items-center justify-center gap-2.5 px-5 py-2.5 sm:py-3 bg-gradient-to-r from-indigo-600 via-indigo-700 to-violet-700 hover:from-indigo-700 hover:via-indigo-800 hover:to-violet-800 text-white rounded-xl shadow-md hover:shadow-lg hover:shadow-indigo-500/25 font-bold text-sm sm:text-base transition-all w-full sm:w-auto flex-shrink-0 cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed border border-indigo-400/30 ring-2 ring-indigo-500/20"
+          title={hasMasterResume ? "Intelligently analyze your CV with AI to scan target roles in your specific domain" : "Upload your Master CV to auto-scan matching roles with AI"}
+        >
+          {isExtractingRoles ? (
+            <>
+              <Sparkles className="h-5 w-5 animate-spin text-amber-300" />
+              <span>Analyzing CV with AI...</span>
+            </>
+          ) : (
+            <>
+              <Zap className="h-5 w-5 text-amber-300 fill-amber-300 animate-pulse" />
+              <span>Auto-Scan for My CV</span>
+            </>
+          )}
+        </button>
       </div>
 
       {/* Demo Notice Banner if SerpAPI key is not configured or no live results returned */}
@@ -529,16 +529,31 @@ export default function RadarPage() {
             </p>
           </div>
         ) : jobs.length === 0 && !loading ? (
-          <div className="p-12 text-center bg-white rounded-xl border border-dashed border-slate-200 space-y-3">
+          <div className="p-12 text-center bg-white rounded-xl border border-dashed border-slate-200 space-y-4">
             <Radar className="h-10 w-10 text-slate-300 mx-auto animate-pulse" />
-            <h4 className="text-base font-bold text-slate-700">
-              {searchedRole ? 'No Postings Detected' : 'No Active Opportunities'}
-            </h4>
-            <p className="text-xs text-slate-500 max-w-sm mx-auto">
-              {searchedRole 
-                ? 'Try adjusting your target role or location keywords to broaden the radar scan.' 
-                : 'Select a quick role above, click "Auto-Scan for My CV", or enter a target role in the search box and click "Scan Radar".'}
-            </p>
+            <div className="space-y-1">
+              <h4 className="text-base font-bold text-slate-700">
+                {searchedRole ? 'No Postings Detected' : 'No Active Opportunities'}
+              </h4>
+              <p className="text-xs text-slate-500 max-w-sm mx-auto">
+                {searchedRole 
+                  ? 'Try adjusting your target role or location keywords to broaden the radar scan.' 
+                  : 'Select a quick role above, click "Auto-Scan for My CV", or enter a target role in the search box and click "Scan Radar".'}
+              </p>
+            </div>
+            {!searchedRole && (
+              <div className="pt-2">
+                <button
+                  type="button"
+                  onClick={handleScanFromCV}
+                  disabled={isExtractingRoles || loading}
+                  className="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-indigo-600 via-indigo-700 to-violet-700 hover:from-indigo-700 hover:to-violet-800 text-white rounded-xl shadow-md hover:shadow-lg font-bold text-sm transition-all cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed border border-indigo-400/30 ring-2 ring-indigo-500/20"
+                >
+                  <Zap className="h-4.5 w-4.5 text-amber-300 fill-amber-300 animate-pulse" />
+                  <span>Auto-Scan for My CV</span>
+                </button>
+              </div>
+            )}
           </div>
         ) : (
           jobs.map((job) => {
