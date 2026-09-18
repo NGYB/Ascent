@@ -92,3 +92,30 @@ body {
   border-width: 1.5px !important;
 }
 
+/* High contrast input fields in Colorblind Mode */
+.colorblind-mode input[type="text"],
+.colorblind-mode input[type="search"],
+.colorblind-mode textarea,
+.colorblind-mode select {
+  color: #020617 !important; /* slate-950 deep contrast */
+  background-color: #ffffff !important;
+  border-color: #475569 !important; /* slate-600 */
+  border-width: 2px !important;
+  font-weight: 600 !important;
+}
+
+.colorblind-mode input::placeholder,
+.colorblind-mode textarea::placeholder {
+  color: #334155 !important; /* slate-700 readable placeholder */
+  font-weight: 500 !important;
+}
+
+.colorblind-mode input:focus,
+.colorblind-mode textarea:focus,
+.colorblind-mode select:focus {
+  border-color: #1d4ed8 !important; /* blue-700 */
+  outline: 2px solid #2563eb !important;
+  outline-offset: 1px !important;
+}
+
+

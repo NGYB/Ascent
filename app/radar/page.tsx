@@ -19,7 +19,8 @@ import {
   DollarSign,
   Building2,
   Filter,
-  ArrowDownWideNarrow
+  ArrowDownWideNarrow,
+  X
 } from 'lucide-react';
 import { isBlockedJob } from '@/lib/job-blocklist';
 
@@ -355,30 +356,66 @@ export default function RadarPage() {
       )}
 
       {/* Search & Filter Bar */}
-      <form onSubmit={handleSearch} className="bg-white p-4 sm:p-5 rounded-xl border border-slate-200 shadow-sm space-y-3">
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-3 items-center">
+      <form onSubmit={handleSearch} className="bg-white p-4 sm:p-5 rounded-xl border border-slate-300 shadow-sm space-y-4">
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-3.5 items-end">
           {/* Role Query Input */}
-          <div className="md:col-span-6 relative">
-            <Search className="h-4 w-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
-            <input
-              type="text"
-              value={roleQuery}
-              onChange={(e) => setRoleQuery(e.target.value)}
-              placeholder="e.g. Product Manager, Data Scientist, AI Engineer, Operations Director..."
-              className="w-full pl-10 pr-4 py-2.5 text-sm border border-slate-200 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500 bg-slate-50/50 hover:bg-white transition-colors"
-            />
+          <div className="md:col-span-6 space-y-1.5">
+            <label htmlFor="radar-role-input" className="text-xs font-bold text-slate-800 uppercase tracking-wider flex items-center gap-1.5">
+              <Search className="h-3.5 w-3.5 text-indigo-700" />
+              <span>Target Role / Job Title</span>
+            </label>
+            <div className="relative">
+              <Search className="h-4 w-4 text-slate-500 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+              <input
+                id="radar-role-input"
+                type="text"
+                value={roleQuery}
+                onChange={(e) => setRoleQuery(e.target.value)}
+                placeholder="e.g. Product Manager, Data Scientist, AI Engineer..."
+                className="w-full pl-10 pr-9 py-2.5 text-sm font-semibold text-slate-950 placeholder:text-slate-500 placeholder:font-normal bg-white border-2 border-slate-300 rounded-lg outline-none focus:border-indigo-600 focus:ring-2 focus:ring-indigo-100 shadow-2xs transition-all"
+              />
+              {roleQuery && (
+                <button
+                  type="button"
+                  onClick={() => setRoleQuery('')}
+                  className="absolute right-2.5 top-1/2 -translate-y-1/2 p-1 text-slate-400 hover:text-slate-700 rounded-md transition-colors"
+                  title="Clear input"
+                  aria-label="Clear role input"
+                >
+                  <X className="h-3.5 w-3.5" />
+                </button>
+              )}
+            </div>
           </div>
 
           {/* Location Input */}
-          <div className="md:col-span-4 relative">
-            <MapPin className="h-4 w-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
-            <input
-              type="text"
-              value={locationQuery}
-              onChange={(e) => setLocationQuery(e.target.value)}
-              placeholder="e.g. Singapore, Remote, London..."
-              className="w-full pl-10 pr-4 py-2.5 text-sm border border-slate-200 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500 bg-slate-50/50 hover:bg-white transition-colors"
-            />
+          <div className="md:col-span-4 space-y-1.5">
+            <label htmlFor="radar-location-input" className="text-xs font-bold text-slate-800 uppercase tracking-wider flex items-center gap-1.5">
+              <MapPin className="h-3.5 w-3.5 text-indigo-700" />
+              <span>Location</span>
+            </label>
+            <div className="relative">
+              <MapPin className="h-4 w-4 text-slate-500 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+              <input
+                id="radar-location-input"
+                type="text"
+                value={locationQuery}
+                onChange={(e) => setLocationQuery(e.target.value)}
+                placeholder="e.g. Singapore, Remote, London..."
+                className="w-full pl-10 pr-9 py-2.5 text-sm font-semibold text-slate-950 placeholder:text-slate-500 placeholder:font-normal bg-white border-2 border-slate-300 rounded-lg outline-none focus:border-indigo-600 focus:ring-2 focus:ring-indigo-100 shadow-2xs transition-all"
+              />
+              {locationQuery && (
+                <button
+                  type="button"
+                  onClick={() => setLocationQuery('')}
+                  className="absolute right-2.5 top-1/2 -translate-y-1/2 p-1 text-slate-400 hover:text-slate-700 rounded-md transition-colors"
+                  title="Clear location"
+                  aria-label="Clear location input"
+                >
+                  <X className="h-3.5 w-3.5" />
+                </button>
+              )}
+            </div>
           </div>
 
           {/* Search Button */}
@@ -386,7 +423,7 @@ export default function RadarPage() {
             <button
               type="submit"
               disabled={loading || isExtractingRoles || !roleQuery.trim()}
-              className="w-full py-2.5 px-4 bg-slate-900 hover:bg-slate-800 text-white rounded-lg font-semibold text-sm transition-colors flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+              className="w-full py-2.5 px-4 bg-slate-900 hover:bg-slate-800 text-white rounded-lg font-bold text-sm transition-colors flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 h-[42px] shadow-sm"
             >
               {loading ? (
                 <>
