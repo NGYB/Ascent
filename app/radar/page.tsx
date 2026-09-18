@@ -214,7 +214,8 @@ export default function RadarPage() {
       const payload = {
         jobTitle: job.title,
         company: job.company,
-        jobDescription: job.description
+        jobDescription: job.description,
+        applyLink: job.applyLink
       };
       sessionStorage.setItem('ascent_import_job', JSON.stringify(payload));
       router.push('/tailor?import=radar');
@@ -237,6 +238,7 @@ export default function RadarPage() {
         jobTitle: job.title,
         company: job.company,
         status: 'DRAFT',
+        applyUrl: job.applyLink,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString()
       };

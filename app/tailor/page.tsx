@@ -29,7 +29,10 @@ import {
   ChevronDown,
   Building2,
   ArrowUpDown,
-  ShieldAlert
+  ShieldAlert,
+  ExternalLink,
+  ArrowLeft,
+  Send
 } from 'lucide-react';
 
 interface TransferableSkill {
@@ -83,6 +86,7 @@ interface TailorResponse {
   atsAnalysis: AtsAnalysis;
   coachFeedback: CoachFeedback;
   jdDeflator?: JdDeflator;
+  applyUrl?: string;
 }
 
 // Renders either a JSON array or parses a legacy/concatenated bulleted string
@@ -171,6 +175,9 @@ export default function TailorPage() {
   const [jobTitle, setJobTitle] = useState('');
   const [company, setCompany] = useState('');
   const [jobDescription, setJobDescription] = useState('');
+  const [applyUrl, setApplyUrl] = useState('');
+  const [fromRadar, setFromRadar] = useState(false);
+  const [appliedState, setAppliedState] = useState(false);
   
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -223,13 +230,64 @@ export default function TailorPage() {
         if (parsed.jobTitle) setJobTitle(parsed.jobTitle);
         if (parsed.company) setCompany(parsed.company);
         if (parsed.jobDescription) setJobDescription(parsed.jobDescription);
+        if (parsed.applyLink) setApplyUrl(parsed.applyLink);
+        setFromRadar(true);
         sessionStorage.removeItem('ascent_import_job');
+      } else if (typeof window !== 'undefined' && window.location.search.includes('import=radar')) {
+        setFromRadar(true);
       }
     } catch {}
 
     window.addEventListener('ascent-storage-cleared', loadStoredTailorData);
     return () => window.removeEventListener('ascent-storage-cleared', loadStoredTailorData);
   }, []);
+
+  const getApplyLink = () => {
+    if (applyUrl && applyUrl.trim()) {
+      const trimmed = applyUrl.trim();
+      return trimmed.startsWith('http://') || trimmed.startsWith('https://') 
+        ? trimmed 
+        : `https://${trimmed}`;
+    }
+    const query = [jobTitle, company, 'apply job'].filter(Boolean).join(' ');
+    return `https://www.google.com/search?q=${encodeURIComponent(query)}`;
+  };
+
+  const handleMarkAsApplied = () => {
+    try {
+      const apps = JSON.parse(localStorage.getItem('ascent_applications') || '[]');
+      const existingIdx = apps.findIndex((a: any) => 
+        (result?.id && a.tailoredResumeId === result.id) || 
+        (a.jobTitle === jobTitle && a.company === (company.trim() || 'Target Company'))
+      );
+
+      if (existingIdx !== -1) {
+        apps[existingIdx].status = 'APPLIED';
+        if (applyUrl.trim() && !apps[existingIdx].applyUrl) {
+          apps[existingIdx].applyUrl = applyUrl.trim();
+        }
+        apps[existingIdx].updatedAt = new Date().toISOString();
+      } else {
+        const newApp = {
+          id: crypto.randomUUID(),
+          jobTitle,
+          company: company.trim() || 'Target Company',
+          status: 'APPLIED',
+          applyUrl: applyUrl.trim() || undefined,
+          tailoredResumeId: result?.id,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString()
+        };
+        apps.push(newApp);
+      }
+
+      localStorage.setItem('ascent_applications', JSON.stringify(apps));
+      setAppliedState(true);
+      setSaved(true);
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
   const handleTailor = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -246,6 +304,7 @@ export default function TailorPage() {
     setError('');
     setResult(null);
     setSaved(false);
+    setAppliedState(false);
 
     try {
       const res = await fetch('/api/tailor', {
@@ -260,7 +319,7 @@ export default function TailorPage() {
       }
 
       const data = await res.json();
-      setResult(data);
+      setResult({ ...data, applyUrl: applyUrl.trim() || undefined });
       if (data.jdDeflator) {
         setActiveTab('deflator');
       } else {
@@ -373,6 +432,7 @@ export default function TailorPage() {
         jobTitle,
         company: company.trim(),
         jobDescription,
+        applyUrl: applyUrl.trim() || undefined,
         tailoredResume: result.tailoredResume,
         atsAnalysis: result.atsAnalysis,
         coachFeedback: result.coachFeedback,
@@ -384,15 +444,16 @@ export default function TailorPage() {
       localStorage.setItem('ascent_tailored_resumes', JSON.stringify(tailoredList));
       setHistoryList(tailoredList);
       
-      // Automatically create a draft in the Job Tracker
+      // Automatically create a draft or applied entry in the Job Tracker
       const apps = JSON.parse(localStorage.getItem('ascent_applications') || '[]');
       const newApp = {
         id: crypto.randomUUID(),
         jobTitle,
         company: company.trim() || 'Target Company',
-        status: 'DRAFT',
+        status: appliedState ? 'APPLIED' : 'DRAFT',
+        applyUrl: applyUrl.trim() || undefined,
         tailoredResumeId: newTailoredVersion.id,
-        createdAt: newTailoredVersion.id,
+        createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString()
       };
       apps.push(newApp);
@@ -401,7 +462,7 @@ export default function TailorPage() {
       setSaved(true);
       
       // Update result state to hold the newly saved ID
-      setResult(prev => prev ? { ...prev, id: newTailoredVersion.id } : null);
+      setResult(prev => prev ? { ...prev, id: newTailoredVersion.id, applyUrl: applyUrl.trim() || undefined } : null);
     }
   };
 
@@ -409,12 +470,14 @@ export default function TailorPage() {
     setJobTitle(item.jobTitle);
     setCompany(item.company && item.company !== 'Target Company' ? item.company : '');
     setJobDescription(item.jobDescription || '');
+    setApplyUrl(item.applyUrl || '');
     setResult({
       id: item.id,
       tailoredResume: item.tailoredResume,
       atsAnalysis: item.atsAnalysis,
       coachFeedback: item.coachFeedback,
-      jdDeflator: item.jdDeflator
+      jdDeflator: item.jdDeflator,
+      applyUrl: item.applyUrl
     });
     if (item.jdDeflator) {
       setActiveTab('deflator');
@@ -422,6 +485,17 @@ export default function TailorPage() {
       setActiveTab('coach');
     }
     setSaved(true);
+    try {
+      const apps = JSON.parse(localStorage.getItem('ascent_applications') || '[]');
+      const match = apps.find((a: any) => a.tailoredResumeId === item.id || (a.jobTitle === item.jobTitle && a.company === (item.company || 'Target Company')));
+      if (match && match.status === 'APPLIED') {
+        setAppliedState(true);
+      } else {
+        setAppliedState(false);
+      }
+    } catch {
+      setAppliedState(false);
+    }
     setError('');
   };
 
@@ -438,6 +512,8 @@ export default function TailorPage() {
         setJobTitle('');
         setCompany('');
         setJobDescription('');
+        setApplyUrl('');
+        setAppliedState(false);
         setSaved(false);
       }
     }
@@ -445,6 +521,21 @@ export default function TailorPage() {
 
   return (
     <div className="max-w-7xl 2xl:max-w-[1600px] w-full mx-auto space-y-6">
+      {fromRadar && (
+        <div className="flex items-center gap-2 flex-wrap animate-in fade-in duration-200">
+          <Link 
+            href="/radar"
+            className="inline-flex items-center gap-1.5 text-xs font-bold text-indigo-700 hover:text-indigo-900 bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 px-3 py-1.5 rounded-lg transition-colors shadow-2xs"
+          >
+            <ArrowLeft className="h-3.5 w-3.5" />
+            <span>Return to Smart Job Radar</span>
+          </Link>
+          <span className="text-xs text-slate-500 font-medium">
+            Imported role: <strong className="text-slate-800">{jobTitle || 'Job Posting'}</strong> {company ? `at ${company}` : ''}
+          </span>
+        </div>
+      )}
+
       <div className="space-y-2">
         <h2 className="text-3xl font-extrabold text-slate-800 tracking-tight">Tailor & ATS Scorecard</h2>
         <p className="text-slate-500 text-base">
@@ -499,6 +590,32 @@ export default function TailorPage() {
                     onChange={(e) => setCompany(e.target.value)}
                     placeholder="e.g. Google, Stripe, Acme Corp"
                     className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-base focus:ring-2 focus:ring-indigo-500 outline-none"
+                  />
+                </div>
+
+                <div className="space-y-1">
+                  <div className="flex items-center justify-between">
+                    <label className="text-sm font-bold text-slate-600">Application Link / URL (Optional)</label>
+                    {applyUrl && (
+                      <a 
+                        href={getApplyLink()} 
+                        target="_blank" 
+                        rel="noopener noreferrer" 
+                        className="text-xs text-indigo-600 hover:text-indigo-800 flex items-center gap-1 font-semibold"
+                        title="Test application link"
+                      >
+                        <span>Test link</span>
+                        <ExternalLink className="h-3 w-3" />
+                      </a>
+                    )}
+                  </div>
+                  <input
+                    type="url"
+                    disabled={!resumeText || loading}
+                    value={applyUrl}
+                    onChange={(e) => setApplyUrl(e.target.value)}
+                    placeholder="e.g. https://careers.company.com/job/123 or job portal link"
+                    className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none"
                   />
                 </div>
 
@@ -616,6 +733,17 @@ export default function TailorPage() {
                 </div>
 
                 <div className="flex gap-2">
+                  <a
+                    href={getApplyLink()}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center justify-center gap-1.5 text-sm font-bold bg-amber-500 hover:bg-amber-400 text-slate-950 px-3 py-1.5 rounded-md shadow-xs transition-colors"
+                    title={applyUrl ? "Open the official job application link" : "Search Google Jobs to apply for this role"}
+                  >
+                    <ExternalLink className="h-4 w-4 text-slate-950 flex-shrink-0" />
+                    <span>Apply ↗</span>
+                  </a>
+
                   <button
                     onClick={handleCopy}
                     className="flex items-center justify-center gap-1.5 text-sm font-semibold bg-white text-slate-700 hover:bg-slate-50 px-3 py-1.5 rounded-md border border-slate-200 transition-colors w-36"
@@ -649,6 +777,65 @@ export default function TailorPage() {
                       </>
                     )}
                   </button>
+                </div>
+              </div>
+
+              {/* Application Launchpad Banner */}
+              <div className="bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white p-4 sm:p-5 border-b border-indigo-900/50 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 animate-in fade-in duration-200">
+                <div className="space-y-1">
+                  <div className="flex items-center gap-2">
+                    <span className="px-2 py-0.5 rounded text-[10px] font-extrabold uppercase tracking-wider bg-amber-400 text-slate-950">Next Step</span>
+                    <h4 className="text-base font-bold text-white flex items-center gap-2">
+                      Ready to Apply for {jobTitle ? <span className="text-amber-300 font-extrabold">{jobTitle}</span> : 'this role'}?
+                    </h4>
+                  </div>
+                  <p className="text-xs text-slate-300">
+                    Your tailored CV and dealbreaker analysis are ready. Launch your application or track pipeline progress.
+                  </p>
+                </div>
+
+                <div className="flex flex-wrap items-center gap-2.5 w-full md:w-auto">
+                  <a
+                    href={getApplyLink()}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center justify-center gap-1.5 px-4 py-2 bg-amber-400 hover:bg-amber-300 text-slate-950 text-xs font-bold rounded-lg shadow-sm transition-all flex-1 md:flex-initial"
+                  >
+                    <ExternalLink className="h-3.5 w-3.5" />
+                    <span>{applyUrl ? 'Open Application ↗' : 'Search & Apply Online ↗'}</span>
+                  </a>
+
+                  <button
+                    type="button"
+                    onClick={handleMarkAsApplied}
+                    disabled={appliedState}
+                    className={`inline-flex items-center justify-center gap-1.5 px-3.5 py-2 text-xs font-bold rounded-lg border transition-all flex-1 md:flex-initial ${
+                      appliedState 
+                        ? 'bg-emerald-800/80 border-emerald-600 text-emerald-100 cursor-default' 
+                        : 'bg-white/10 hover:bg-white/20 border-white/20 text-white'
+                    }`}
+                  >
+                    {appliedState ? (
+                      <>
+                        <CheckCircle2 className="h-3.5 w-3.5 text-emerald-300" />
+                        <span>Marked as Applied!</span>
+                      </>
+                    ) : (
+                      <>
+                        <Send className="h-3.5 w-3.5 text-indigo-300" />
+                        <span>Mark as &apos;Applied&apos;</span>
+                      </>
+                    )}
+                  </button>
+
+                  <Link
+                    href="/radar"
+                    className="inline-flex items-center justify-center gap-1.5 px-3 py-2 text-xs font-medium text-slate-300 hover:text-white bg-slate-800/80 hover:bg-slate-800 border border-slate-700 rounded-lg transition-colors"
+                    title="Return to Smart Job Radar"
+                  >
+                    <ArrowLeft className="h-3.5 w-3.5" />
+                    <span className="hidden sm:inline">Job Radar</span>
+                  </Link>
                 </div>
               </div>
 

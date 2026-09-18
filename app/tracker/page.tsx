@@ -27,6 +27,7 @@ interface Application {
   status: 'DRAFT' | 'APPLIED' | 'INTERVIEWING' | 'OFFER' | 'REJECTED';
   rejectedFromStage?: 'APPLIED' | 'INTERVIEWING' | 'OFFER';
   tailoredResumeId?: string;
+  applyUrl?: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -63,6 +64,7 @@ export default function TrackerPage() {
   const [showAddModal, setShowAddModal] = useState(false);
   const [newTitle, setNewTitle] = useState('');
   const [newCompany, setNewCompany] = useState('');
+  const [newApplyUrl, setNewApplyUrl] = useState('');
   const [newStatus, setNewStatus] = useState<Application['status']>('DRAFT');
   const [newRejectedStage, setNewRejectedStage] = useState<'APPLIED' | 'INTERVIEWING' | 'OFFER'>('APPLIED');
   const [selectedResume, setSelectedResume] = useState('');
@@ -99,6 +101,7 @@ export default function TrackerPage() {
       status: newStatus,
       rejectedFromStage: newStatus === 'REJECTED' ? newRejectedStage : undefined,
       tailoredResumeId: selectedResume || undefined,
+      applyUrl: newApplyUrl.trim() || undefined,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString()
     };
@@ -109,6 +112,7 @@ export default function TrackerPage() {
     // Reset form
     setNewTitle('');
     setNewCompany('');
+    setNewApplyUrl('');
     setNewStatus('DRAFT');
     setNewRejectedStage('APPLIED');
     setSelectedResume('');
@@ -244,12 +248,27 @@ export default function TrackerPage() {
                           <p className="text-[10px] text-slate-500 font-medium">{app.company}</p>
                         </div>
 
-                        {matchedCV && (
-                          <div className="flex items-center gap-1 text-[9px] font-semibold text-indigo-600 bg-indigo-50/60 border border-indigo-100 rounded px-1.5 py-0.5 w-fit">
-                            <FileText className="h-3 w-3 flex-shrink-0" />
-                            <span className="truncate max-w-[120px]">{matchedCV}</span>
-                          </div>
-                        )}
+                        <div className="flex flex-wrap items-center gap-1.5">
+                          {matchedCV && (
+                            <div className="flex items-center gap-1 text-[9px] font-semibold text-indigo-600 bg-indigo-50/60 border border-indigo-100 rounded px-1.5 py-0.5 w-fit">
+                              <FileText className="h-3 w-3 flex-shrink-0" />
+                              <span className="truncate max-w-[120px]">{matchedCV}</span>
+                            </div>
+                          )}
+
+                          {app.applyUrl && (
+                            <a
+                              href={app.applyUrl.startsWith('http') ? app.applyUrl : `https://${app.applyUrl}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="inline-flex items-center gap-1 text-[9px] font-bold text-amber-900 hover:text-amber-950 bg-amber-50 hover:bg-amber-100 border border-amber-300 rounded px-1.5 py-0.5 w-fit transition-colors shadow-2xs"
+                              title="Open original job application link"
+                            >
+                              <ExternalLink className="h-2.5 w-2.5 flex-shrink-0 text-amber-700" />
+                              <span className="truncate max-w-[120px]">Apply / Posting ↗</span>
+                            </a>
+                          )}
+                        </div>
 
                         {/* If REJECTED, show which stage it was rejected from with interactive selector */}
                         {app.status === 'REJECTED' && (
@@ -400,6 +419,17 @@ export default function TrackerPage() {
                   value={newCompany}
                   onChange={(e) => setNewCompany(e.target.value)}
                   placeholder="e.g. Acme Corporation"
+                  className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none"
+                />
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-xs font-bold text-slate-600">Application / Posting Link (Optional)</label>
+                <input
+                  type="url"
+                  value={newApplyUrl}
+                  onChange={(e) => setNewApplyUrl(e.target.value)}
+                  placeholder="e.g. https://careers.company.com/job/123"
                   className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none"
                 />
               </div>
