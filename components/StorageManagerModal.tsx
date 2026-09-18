@@ -79,8 +79,16 @@ export default function StorageManagerModal({ isOpen, onClose, onStorageCleared 
       const trackerCount = getCount('ascent_applications');
 
       // 5. Job Radar Cache
-      const radarSize = getBytes('ascent_radar_suggested_roles') + getBytes('ascent_radar_domain');
-      const radarCount = (localStorage.getItem('ascent_radar_suggested_roles') ? 1 : 0) + (localStorage.getItem('ascent_radar_domain') ? 1 : 0);
+      const radarKeys = [
+        'ascent_radar_suggested_roles',
+        'ascent_radar_domain',
+        'ascent_radar_last_role',
+        'ascent_radar_last_location',
+        'ascent_radar_last_remote',
+        'ascent_radar_cached_jobs'
+      ];
+      const radarSize = radarKeys.reduce((acc, k) => acc + getBytes(k), 0);
+      const radarCount = radarKeys.filter(k => localStorage.getItem(k)).length;
 
       const cats: StorageCategory[] = [
         {
@@ -122,9 +130,9 @@ export default function StorageManagerModal({ isOpen, onClose, onStorageCleared 
         {
           id: 'radar',
           name: 'Job Radar Cache',
-          description: 'Cached career domains and AI target search title suggestions.',
+          description: 'Cached searches, active role parameters, and AI target title suggestions.',
           icon: Radar,
-          keys: ['ascent_radar_suggested_roles', 'ascent_radar_domain'],
+          keys: radarKeys,
           sizeBytes: radarSize,
           itemCount: radarCount
         }
@@ -160,6 +168,14 @@ export default function StorageManagerModal({ isOpen, onClose, onStorageCleared 
   const handleClearCategory = (cat: StorageCategory) => {
     if (confirm(`Are you sure you want to delete all stored data for "${cat.name}"? This action cannot be undone.`)) {
       cat.keys.forEach(k => localStorage.removeItem(k));
+      if (cat.id === 'radar') {
+        try {
+          sessionStorage.removeItem('ascent_radar_cached_jobs');
+          sessionStorage.removeItem('ascent_radar_cached_role');
+          sessionStorage.removeItem('ascent_radar_cached_location');
+          sessionStorage.removeItem('ascent_radar_cached_remote');
+        } catch {}
+      }
       calculateStorage();
       setSuccessNotice(`Cleared data for ${cat.name}.`);
       setTimeout(() => setSuccessNotice(''), 3000);
@@ -178,9 +194,19 @@ export default function StorageManagerModal({ isOpen, onClose, onStorageCleared 
         'ascent_interview_history',
         'ascent_applications',
         'ascent_radar_suggested_roles',
-        'ascent_radar_domain'
+        'ascent_radar_domain',
+        'ascent_radar_last_role',
+        'ascent_radar_last_location',
+        'ascent_radar_last_remote',
+        'ascent_radar_cached_jobs'
       ];
       allKeys.forEach(k => localStorage.removeItem(k));
+      try {
+        sessionStorage.removeItem('ascent_radar_cached_jobs');
+        sessionStorage.removeItem('ascent_radar_cached_role');
+        sessionStorage.removeItem('ascent_radar_cached_location');
+        sessionStorage.removeItem('ascent_radar_cached_remote');
+      } catch {}
       calculateStorage();
       setSuccessNotice('All Ascent local storage has been wiped.');
       setTimeout(() => setSuccessNotice(''), 3000);

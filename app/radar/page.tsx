@@ -77,30 +77,62 @@ export default function RadarPage() {
 
   // Initial load
   useEffect(() => {
-    try {
-      const savedResume = localStorage.getItem('ascent_master_resume') || '';
-      if (savedResume) {
-        setHasMasterResume(true);
-        setResumeText(savedResume);
-      }
+    const loadRadarState = () => {
+      try {
+        const savedResume = localStorage.getItem('ascent_master_resume') || '';
+        if (savedResume) {
+          setHasMasterResume(true);
+          setResumeText(savedResume);
+        }
 
-      // Load cached suggestions if available
-      const cachedSuggestions = localStorage.getItem('ascent_radar_suggested_roles');
-      if (cachedSuggestions) {
-        setSuggestedRoles(JSON.parse(cachedSuggestions));
-      }
-      const cachedDomain = localStorage.getItem('ascent_radar_domain');
-      if (cachedDomain) {
-        setDetectedDomain(cachedDomain);
-      }
+        // Load cached suggestions if available
+        const cachedSuggestions = localStorage.getItem('ascent_radar_suggested_roles');
+        if (cachedSuggestions) {
+          setSuggestedRoles(JSON.parse(cachedSuggestions));
+        }
+        const cachedDomain = localStorage.getItem('ascent_radar_domain');
+        if (cachedDomain) {
+          setDetectedDomain(cachedDomain);
+        }
 
-      // Load already saved applications to show checkmark
-      const savedApps = JSON.parse(localStorage.getItem('ascent_applications') || '[]');
-      const savedTitles = new Set<string>(savedApps.map((a: any) => `${a.jobTitle}-${a.company}`));
-      setSavedJobIds(savedTitles);
-    } catch {}
+        // Load already saved applications to show checkmark
+        const savedApps = JSON.parse(localStorage.getItem('ascent_applications') || '[]');
+        const savedTitles = new Set<string>(savedApps.map((a: any) => `${a.jobTitle}-${a.company}`));
+        setSavedJobIds(savedTitles);
 
-    // Do NOT run automatic initial scan on page entry.
+        // Restore last searched parameters
+        const lastRole = sessionStorage.getItem('ascent_radar_cached_role') || localStorage.getItem('ascent_radar_last_role') || '';
+        const lastLocation = sessionStorage.getItem('ascent_radar_cached_location') || localStorage.getItem('ascent_radar_last_location') || 'Singapore';
+        const lastRemoteStr = sessionStorage.getItem('ascent_radar_cached_remote') || localStorage.getItem('ascent_radar_last_remote');
+        const lastRemote = lastRemoteStr === 'true';
+
+        if (lastRole) {
+          setRoleQuery(lastRole);
+        }
+        if (lastLocation) {
+          setLocationQuery(lastLocation);
+        }
+        setRemoteOnly(lastRemote);
+
+        // Restore cached job cards so user doesn't have to re-search from scratch
+        const cachedJobsStr = sessionStorage.getItem('ascent_radar_cached_jobs') || localStorage.getItem('ascent_radar_cached_jobs');
+        if (cachedJobsStr && lastRole) {
+          const parsedJobs: RadarJob[] = JSON.parse(cachedJobsStr);
+          if (Array.isArray(parsedJobs) && parsedJobs.length > 0) {
+            setJobs(parsedJobs);
+            setSearchedRole(lastRole);
+            setSearchedLocation(lastLocation);
+          }
+        }
+      } catch (err) {
+        console.error('Error loading radar state:', err);
+      }
+    };
+
+    loadRadarState();
+
+    window.addEventListener('ascent-storage-cleared', loadRadarState);
+    return () => window.removeEventListener('ascent-storage-cleared', loadRadarState);
   }, []);
 
   const fetchRadarJobs = async (q: string, loc: string, remote: boolean, explicitResume?: string) => {
@@ -111,6 +143,12 @@ export default function RadarPage() {
       setJobs([]);
       setSearchedRole('');
       setSearchedLocation(trimmedLocation);
+      try {
+        localStorage.removeItem('ascent_radar_last_role');
+        localStorage.removeItem('ascent_radar_cached_jobs');
+        sessionStorage.removeItem('ascent_radar_cached_role');
+        sessionStorage.removeItem('ascent_radar_cached_jobs');
+      } catch {}
       return;
     }
 
@@ -149,6 +187,18 @@ export default function RadarPage() {
         setIsDemo(data.isDemo || false);
         setHasApiKey(data.hasApiKey ?? true);
         setDemoMessage(data.message || '');
+
+        // Persist last searched role and results so user never has to re-search from scratch
+        try {
+          localStorage.setItem('ascent_radar_last_role', trimmedQuery);
+          localStorage.setItem('ascent_radar_last_location', trimmedLocation);
+          localStorage.setItem('ascent_radar_last_remote', String(remote));
+          localStorage.setItem('ascent_radar_cached_jobs', JSON.stringify(returnedJobs));
+          sessionStorage.setItem('ascent_radar_cached_role', trimmedQuery);
+          sessionStorage.setItem('ascent_radar_cached_location', trimmedLocation);
+          sessionStorage.setItem('ascent_radar_cached_remote', String(remote));
+          sessionStorage.setItem('ascent_radar_cached_jobs', JSON.stringify(returnedJobs));
+        } catch {}
       } else {
         setJobs([]);
       }
@@ -166,6 +216,12 @@ export default function RadarPage() {
       setJobs([]);
       setSearchedRole('');
       setSearchedLocation(locationQuery.trim());
+      try {
+        localStorage.removeItem('ascent_radar_last_role');
+        localStorage.removeItem('ascent_radar_cached_jobs');
+        sessionStorage.removeItem('ascent_radar_cached_role');
+        sessionStorage.removeItem('ascent_radar_cached_jobs');
+      } catch {}
       return;
     }
     fetchRadarJobs(roleQuery.trim(), locationQuery.trim(), remoteOnly);
@@ -182,8 +238,18 @@ export default function RadarPage() {
       setRoleQuery('');
       setSearchedRole('');
       setJobs([]);
+      try {
+        localStorage.removeItem('ascent_radar_last_role');
+        localStorage.removeItem('ascent_radar_cached_jobs');
+        sessionStorage.removeItem('ascent_radar_cached_role');
+        sessionStorage.removeItem('ascent_radar_cached_jobs');
+      } catch {}
     } else {
       setRoleQuery(tag);
+      try {
+        localStorage.setItem('ascent_radar_last_role', tag);
+        sessionStorage.setItem('ascent_radar_cached_role', tag);
+      } catch {}
       fetchRadarJobs(tag, locationQuery, remoteOnly);
     }
   };
@@ -198,8 +264,18 @@ export default function RadarPage() {
       setRoleQuery('');
       setSearchedRole('');
       setJobs([]);
+      try {
+        localStorage.removeItem('ascent_radar_last_role');
+        localStorage.removeItem('ascent_radar_cached_jobs');
+        sessionStorage.removeItem('ascent_radar_cached_role');
+        sessionStorage.removeItem('ascent_radar_cached_jobs');
+      } catch {}
     } else {
       setRoleQuery(tag);
+      try {
+        localStorage.setItem('ascent_radar_last_role', tag);
+        sessionStorage.setItem('ascent_radar_cached_role', tag);
+      } catch {}
       fetchRadarJobs(tag, locationQuery, remoteOnly);
     }
   };
@@ -283,6 +359,8 @@ export default function RadarPage() {
         setDetectedDomain(domain);
 
         try {
+          localStorage.setItem('ascent_radar_last_role', primary);
+          sessionStorage.setItem('ascent_radar_cached_role', primary);
           localStorage.setItem('ascent_radar_suggested_roles', JSON.stringify(suggestions));
           if (domain) localStorage.setItem('ascent_radar_domain', domain);
         } catch {}
@@ -372,14 +450,30 @@ export default function RadarPage() {
                 id="radar-role-input"
                 type="text"
                 value={roleQuery}
-                onChange={(e) => setRoleQuery(e.target.value)}
+                onChange={(e) => {
+                  const val = e.target.value;
+                  setRoleQuery(val);
+                  try {
+                    localStorage.setItem('ascent_radar_last_role', val);
+                  } catch {}
+                }}
                 placeholder="e.g. Product Manager, Data Scientist, AI Engineer..."
                 className="w-full pl-10 pr-9 py-2.5 text-sm font-semibold text-slate-950 placeholder:text-slate-500 placeholder:font-normal bg-white border-2 border-slate-300 rounded-lg outline-none focus:border-indigo-600 focus:ring-2 focus:ring-indigo-100 shadow-2xs transition-all"
               />
               {roleQuery && (
                 <button
                   type="button"
-                  onClick={() => setRoleQuery('')}
+                  onClick={() => {
+                    setRoleQuery('');
+                    setJobs([]);
+                    setSearchedRole('');
+                    try {
+                      localStorage.removeItem('ascent_radar_last_role');
+                      localStorage.removeItem('ascent_radar_cached_jobs');
+                      sessionStorage.removeItem('ascent_radar_cached_role');
+                      sessionStorage.removeItem('ascent_radar_cached_jobs');
+                    } catch {}
+                  }}
                   className="absolute right-2.5 top-1/2 -translate-y-1/2 p-1 text-slate-400 hover:text-slate-700 rounded-md transition-colors"
                   title="Clear input"
                   aria-label="Clear role input"
@@ -402,14 +496,26 @@ export default function RadarPage() {
                 id="radar-location-input"
                 type="text"
                 value={locationQuery}
-                onChange={(e) => setLocationQuery(e.target.value)}
+                onChange={(e) => {
+                  const val = e.target.value;
+                  setLocationQuery(val);
+                  try {
+                    localStorage.setItem('ascent_radar_last_location', val);
+                  } catch {}
+                }}
                 placeholder="e.g. Singapore, Remote, London..."
                 className="w-full pl-10 pr-9 py-2.5 text-sm font-semibold text-slate-950 placeholder:text-slate-500 placeholder:font-normal bg-white border-2 border-slate-300 rounded-lg outline-none focus:border-indigo-600 focus:ring-2 focus:ring-indigo-100 shadow-2xs transition-all"
               />
               {locationQuery && (
                 <button
                   type="button"
-                  onClick={() => setLocationQuery('')}
+                  onClick={() => {
+                    setLocationQuery('');
+                    try {
+                      localStorage.removeItem('ascent_radar_last_location');
+                      sessionStorage.removeItem('ascent_radar_cached_location');
+                    } catch {}
+                  }}
                   className="absolute right-2.5 top-1/2 -translate-y-1/2 p-1 text-slate-400 hover:text-slate-700 rounded-md transition-colors"
                   title="Clear location"
                   aria-label="Clear location input"
@@ -523,6 +629,10 @@ export default function RadarPage() {
               onChange={(e) => {
                 const nextRemote = e.target.checked;
                 setRemoteOnly(nextRemote);
+                try {
+                  localStorage.setItem('ascent_radar_last_remote', String(nextRemote));
+                  sessionStorage.setItem('ascent_radar_cached_remote', String(nextRemote));
+                } catch {}
                 if (searchedRole.trim()) {
                   fetchRadarJobs(searchedRole, locationQuery, nextRemote);
                 }
