@@ -10,7 +10,6 @@ import {
   Clock, 
   ExternalLink, 
   Sparkles, 
-  BookmarkPlus, 
   Check, 
   ChevronDown, 
   ChevronUp, 
@@ -298,33 +297,6 @@ export default function RadarPage() {
     } catch (err) {
       console.error('Error initiating tailoring import:', err);
       router.push('/tailor');
-    }
-  };
-
-  // 1-Click Save to Pipeline: Adds card into tracker under DRAFT
-  const handleSaveToPipeline = (job: RadarJob) => {
-    if (isBlockedJob(job)) {
-      alert('This posting has been flagged and blocked as an unverified/scam source.');
-      return;
-    }
-    try {
-      const apps = JSON.parse(localStorage.getItem('ascent_applications') || '[]');
-      const newApp = {
-        id: crypto.randomUUID(),
-        jobTitle: job.title,
-        company: job.company,
-        status: 'DRAFT',
-        applyUrl: job.applyLink,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
-      };
-      apps.push(newApp);
-      localStorage.setItem('ascent_applications', JSON.stringify(apps));
-
-      const key = `${job.title}-${job.company}`;
-      setSavedJobIds(prev => new Set(prev).add(key));
-    } catch (err) {
-      console.error('Error saving to pipeline:', err);
     }
   };
 
@@ -866,33 +838,15 @@ export default function RadarPage() {
                       title="Pre-fill this job description into Tailor & ATS Scorecard"
                     >
                       <Sparkles className="h-3.5 w-3.5" />
-                      <span>Tailor CV for this Role</span>
+                      <span>{isSaved ? 'Re-tailor CV for this Role' : 'Tailor CV for this Role'}</span>
                     </button>
 
-                    {/* 1-Click Save to Application Pipeline */}
-                    <button
-                      type="button"
-                      onClick={() => handleSaveToPipeline(job)}
-                      disabled={isSaved}
-                      className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold border transition-colors cursor-pointer ${
-                        isSaved 
-                          ? 'bg-blue-50 text-blue-900 border-blue-300 font-bold' 
-                          : 'bg-white hover:bg-slate-50 text-slate-700 border-slate-200'
-                      }`}
-                      title={isSaved ? "Saved to Job Tracker" : "Save to Application Pipeline"}
-                    >
-                      {isSaved ? (
-                        <>
-                          <Check className="h-3.5 w-3.5 text-blue-700" />
-                          <span>In Pipeline</span>
-                        </>
-                      ) : (
-                        <>
-                          <BookmarkPlus className="h-3.5 w-3.5 text-slate-400" />
-                          <span>Save to Pipeline</span>
-                        </>
-                      )}
-                    </button>
+                    {isSaved && (
+                      <span className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-bold bg-blue-50 text-blue-900 border border-blue-200">
+                        <Check className="h-3.5 w-3.5 text-blue-700" />
+                        <span>In Pipeline</span>
+                      </span>
+                    )}
                   </div>
 
                   {/* Direct External Link to Apply on Source */}
