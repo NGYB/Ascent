@@ -32,7 +32,8 @@ import {
   ShieldAlert,
   ExternalLink,
   ArrowLeft,
-  Send
+  Send,
+  RotateCcw
 } from 'lucide-react';
 
 interface TransferableSkill {
@@ -287,6 +288,25 @@ export default function TailorPage() {
     } catch (err) {
       console.error(err);
     }
+  };
+
+  const handleStartFresh = () => {
+    setJobTitle('');
+    setCompany('');
+    setApplyUrl('');
+    setJobDescription('');
+    setResult(null);
+    setSaved(false);
+    setAppliedState(false);
+    setError('');
+    setFromRadar(false);
+    setActiveTab('deflator');
+    try {
+      sessionStorage.removeItem('ascent_import_job');
+      if (typeof window !== 'undefined' && window.history.replaceState) {
+        window.history.replaceState({}, '', '/tailor');
+      }
+    } catch {}
   };
 
   const handleTailor = async (e: React.FormEvent) => {
@@ -562,10 +582,23 @@ export default function TailorPage() {
         <div className="lg:col-span-2">
           <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-6 h-full flex flex-col justify-between animate-in fade-in duration-200">
             <div className="space-y-6">
-              <h3 className="font-bold text-slate-800 text-base uppercase tracking-wider flex items-center gap-2">
-                <Sparkles className="h-5 w-5 text-amber-500" />
-                <span>Target Job Details</span>
-              </h3>
+              <div className="flex items-center justify-between">
+                <h3 className="font-bold text-slate-800 text-base uppercase tracking-wider flex items-center gap-2">
+                  <Sparkles className="h-5 w-5 text-amber-500" />
+                  <span>Target Job Details</span>
+                </h3>
+                {(result || jobTitle || jobDescription || applyUrl) && (
+                  <button
+                    type="button"
+                    onClick={handleStartFresh}
+                    className="text-xs font-bold text-slate-500 hover:text-slate-800 flex items-center gap-1.5 transition-colors px-2 py-1 rounded hover:bg-slate-100 border border-transparent hover:border-slate-200"
+                    title="Clear all fields and start fresh"
+                  >
+                    <RotateCcw className="h-3.5 w-3.5" />
+                    <span>Start fresh</span>
+                  </button>
+                )}
+              </div>
 
               <form onSubmit={handleTailor} className="space-y-4">
                 <div className="space-y-1">
@@ -659,6 +692,18 @@ export default function TailorPage() {
                   </>
                 )}
               </button>
+
+              {result && (
+                <button
+                  type="button"
+                  onClick={handleStartFresh}
+                  className="w-full py-2.5 px-4 bg-white hover:bg-slate-100 text-slate-700 border border-slate-300 rounded-lg text-sm font-bold transition-colors flex items-center justify-center gap-2 shadow-2xs"
+                  title="Clear all fields and start fresh"
+                >
+                  <RotateCcw className="h-4 w-4 text-slate-500" />
+                  <span>Start Fresh (Clear Form & Results)</span>
+                </button>
+              )}
             </div>
           </div>
         </div>
@@ -777,6 +822,15 @@ export default function TailorPage() {
                       </>
                     )}
                   </button>
+
+                  <button
+                    onClick={handleStartFresh}
+                    className="flex items-center justify-center gap-1.5 text-sm font-semibold bg-white text-slate-700 hover:bg-slate-50 px-3 py-1.5 rounded-md border border-slate-200 transition-colors"
+                    title="Clear inputs and start fresh"
+                  >
+                    <RotateCcw className="h-4 w-4 text-slate-500" />
+                    <span>Start fresh</span>
+                  </button>
                 </div>
               </div>
 
@@ -826,6 +880,16 @@ export default function TailorPage() {
                         <span>Mark as &apos;Applied&apos;</span>
                       </>
                     )}
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={handleStartFresh}
+                    className="inline-flex items-center justify-center gap-1.5 px-3 py-2 text-xs font-bold text-slate-300 hover:text-white bg-slate-800/80 hover:bg-slate-800 border border-slate-700 rounded-lg transition-colors"
+                    title="Clear inputs and start fresh for a new role"
+                  >
+                    <RotateCcw className="h-3.5 w-3.5 text-slate-400" />
+                    <span>Start Fresh</span>
                   </button>
 
                   <Link
