@@ -28,7 +28,8 @@ import {
   HelpCircle,
   ChevronDown,
   Building2,
-  ArrowUpDown
+  ArrowUpDown,
+  ShieldAlert
 } from 'lucide-react';
 
 interface TransferableSkill {
@@ -518,8 +519,9 @@ export default function TailorPage() {
 
             <div className="space-y-4">
               {error && (
-                <div className="p-3 bg-rose-50 text-rose-800 text-sm rounded-lg border border-rose-100">
-                  {error}
+                <div className="p-3 bg-amber-50 text-amber-950 text-sm rounded-lg border border-amber-300 flex items-start gap-2 font-medium">
+                  <AlertTriangle className="h-4 w-4 text-amber-700 flex-shrink-0 mt-0.5" />
+                  <span>{error}</span>
                 </div>
               )}
 
@@ -564,7 +566,7 @@ export default function TailorPage() {
                     {result.jdDeflator && (
                       <span className={`ml-1 px-1.5 py-0.5 rounded text-[10px] font-extrabold ${
                         result.jdDeflator.mustHavesMatchRate >= 80 
-                          ? 'bg-emerald-500 text-white' 
+                          ? 'bg-blue-600 text-white' 
                           : 'bg-amber-500 text-white'
                       }`}>
                         {result.jdDeflator.mustHavesMatchRate}%
@@ -633,7 +635,7 @@ export default function TailorPage() {
                   <button
                     onClick={handleSave}
                     disabled={saved}
-                    className="flex items-center gap-1.5 text-sm font-semibold bg-indigo-600 hover:bg-indigo-700 disabled:bg-emerald-600 text-white px-3 py-1.5 rounded-md transition-colors"
+                    className="flex items-center gap-1.5 text-sm font-semibold bg-indigo-600 hover:bg-indigo-700 disabled:bg-blue-600 disabled:opacity-95 text-white px-3 py-1.5 rounded-md transition-colors"
                   >
                     {saved ? (
                       <>
@@ -659,16 +661,16 @@ export default function TailorPage() {
                         {/* Recruiter Verdict Hero Banner */}
                         <div className={`p-5 rounded-2xl border shadow-sm space-y-3 ${
                           result.jdDeflator.mustHavesMatchRate >= 80
-                            ? 'bg-gradient-to-br from-emerald-50/80 via-white to-emerald-50/40 border-emerald-200 text-emerald-950'
+                            ? 'bg-gradient-to-br from-blue-50/80 via-white to-blue-50/40 border-blue-200 text-blue-950'
                             : result.jdDeflator.mustHavesMatchRate >= 60
                             ? 'bg-gradient-to-br from-amber-50/80 via-white to-amber-50/40 border-amber-200 text-amber-950'
-                            : 'bg-gradient-to-br from-slate-50 via-white to-rose-50/40 border-slate-200 text-slate-900'
+                            : 'bg-gradient-to-br from-slate-50 via-white to-amber-50/40 border-slate-200 text-slate-900'
                         }`}>
                           <div className="flex items-center justify-between flex-wrap gap-2">
                             <div className="flex items-center gap-2">
                               <span className={`p-1.5 rounded-lg flex items-center justify-center ${
                                 result.jdDeflator.mustHavesMatchRate >= 80
-                                  ? 'bg-emerald-600 text-white'
+                                  ? 'bg-blue-700 text-white'
                                   : result.jdDeflator.mustHavesMatchRate >= 60
                                   ? 'bg-amber-600 text-white'
                                   : 'bg-slate-700 text-white'
@@ -677,7 +679,7 @@ export default function TailorPage() {
                               </span>
                               <span className="text-xs font-extrabold tracking-wider uppercase">
                                 {result.jdDeflator.mustHavesMatchRate >= 80
-                                  ? 'Recruiter Verdict: Green Light to Apply'
+                                  ? 'Recruiter Verdict: Strong Fit — Recommended to Apply'
                                   : result.jdDeflator.mustHavesMatchRate >= 60
                                   ? 'Recruiter Verdict: Viable with Strategic Positioning'
                                   : 'Recruiter Verdict: Significant Structural Gap'}
@@ -685,9 +687,9 @@ export default function TailorPage() {
                             </div>
                             <span className={`px-2.5 py-0.5 rounded-full text-xs font-bold ${
                               result.jdDeflator.mustHavesMatchRate >= 80
-                                ? 'bg-emerald-100 text-emerald-800'
+                                ? 'bg-blue-100 text-blue-900 border border-blue-200'
                                 : result.jdDeflator.mustHavesMatchRate >= 60
-                                ? 'bg-amber-100 text-amber-800'
+                                ? 'bg-amber-100 text-amber-900 border border-amber-200'
                                 : 'bg-slate-200 text-slate-700'
                             }`}>
                               Must-Have Fit: {result.jdDeflator.mustHavesMatchRate}%
@@ -704,25 +706,25 @@ export default function TailorPage() {
                           {/* Must Haves Card */}
                           <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm space-y-1.5">
                             <div className="flex items-center justify-between">
-                              <span className="text-xs font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
-                                <span className="h-2 w-2 rounded-full bg-rose-500"></span>
+                              <span className="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
+                                <ShieldAlert className="h-4 w-4 text-indigo-700 flex-shrink-0" />
                                 <span>Core Must-Haves (Dealbreakers)</span>
                               </span>
                               <span className={`text-xl font-black ${
-                                result.jdDeflator.mustHavesMatchRate >= 80 ? 'text-emerald-600' : 'text-slate-800'
+                                result.jdDeflator.mustHavesMatchRate >= 80 ? 'text-blue-700' : 'text-slate-800'
                               }`}>
                                 {result.jdDeflator.mustHavesMatchRate}%
                               </span>
                             </div>
-                            <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
+                            <div className="w-full bg-slate-100 h-2.5 rounded-full overflow-hidden border border-slate-200">
                               <div 
                                 className={`h-full rounded-full transition-all duration-500 ${
-                                  result.jdDeflator.mustHavesMatchRate >= 80 ? 'bg-emerald-500' : 'bg-amber-500'
+                                  result.jdDeflator.mustHavesMatchRate >= 80 ? 'bg-blue-600' : 'bg-amber-500'
                                 }`}
                                 style={{ width: `${result.jdDeflator.mustHavesMatchRate}%` }}
                               />
                             </div>
-                            <p className="text-[11px] text-slate-400">
+                            <p className="text-[11px] text-slate-600 font-medium">
                               {result.jdDeflator.mustHaves.filter(m => m.matched).length} of {result.jdDeflator.mustHaves.length} non-negotiable requirements satisfied
                             </p>
                           </div>
@@ -730,8 +732,8 @@ export default function TailorPage() {
                           {/* Good To Haves Card */}
                           <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm space-y-1.5">
                             <div className="flex items-center justify-between">
-                              <span className="text-xs font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
-                                <span className="h-2 w-2 rounded-full bg-amber-400"></span>
+                              <span className="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
+                                <Sparkles className="h-4 w-4 text-amber-600 flex-shrink-0" />
                                 <span>Recruiter Wishlist (Learnable)</span>
                               </span>
                               <span className="text-xl font-black text-slate-700">
@@ -828,12 +830,12 @@ export default function TailorPage() {
                           <div className="space-y-3">
                             <div className="flex items-center justify-between pb-1 border-b border-slate-200">
                               <h4 className="text-sm font-bold text-slate-800 flex items-center gap-1.5">
-                                <span className="px-1.5 py-0.5 rounded text-[10px] font-black bg-rose-100 text-rose-800 uppercase">
+                                <span className="px-1.5 py-0.5 rounded text-[10px] font-black bg-indigo-100 text-indigo-900 border border-indigo-200 uppercase">
                                   Dealbreakers
                                 </span>
                                 <span>Day-1 Non-Negotiables</span>
                               </h4>
-                              <span className="text-xs font-bold text-slate-400">
+                              <span className="text-xs font-bold text-slate-600">
                                 {result.jdDeflator.mustHaves.length} items
                               </span>
                             </div>
@@ -844,17 +846,17 @@ export default function TailorPage() {
                                   key={idx} 
                                   className={`p-3.5 rounded-xl border transition-all ${
                                     item.matched 
-                                      ? 'bg-white border-slate-200 shadow-sm hover:border-emerald-200' 
-                                      : 'bg-rose-50/40 border-rose-200 shadow-sm'
+                                      ? 'bg-white border-slate-200 shadow-sm hover:border-blue-300' 
+                                      : 'bg-amber-50/50 border-amber-300 border-dashed shadow-sm'
                                   }`}
                                 >
                                   <div className="flex items-start justify-between gap-2">
                                     <div className="space-y-0.5">
                                       <div className="flex items-center gap-1.5">
                                         {item.matched ? (
-                                          <CheckCircle2 className="h-4 w-4 text-emerald-600 flex-shrink-0" />
+                                          <CheckCircle2 className="h-4 w-4 text-blue-700 flex-shrink-0" />
                                         ) : (
-                                          <XCircle className="h-4 w-4 text-rose-600 flex-shrink-0" />
+                                          <XCircle className="h-4 w-4 text-amber-800 flex-shrink-0" />
                                         )}
                                         <span className="text-xs font-bold text-slate-800 leading-snug">
                                           {item.skill}
@@ -863,20 +865,20 @@ export default function TailorPage() {
                                     </div>
                                     <span className={`px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider flex-shrink-0 ${
                                       item.matched 
-                                        ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' 
-                                        : 'bg-rose-100 text-rose-700 border border-rose-200'
+                                        ? 'bg-blue-100 text-blue-900 border border-blue-300' 
+                                        : 'bg-amber-100 text-amber-950 border border-amber-300 border-dashed'
                                     }`}>
-                                      {item.matched ? 'Verified' : 'Gap'}
+                                      {item.matched ? '✓ Verified' : '✕ Skill Gap'}
                                     </span>
                                   </div>
 
                                   <div className="mt-2.5 pt-2 border-t border-slate-100 space-y-1 text-[11px]">
-                                    <div className="text-slate-500">
+                                    <div className="text-slate-600">
                                       <strong className="text-slate-700">Why Recruiter Cares: </strong>
                                       <span>{item.recruiterRationale}</span>
                                     </div>
-                                    <div className="text-slate-600 bg-slate-50 p-2 rounded border border-slate-100">
-                                      <strong className="text-slate-700">CV Evidence: </strong>
+                                    <div className="text-slate-700 bg-slate-50 p-2 rounded border border-slate-200">
+                                      <strong className="text-slate-800">CV Evidence: </strong>
                                       <span>{item.candidateEvidence}</span>
                                     </div>
                                   </div>
@@ -889,12 +891,12 @@ export default function TailorPage() {
                           <div className="space-y-3">
                             <div className="flex items-center justify-between pb-1 border-b border-slate-200">
                               <h4 className="text-sm font-bold text-slate-800 flex items-center gap-1.5">
-                                <span className="px-1.5 py-0.5 rounded text-[10px] font-black bg-amber-100 text-amber-800 uppercase">
+                                <span className="px-1.5 py-0.5 rounded text-[10px] font-black bg-amber-100 text-amber-900 border border-amber-200 uppercase">
                                   Wishlist
                                 </span>
                                 <span>Learnable on the Job</span>
                               </h4>
-                              <span className="text-xs font-bold text-slate-400">
+                              <span className="text-xs font-bold text-slate-600">
                                 {result.jdDeflator.goodToHaves.length} items
                               </span>
                             </div>
@@ -905,7 +907,7 @@ export default function TailorPage() {
                                   key={idx} 
                                   className={`p-3.5 rounded-xl border transition-all ${
                                     item.matched 
-                                      ? 'bg-white border-slate-200 shadow-sm' 
+                                      ? 'bg-white border-slate-200 shadow-sm hover:border-blue-300' 
                                       : 'bg-amber-50/30 border-amber-200/80 shadow-sm'
                                   }`}
                                 >
@@ -913,9 +915,9 @@ export default function TailorPage() {
                                     <div className="space-y-0.5">
                                       <div className="flex items-center gap-1.5">
                                         {item.matched ? (
-                                          <CheckCircle2 className="h-4 w-4 text-emerald-600 flex-shrink-0" />
+                                          <CheckCircle2 className="h-4 w-4 text-blue-700 flex-shrink-0" />
                                         ) : (
-                                          <Zap className="h-4 w-4 text-amber-500 flex-shrink-0" />
+                                          <Zap className="h-4 w-4 text-amber-600 flex-shrink-0" />
                                         )}
                                         <span className="text-xs font-bold text-slate-800 leading-snug">
                                           {item.skill}
@@ -924,19 +926,19 @@ export default function TailorPage() {
                                     </div>
                                     <span className={`px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider flex-shrink-0 ${
                                       item.matched 
-                                        ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' 
-                                        : 'bg-amber-100 text-amber-800 border border-amber-200'
+                                        ? 'bg-blue-100 text-blue-900 border border-blue-300' 
+                                        : 'bg-amber-100 text-amber-900 border border-amber-200'
                                     }`}>
-                                      {item.matched ? 'Bonus Match' : 'Learnable'}
+                                      {item.matched ? '✓ Bonus Match' : '▲ Learnable'}
                                     </span>
                                   </div>
 
                                   <div className="mt-2.5 pt-2 border-t border-slate-100 space-y-1 text-[11px]">
-                                    <div className="text-slate-500">
+                                    <div className="text-slate-600">
                                       <strong className="text-slate-700">Why It&apos;s Flexible: </strong>
                                       <span>{item.recruiterRationale}</span>
                                     </div>
-                                    <div className="text-amber-900 bg-amber-50/60 p-2 rounded border border-amber-100">
+                                    <div className="text-amber-950 bg-amber-50/70 p-2 rounded border border-amber-200">
                                       <strong className="text-amber-950">💡 Bridge / Substitute: </strong>
                                       <span>{item.substituteAdvice}</span>
                                     </div>
@@ -1008,8 +1010,8 @@ export default function TailorPage() {
                         <div className="space-y-6">
                           {/* Strengths */}
                           <div className="space-y-2">
-                            <div className="flex items-center gap-2 text-emerald-800 font-bold text-sm">
-                              <CheckCircle className="h-4 w-4 text-emerald-600" />
+                            <div className="flex items-center gap-2 text-blue-900 font-bold text-sm">
+                              <CheckCircle className="h-4 w-4 text-blue-700" />
                               <span>Top Transferable Strengths</span>
                             </div>
                             <div className="bg-white p-4.5 rounded-xl border border-slate-200/60 shadow-sm leading-relaxed">
@@ -1019,8 +1021,8 @@ export default function TailorPage() {
 
                           {/* Gaps */}
                           <div className="space-y-2">
-                            <div className="flex items-center gap-2 text-amber-800 font-bold text-sm">
-                              <AlertTriangle className="h-4 w-4 text-amber-600" />
+                            <div className="flex items-center gap-2 text-amber-900 font-bold text-sm">
+                              <AlertTriangle className="h-4 w-4 text-amber-700" />
                               <span>Key Alignment Gaps</span>
                             </div>
                             <div className="bg-white p-4.5 rounded-xl border border-slate-200/60 shadow-sm leading-relaxed">
@@ -1060,23 +1062,23 @@ export default function TailorPage() {
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 p-4 rounded-xl bg-slate-50 border border-slate-100">
                       <div className="flex items-center gap-4 bg-white p-3 rounded-lg border border-slate-200 shadow-sm">
                         <div className="h-16 w-16 rounded-full border-4 border-slate-300 bg-slate-50 flex flex-col items-center justify-center shadow-sm">
-                          <span className="text-lg font-black text-slate-500">{result.atsAnalysis.beforeScore}</span>
-                          <span className="text-[8px] text-slate-500 font-bold uppercase tracking-wider">Before</span>
+                          <span className="text-lg font-black text-slate-700">{result.atsAnalysis.beforeScore}</span>
+                          <span className="text-[8px] text-slate-600 font-bold uppercase tracking-wider">Before</span>
                         </div>
                         <div>
                           <h4 className="font-bold text-slate-700 text-sm">Original CV Match</h4>
-                          <p className="text-xs text-slate-400">Baseline fit score</p>
+                          <p className="text-xs text-slate-500 font-medium">Baseline fit score</p>
                         </div>
                       </div>
                       
-                      <div className="flex items-center gap-4 bg-white p-3 rounded-lg border border-emerald-200 shadow-sm">
-                        <div className="h-16 w-16 rounded-full border-4 border-emerald-500 bg-emerald-50 flex flex-col items-center justify-center shadow-sm">
-                          <span className="text-lg font-black text-slate-800">{result.atsAnalysis.afterScore}</span>
-                          <span className="text-[8px] text-emerald-600 font-bold uppercase tracking-wider">After</span>
+                      <div className="flex items-center gap-4 bg-white p-3 rounded-lg border border-blue-300 shadow-sm">
+                        <div className="h-16 w-16 rounded-full border-4 border-blue-600 bg-blue-50 flex flex-col items-center justify-center shadow-sm">
+                          <span className="text-lg font-black text-blue-950">{result.atsAnalysis.afterScore}</span>
+                          <span className="text-[8px] text-blue-700 font-bold uppercase tracking-wider">After</span>
                         </div>
                         <div>
-                          <h4 className="font-bold text-emerald-800 text-sm">Optimized CV Match</h4>
-                          <p className="text-xs text-emerald-600/70 font-semibold">After tailoring edits</p>
+                          <h4 className="font-bold text-blue-900 text-sm">Optimized CV Match</h4>
+                          <p className="text-xs text-blue-700 font-semibold">After tailoring edits</p>
                         </div>
                       </div>
                     </div>
@@ -1084,28 +1086,30 @@ export default function TailorPage() {
                     {/* Keywords lists */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       <div className="space-y-3">
-                        <h5 className="font-bold text-sm uppercase tracking-wider text-slate-400 flex items-center gap-2">
-                          <CheckCircle className="h-5 w-5 text-emerald-600" />
+                        <h5 className="font-bold text-sm uppercase tracking-wider text-slate-700 flex items-center gap-2">
+                          <CheckCircle className="h-5 w-5 text-blue-700" />
                           <span>Matching Keywords ({result.atsAnalysis.matchingKeywords.length})</span>
                         </h5>
                         <div className="flex flex-wrap gap-1.5">
                           {result.atsAnalysis.matchingKeywords.map((kw, i) => (
-                            <span key={i} className="px-2.5 py-1 rounded bg-emerald-50 text-emerald-700 text-sm font-semibold border border-emerald-100">
-                              {kw}
+                            <span key={i} className="px-2.5 py-1 rounded bg-blue-50 text-blue-900 text-sm font-semibold border border-blue-200 flex items-center gap-1.5">
+                              <span className="text-blue-700 font-bold">✓</span>
+                              <span>{kw}</span>
                             </span>
                           ))}
                         </div>
                       </div>
 
                       <div className="space-y-3">
-                        <h5 className="font-bold text-sm uppercase tracking-wider text-slate-400 flex items-center gap-2">
-                          <AlertTriangle className="h-5 w-5 text-amber-600" />
+                        <h5 className="font-bold text-sm uppercase tracking-wider text-slate-700 flex items-center gap-2">
+                          <AlertTriangle className="h-5 w-5 text-amber-700" />
                           <span>Missing Keywords ({result.atsAnalysis.missingKeywords.length})</span>
                         </h5>
                         <div className="flex flex-wrap gap-1.5">
                           {result.atsAnalysis.missingKeywords.map((kw, i) => (
-                            <span key={i} className="px-2.5 py-1 rounded bg-amber-50 text-amber-700 text-sm font-semibold border border-amber-155">
-                              {kw}
+                            <span key={i} className="px-2.5 py-1 rounded bg-amber-50 text-amber-950 text-sm font-semibold border border-dashed border-amber-300 flex items-center gap-1.5">
+                              <span className="text-amber-700 font-bold">✕</span>
+                              <span>{kw}</span>
                             </span>
                           ))}
                         </div>
@@ -1114,7 +1118,7 @@ export default function TailorPage() {
 
                     {/* Upskilling Actions */}
                     <div className="space-y-3 pt-4 border-t border-slate-100">
-                      <h5 className="font-bold text-sm uppercase tracking-wider text-slate-400 flex items-center gap-2">
+                      <h5 className="font-bold text-sm uppercase tracking-wider text-slate-700 flex items-center gap-2">
                         <BookOpen className="h-5 w-5 text-indigo-500" />
                         <span>Recommended Upskilling Actions</span>
                       </h5>

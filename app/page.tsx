@@ -102,7 +102,7 @@ export default function Home() {
         </div>
 
         <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm flex items-center gap-4">
-          <div className="h-12 w-12 rounded-lg bg-emerald-50 flex items-center justify-center text-emerald-600">
+          <div className="h-12 w-12 rounded-lg bg-sky-50 flex items-center justify-center text-sky-700">
             <Briefcase className="h-6 w-6" />
           </div>
           <div>
@@ -188,7 +188,7 @@ export default function Home() {
           {/* Card 4: Interview Prep */}
           <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm hover:shadow-md transition-shadow flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 group">
             <div className="flex items-start gap-4 flex-1">
-              <div className="h-12 w-12 rounded-lg bg-emerald-50 flex items-center justify-center text-emerald-600 flex-shrink-0 mt-1">
+              <div className="h-12 w-12 rounded-lg bg-teal-50 flex items-center justify-center text-teal-700 flex-shrink-0 mt-1">
                 <MessageSquare className="h-6 w-6" />
               </div>
               <div className="space-y-1">

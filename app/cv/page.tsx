@@ -327,8 +327,8 @@ export default function CVPage() {
             )}
 
             {success && (
-              <div className="p-3.5 bg-emerald-50 text-emerald-800 text-sm rounded-lg border border-emerald-100 flex gap-2 leading-relaxed">
-                <CheckCircle className="h-5 w-5 flex-shrink-0 animate-bounce text-emerald-600 mt-0.5" />
+              <div className="p-3.5 bg-blue-50 text-blue-950 text-sm rounded-lg border border-blue-200 flex gap-2 leading-relaxed font-medium">
+                <CheckCircle className="h-5 w-5 flex-shrink-0 text-blue-700 mt-0.5" />
                 <span>{success}</span>
               </div>
             )}
@@ -401,7 +401,7 @@ export default function CVPage() {
                 {isEditing ? (
                   <button
                     onClick={handleSaveText}
-                    className="flex items-center gap-1.5 text-sm font-bold bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-1.5 rounded-md shadow-sm transition-colors"
+                    className="flex items-center gap-1.5 text-sm font-bold bg-blue-600 hover:bg-blue-700 text-white px-4 py-1.5 rounded-md shadow-sm transition-colors"
                   >
                     <Save className="h-4 w-4" />
                     <span>Save Changes</span>
@@ -410,7 +410,7 @@ export default function CVPage() {
                   <>
                     <button
                       onClick={handleSaveText}
-                      className="flex items-center gap-1.5 text-sm font-bold bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-1.5 rounded-md shadow-sm transition-colors"
+                      className="flex items-center gap-1.5 text-sm font-bold bg-blue-600 hover:bg-blue-700 text-white px-4 py-1.5 rounded-md shadow-sm transition-colors"
                     >
                       <Save className="h-4 w-4" />
                       <span>Save CV</span>
@@ -427,7 +427,7 @@ export default function CVPage() {
                 
                 <button
                   onClick={handleClear}
-                  className="text-sm font-semibold bg-rose-50 hover:bg-rose-100 text-rose-700 px-3 py-1.5 rounded-md border border-rose-200 transition-colors"
+                  className="text-sm font-semibold bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-1.5 rounded-md border border-slate-300 transition-colors"
                 >
                   Clear
                 </button>

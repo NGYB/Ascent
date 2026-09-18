@@ -451,8 +451,8 @@ export default function InterviewPage() {
         {started && (
           <div className="flex items-center gap-2.5 flex-shrink-0">
             {sessionSavedNotice ? (
-              <span className="text-xs font-bold text-emerald-700 bg-emerald-50 px-3 py-1.5 rounded-lg border border-emerald-200 inline-flex items-center gap-1.5 shadow-2xs animate-in fade-in">
-                <Check className="h-3.5 w-3.5 text-emerald-600" />
+              <span className="text-xs font-bold text-blue-800 bg-blue-50 px-3 py-1.5 rounded-lg border border-blue-200 inline-flex items-center gap-1.5 shadow-2xs animate-in fade-in">
+                <Check className="h-3.5 w-3.5 text-blue-700" />
                 <span>Progress Saved</span>
               </span>
             ) : (
@@ -574,8 +574,9 @@ export default function InterviewPage() {
                 </div>
 
                 {error && (
-                  <div className="p-3 bg-rose-50 text-rose-800 text-xs rounded-lg border border-rose-100">
-                    {error}
+                  <div className="p-3 bg-amber-50 text-amber-950 text-xs rounded-lg border border-amber-300 flex items-start gap-2 font-medium">
+                    <AlertTriangle className="h-4 w-4 text-amber-700 flex-shrink-0 mt-0.5" />
+                    <span>{error}</span>
                   </div>
                 )}
 
@@ -786,7 +787,7 @@ export default function InterviewPage() {
                   >
                     <div className="flex items-center gap-2 truncate">
                       <span className={`h-2 w-2 rounded-full flex-shrink-0 ${
-                        isAnswered ? 'bg-emerald-500' : isCurrent ? 'bg-indigo-600 animate-pulse' : 'bg-slate-300'
+                        isAnswered ? 'bg-blue-600' : isCurrent ? 'bg-indigo-600 animate-pulse' : 'bg-slate-300'
                       }`} />
                       <span className="truncate">Q{idx + 1}: {q.category === 'behavioral' ? 'Behavioral' : 'Technical'}</span>
                     </div>
@@ -812,7 +813,7 @@ export default function InterviewPage() {
               <button
                 type="button"
                 onClick={handleRestart}
-                className="w-full text-xs font-semibold text-rose-600 hover:text-rose-700 bg-rose-50 hover:bg-rose-100 p-2 rounded-lg border border-rose-200 transition-colors cursor-pointer"
+                className="w-full text-xs font-semibold text-slate-700 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 p-2 rounded-lg border border-slate-300 transition-colors cursor-pointer"
               >
                 Quit / Discard Session
               </button>
@@ -884,14 +885,14 @@ export default function InterviewPage() {
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-1">
                     <div className="space-y-2">
-                      <span className="text-xs font-bold text-emerald-700 uppercase tracking-widest flex items-center gap-1">
-                        <Check className="h-3.5 w-3.5" />
+                      <span className="text-xs font-bold text-blue-900 uppercase tracking-widest flex items-center gap-1.5">
+                        <Check className="h-4 w-4 text-blue-700" />
                         <span>Strengths</span>
                       </span>
-                      <ul className="space-y-1.5">
+                      <ul className="space-y-2">
                         {feedbacks[questions[currentIndex].id].strengths.map((s, idx) => (
-                          <li key={idx} className="text-xs text-slate-700 flex gap-2 leading-relaxed">
-                            <span className="text-emerald-500 font-bold">•</span>
+                          <li key={idx} className="text-xs text-slate-800 flex items-start gap-2 leading-relaxed bg-blue-50/50 p-2.5 rounded-lg border border-blue-200">
+                            <span className="text-blue-700 font-black text-xs mt-0.5">✓</span>
                             <span>{s}</span>
                           </li>
                         ))}
@@ -899,14 +900,14 @@ export default function InterviewPage() {
                     </div>
 
                     <div className="space-y-2">
-                      <span className="text-xs font-bold text-amber-700 uppercase tracking-widest flex items-center gap-1">
-                        <AlertTriangle className="h-3.5 w-3.5" />
+                      <span className="text-xs font-bold text-amber-950 uppercase tracking-widest flex items-center gap-1.5">
+                        <AlertTriangle className="h-4 w-4 text-amber-700" />
                         <span>Suggested Improvements</span>
                       </span>
-                      <ul className="space-y-1.5">
+                      <ul className="space-y-2">
                         {feedbacks[questions[currentIndex].id].improvements.map((imp, idx) => (
-                          <li key={idx} className="text-xs text-slate-700 flex gap-2 leading-relaxed">
-                            <span className="text-amber-500 font-bold">•</span>
+                          <li key={idx} className="text-xs text-slate-800 flex items-start gap-2 leading-relaxed bg-amber-50/50 p-2.5 rounded-lg border border-amber-200">
+                            <span className="text-amber-700 font-black text-xs mt-0.5">▲</span>
                             <span>{imp}</span>
                           </li>
                         ))}
@@ -935,8 +936,8 @@ export default function InterviewPage() {
                     >
                       {copiedAnswer ? (
                         <>
-                          <Check className="h-3.5 w-3.5 text-emerald-600" />
-                          <span className="text-emerald-700 font-bold">Copied!</span>
+                          <Check className="h-3.5 w-3.5 text-blue-700" />
+                          <span className="text-blue-800 font-bold">Copied!</span>
                         </>
                       ) : (
                         <>
@@ -1001,8 +1002,9 @@ export default function InterviewPage() {
                 </div>
 
                 {error && (
-                  <div className="p-3 bg-rose-50 text-rose-800 text-xs rounded-lg border border-rose-100">
-                    {error}
+                  <div className="p-3 bg-amber-50 text-amber-950 text-xs rounded-lg border border-amber-300 flex items-start gap-2 font-medium">
+                    <AlertTriangle className="h-4 w-4 text-amber-700 flex-shrink-0 mt-0.5" />
+                    <span>{error}</span>
                   </div>
                 )}
 

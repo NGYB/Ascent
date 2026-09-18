@@ -128,7 +128,7 @@ export default function SankeyChart({ apps }: SankeyChartProps) {
             )}
           </button>
         ) : (
-          <span className="px-2 py-0.5 rounded text-[10px] bg-emerald-50 text-emerald-700 border border-emerald-200 font-bold uppercase tracking-wider">
+          <span className="px-2 py-0.5 rounded text-[10px] bg-blue-50 text-blue-800 border border-blue-200 font-bold uppercase tracking-wider">
             Live Conversion Pipeline
           </span>
         )}
@@ -166,19 +166,19 @@ export default function SankeyChart({ apps }: SankeyChartProps) {
               </linearGradient>
               <linearGradient id="applied-to-rejected" x1="0" y1="0" x2="1" y2="0">
                 <stop offset="0%" stopColor="#3b82f6" stopOpacity="0.25" />
-                <stop offset="100%" stopColor="#f43f5e" stopOpacity="0.25" />
+                <stop offset="100%" stopColor="#d97706" stopOpacity="0.25" />
               </linearGradient>
               <linearGradient id="interviewing-to-offers" x1="0" y1="0" x2="1" y2="0">
                 <stop offset="0%" stopColor="#6366f1" stopOpacity="0.35" />
-                <stop offset="100%" stopColor="#10b981" stopOpacity="0.35" />
+                <stop offset="100%" stopColor="#2563eb" stopOpacity="0.35" />
               </linearGradient>
               <linearGradient id="interviewing-to-rejected" x1="0" y1="0" x2="1" y2="0">
                 <stop offset="0%" stopColor="#6366f1" stopOpacity="0.25" />
-                <stop offset="100%" stopColor="#e11d48" stopOpacity="0.25" />
+                <stop offset="100%" stopColor="#ea580c" stopOpacity="0.25" />
               </linearGradient>
               <linearGradient id="offers-to-rejected" x1="0" y1="0" x2="1" y2="0">
-                <stop offset="0%" stopColor="#10b981" stopOpacity="0.25" />
-                <stop offset="100%" stopColor="#e11d48" stopOpacity="0.25" />
+                <stop offset="0%" stopColor="#2563eb" stopOpacity="0.25" />
+                <stop offset="100%" stopColor="#ea580c" stopOpacity="0.25" />
               </linearGradient>
             </defs>
 
@@ -213,7 +213,7 @@ export default function SankeyChart({ apps }: SankeyChartProps) {
                 fill="none"
                 stroke="url(#interviewing-to-offers)"
                 strokeWidth={Math.max(2, offerTotal * scale)}
-                className="hover:stroke-emerald-500/60 transition-colors cursor-pointer"
+                className="hover:stroke-blue-500/60 transition-colors cursor-pointer"
               >
                 <title>{`Received Offers: ${offerTotal}`}</title>
               </path>
@@ -231,7 +231,7 @@ export default function SankeyChart({ apps }: SankeyChartProps) {
                 fill="none"
                 stroke="url(#interviewing-to-rejected)"
                 strokeWidth={Math.max(2, rejInterviewOnly * scale)}
-                className="hover:stroke-rose-600/50 transition-colors cursor-pointer"
+                className="hover:stroke-orange-500/50 transition-colors cursor-pointer"
               >
                 <title>{`Rejected after Interview: ${rejInterviewOnly}`}</title>
               </path>
@@ -249,7 +249,7 @@ export default function SankeyChart({ apps }: SankeyChartProps) {
                 fill="none"
                 stroke="url(#offers-to-rejected)"
                 strokeWidth={Math.max(2, rejOffer * scale)}
-                className="hover:stroke-rose-600/50 transition-colors cursor-pointer"
+                className="hover:stroke-orange-500/50 transition-colors cursor-pointer"
               >
                 <title>{`Declined / Rejected at Offer: ${rejOffer}`}</title>
               </path>
@@ -267,7 +267,7 @@ export default function SankeyChart({ apps }: SankeyChartProps) {
                 fill="none"
                 stroke="url(#applied-to-rejected)"
                 strokeWidth={Math.max(2, rejApplied * scale)}
-                className="hover:stroke-rose-500/40 transition-colors cursor-pointer"
+                className="hover:stroke-amber-500/40 transition-colors cursor-pointer"
               >
                 <title>{`Rejected after Applied: ${rejApplied}`}</title>
               </path>
@@ -318,12 +318,12 @@ export default function SankeyChart({ apps }: SankeyChartProps) {
                 width={nodeWidth}
                 height={hOffers}
                 rx={3}
-                className={offerTotal > 0 ? 'fill-emerald-500 shadow-sm' : 'fill-slate-200'}
+                className={offerTotal > 0 ? 'fill-blue-600 shadow-sm' : 'fill-slate-200'}
               />
               <text x={xOffers + nodeWidth + 12} y={yOffers + Math.min(16, hOffers / 2) + 2} className={`text-xs font-bold ${offerActive > 0 ? 'text-slate-800' : 'text-slate-400'}`} textAnchor="start">
                 Offers ({offerActive})
               </text>
-              <text x={xOffers + nodeWidth + 12} y={yOffers + Math.min(16, hOffers / 2) + 16} className={`text-[10px] font-semibold ${offerTotal > 0 ? 'text-emerald-600' : 'text-slate-400'}`} textAnchor="start">
+              <text x={xOffers + nodeWidth + 12} y={yOffers + Math.min(16, hOffers / 2) + 16} className={`text-[10px] font-semibold ${offerTotal > 0 ? 'text-blue-700' : 'text-slate-400'}`} textAnchor="start">
                 {rejOffer > 0 ? `${rejOffer} declined` : offerTotal > 0 ? `${offerTotal} received` : '0 offers'}
               </text>
             </g>
@@ -336,12 +336,12 @@ export default function SankeyChart({ apps }: SankeyChartProps) {
                 width={nodeWidth}
                 height={hRejInterview}
                 rx={3}
-                className={rejInterviewTotal > 0 ? 'fill-rose-600 shadow-sm' : 'fill-slate-200'}
+                className={rejInterviewTotal > 0 ? 'fill-amber-600 shadow-sm' : 'fill-slate-200'}
               />
               <text x={xRejected + nodeWidth + 12} y={yRejInterview + Math.min(16, hRejInterview / 2) + 2} className={`text-xs font-bold ${rejInterviewTotal > 0 ? 'text-slate-800' : 'text-slate-400'}`} textAnchor="start">
                 Rejected after interviewing ({rejInterviewTotal})
               </text>
-              <text x={xRejected + nodeWidth + 12} y={yRejInterview + Math.min(16, hRejInterview / 2) + 16} className={`text-[10px] font-semibold ${rejInterviewTotal > 0 ? 'text-rose-600' : 'text-slate-400'}`} textAnchor="start">
+              <text x={xRejected + nodeWidth + 12} y={yRejInterview + Math.min(16, hRejInterview / 2) + 16} className={`text-[10px] font-semibold ${rejInterviewTotal > 0 ? 'text-amber-800' : 'text-slate-400'}`} textAnchor="start">
                 {rejInterviewTotal > 0 ? `${rejInterviewTotal} after interview` : '0 after interview'}
               </text>
             </g>
@@ -354,12 +354,12 @@ export default function SankeyChart({ apps }: SankeyChartProps) {
                 width={nodeWidth}
                 height={hRejApplied}
                 rx={3}
-                className={rejApplied > 0 ? 'fill-rose-500 shadow-sm' : 'fill-slate-200'}
+                className={rejApplied > 0 ? 'fill-amber-500 shadow-sm' : 'fill-slate-200'}
               />
               <text x={xRejected + nodeWidth + 12} y={yRejApplied + Math.min(16, hRejApplied / 2) + 2} className={`text-xs font-bold ${rejApplied > 0 ? 'text-slate-800' : 'text-slate-400'}`} textAnchor="start">
                 Rejected after applied ({rejApplied})
               </text>
-              <text x={xRejected + nodeWidth + 12} y={yRejApplied + Math.min(16, hRejApplied / 2) + 16} className={`text-[10px] font-semibold ${rejApplied > 0 ? 'text-rose-500' : 'text-slate-400'}`} textAnchor="start">
+              <text x={xRejected + nodeWidth + 12} y={yRejApplied + Math.min(16, hRejApplied / 2) + 16} className={`text-[10px] font-semibold ${rejApplied > 0 ? 'text-amber-800' : 'text-slate-400'}`} textAnchor="start">
                 {rejApplied > 0 ? `${rejApplied} after applied` : '0 after applied'}
               </text>
             </g>

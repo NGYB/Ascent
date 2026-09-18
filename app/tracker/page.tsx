@@ -14,7 +14,10 @@ import {
   ChevronsRight,
   X,
   ExternalLink,
-  ChevronDown
+  ChevronDown,
+  Send,
+  Award,
+  ArchiveX
 } from 'lucide-react';
 
 interface Application {
@@ -36,12 +39,20 @@ interface TailoredResumeItem {
   createdAt: string;
 }
 
-const COLUMNS: { id: Application['status']; name: string; color: string; bg: string }[] = [
-  { id: 'DRAFT', name: 'Draft / Tailored', color: 'text-indigo-700 border-indigo-200', bg: 'bg-indigo-50/50' },
-  { id: 'APPLIED', name: 'Applied', color: 'text-amber-700 border-amber-200', bg: 'bg-amber-50/50' },
-  { id: 'INTERVIEWING', name: 'Interviewing', color: 'text-blue-700 border-blue-200', bg: 'bg-blue-50/50' },
-  { id: 'OFFER', name: 'Offers', color: 'text-emerald-700 border-emerald-200', bg: 'bg-emerald-50/50' },
-  { id: 'REJECTED', name: 'Archived / Reject', color: 'text-slate-500 border-slate-200', bg: 'bg-slate-50/50' }
+interface ColumnDef {
+  id: Application['status'];
+  name: string;
+  icon: React.ComponentType<{ className?: string }>;
+  color: string;
+  bg: string;
+}
+
+const COLUMNS: ColumnDef[] = [
+  { id: 'DRAFT', name: 'Draft / Tailored', icon: FileText, color: 'text-indigo-800 border-indigo-200', bg: 'bg-indigo-50/50' },
+  { id: 'APPLIED', name: 'Applied', icon: Send, color: 'text-amber-800 border-amber-300', bg: 'bg-amber-50/50' },
+  { id: 'INTERVIEWING', name: 'Interviewing', icon: Calendar, color: 'text-sky-800 border-sky-300', bg: 'bg-sky-50/50' },
+  { id: 'OFFER', name: 'Offers', icon: Award, color: 'text-blue-800 border-blue-300', bg: 'bg-blue-50/50' },
+  { id: 'REJECTED', name: 'Archived / Reject', icon: ArchiveX, color: 'text-slate-700 border-slate-300', bg: 'bg-slate-50/50' }
 ];
 
 export default function TrackerPage() {
@@ -202,11 +213,14 @@ export default function TrackerPage() {
           return (
             <div key={col.id} className="bg-white rounded-xl border border-slate-200 shadow-sm flex flex-col min-w-[200px] h-[550px]">
               {/* Column Header */}
-              <div className="px-4 py-3 border-b border-slate-200 flex items-center justify-between bg-slate-50/50 rounded-t-xl">
-                <span className="font-bold text-xs text-slate-700 tracking-wide uppercase">
-                  {col.name}
-                </span>
-                <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-200 text-slate-600">
+              <div className="px-4 py-3 border-b border-slate-200 flex items-center justify-between bg-slate-50 rounded-t-xl">
+                <div className="flex items-center gap-2 min-w-0">
+                  <col.icon className="h-4 w-4 text-slate-700 flex-shrink-0" />
+                  <span className="font-bold text-xs text-slate-800 tracking-wide uppercase truncate">
+                    {col.name}
+                  </span>
+                </div>
+                <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-200 text-slate-700 flex-shrink-0 ml-1">
                   {colApps.length}
                 </span>
               </div>
@@ -241,25 +255,25 @@ export default function TrackerPage() {
                         {app.status === 'REJECTED' && (
                           <div className="bg-slate-50 border border-slate-200/80 rounded-lg p-2 space-y-1.5">
                             <div className="flex items-center justify-between">
-                              <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">
+                              <span className="text-[10px] font-bold text-slate-600 uppercase tracking-wider">
                                 Rejection stage:
                               </span>
-                              <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded ${
+                              <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded border ${
                                 (app.rejectedFromStage === 'APPLIED' || !app.rejectedFromStage)
-                                  ? 'bg-amber-100 text-amber-800'
-                                  : 'bg-rose-100 text-rose-800'
+                                  ? 'bg-amber-100 text-amber-950 border-amber-300'
+                                  : 'bg-slate-200 text-slate-800 border-slate-300'
                               }`}>
-                                {(app.rejectedFromStage === 'APPLIED' || !app.rejectedFromStage) ? 'Rejected after applied' : 'Rejected after interviewing'}
+                                {(app.rejectedFromStage === 'APPLIED' || !app.rejectedFromStage) ? '▲ After applied' : '■ After interviewing'}
                               </span>
                             </div>
                             <div className="grid grid-cols-2 gap-1.5">
                               <button
                                 type="button"
                                 onClick={() => handleSetRejectedStage(app.id, 'APPLIED')}
-                                className={`px-2 py-1 text-[10px] font-semibold rounded text-center transition-all ${
+                                className={`px-2 py-1 text-[10px] font-bold rounded text-center transition-all ${
                                   (app.rejectedFromStage === 'APPLIED' || !app.rejectedFromStage)
-                                    ? 'bg-amber-500 text-white shadow-xs font-bold'
-                                    : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200'
+                                    ? 'bg-amber-600 text-white shadow-xs'
+                                    : 'bg-white text-slate-700 hover:bg-slate-100 border border-slate-200 font-medium'
                                 }`}
                                 title="Mark as rejected after applied"
                               >
@@ -268,10 +282,10 @@ export default function TrackerPage() {
                               <button
                                 type="button"
                                 onClick={() => handleSetRejectedStage(app.id, 'INTERVIEWING')}
-                                className={`px-2 py-1 text-[10px] font-semibold rounded text-center transition-all ${
+                                className={`px-2 py-1 text-[10px] font-bold rounded text-center transition-all ${
                                   (app.rejectedFromStage === 'INTERVIEWING' || app.rejectedFromStage === 'OFFER')
-                                    ? 'bg-rose-600 text-white shadow-xs font-bold'
-                                    : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200'
+                                    ? 'bg-slate-800 text-white shadow-xs'
+                                    : 'bg-white text-slate-700 hover:bg-slate-100 border border-slate-200 font-medium'
                                 }`}
                                 title="Mark as rejected after interviewing"
                               >
@@ -299,7 +313,7 @@ export default function TrackerPage() {
                             {app.status !== 'REJECTED' && (
                               <button
                                 onClick={() => handleChangeStatus(app.id, 'REJECTED')}
-                                className="text-[10px] font-semibold text-rose-600 hover:bg-rose-50 border border-rose-200/60 px-1.5 py-0.5 rounded transition-colors whitespace-nowrap"
+                                className="text-[10px] font-semibold text-slate-700 hover:text-slate-900 bg-white hover:bg-slate-100 border border-slate-300 px-2 py-0.5 rounded transition-colors whitespace-nowrap"
                                 title="Move directly to Archived / Reject"
                               >
                                 Reject

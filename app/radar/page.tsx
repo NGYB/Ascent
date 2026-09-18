@@ -579,10 +579,16 @@ export default function RadarPage() {
             const score = job.matchScore || 70;
 
             const scoreColor = score >= 80 
-              ? 'bg-emerald-50 text-emerald-700 border-emerald-200' 
+              ? 'bg-blue-50 text-blue-900 border-blue-200' 
               : score >= 65 
-              ? 'bg-blue-50 text-blue-700 border-blue-200' 
-              : 'bg-slate-50 text-slate-600 border-slate-200';
+              ? 'bg-indigo-50 text-indigo-900 border-indigo-200' 
+              : 'bg-amber-50 text-amber-950 border-amber-300';
+
+            const matchTier = score >= 80 
+              ? 'High Fit' 
+              : score >= 65 
+              ? 'Good Fit' 
+              : 'Transferable';
 
             return (
               <div 
@@ -603,19 +609,19 @@ export default function RadarPage() {
 
                     <div className="flex items-center gap-3 text-xs text-slate-600 font-medium flex-wrap">
                       <span className="flex items-center gap-1">
-                        <Building2 className="h-3.5 w-3.5 text-slate-400" />
+                        <Building2 className="h-3.5 w-3.5 text-slate-500" />
                         <strong>{job.company}</strong>
                       </span>
                       <span className="text-slate-300">•</span>
                       <span className="flex items-center gap-1 text-slate-500">
-                        <MapPin className="h-3.5 w-3.5 text-slate-400" />
+                        <MapPin className="h-3.5 w-3.5 text-slate-500" />
                         {job.location}
                       </span>
                       {job.postedAt && (
                         <>
                           <span className="text-slate-300">•</span>
-                          <span className="flex items-center gap-1 text-slate-400 text-[11px]">
-                            <Clock className="h-3 w-3" />
+                          <span className="flex items-center gap-1 text-slate-500 text-[11px]">
+                            <Clock className="h-3.5 w-3.5" />
                             {job.postedAt}
                           </span>
                         </>
@@ -623,7 +629,7 @@ export default function RadarPage() {
                       {job.scheduleType && (
                         <>
                           <span className="text-slate-300">•</span>
-                          <span className="text-slate-500 text-[11px]">
+                          <span className="text-slate-600 text-[11px] font-medium">
                             {job.scheduleType}
                           </span>
                         </>
@@ -634,10 +640,10 @@ export default function RadarPage() {
                   {/* AI Fit Match Badge */}
                   <div className="flex items-center gap-2 self-start flex-shrink-0">
                     <div className={`px-3 py-1.5 rounded-lg border flex items-center gap-1.5 ${scoreColor}`}>
-                      <Sparkles className="h-3.5 w-3.5" />
+                      <Sparkles className="h-3.5 w-3.5 flex-shrink-0" />
                       <div className="text-left">
                         <span className="text-xs font-black tracking-tight block">
-                          {score}% Match
+                          {score}% Match • {matchTier}
                         </span>
                       </div>
                     </div>
@@ -670,8 +676,8 @@ export default function RadarPage() {
 
                 {/* Detected Salary (if available) */}
                 {job.salary && (
-                  <div className="flex items-center gap-1.5 text-xs text-emerald-700 bg-emerald-50/60 border border-emerald-200/60 px-2.5 py-1 rounded-md w-fit font-medium">
-                    <DollarSign className="h-3.5 w-3.5" />
+                  <div className="flex items-center gap-1.5 text-xs text-blue-900 bg-blue-50 border border-blue-200 px-2.5 py-1 rounded-md w-fit font-medium">
+                    <DollarSign className="h-3.5 w-3.5 text-blue-700" />
                     <span>Reported Salary: <strong>{job.salary}</strong></span>
                   </div>
                 )}
@@ -721,14 +727,14 @@ export default function RadarPage() {
                       disabled={isSaved}
                       className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold border transition-colors cursor-pointer ${
                         isSaved 
-                          ? 'bg-emerald-50 text-emerald-700 border-emerald-200' 
+                          ? 'bg-blue-50 text-blue-900 border-blue-300 font-bold' 
                           : 'bg-white hover:bg-slate-50 text-slate-700 border-slate-200'
                       }`}
                       title={isSaved ? "Saved to Job Tracker" : "Save to Application Pipeline"}
                     >
                       {isSaved ? (
                         <>
-                          <Check className="h-3.5 w-3.5" />
+                          <Check className="h-3.5 w-3.5 text-blue-700" />
                           <span>In Pipeline</span>
                         </>
                       ) : (

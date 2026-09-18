@@ -2,14 +2,16 @@
 
 import { useState } from 'react';
 import { usePathname } from 'next/navigation';
-import { UserCheck, PanelLeftClose, PanelLeftOpen, HardDrive, MessageSquarePlus } from 'lucide-react';
+import { UserCheck, PanelLeftClose, PanelLeftOpen, HardDrive, MessageSquarePlus, Eye } from 'lucide-react';
 import { useSidebar } from '@/context/SidebarContext';
+import { useAccessibility } from '@/context/AccessibilityContext';
 import StorageManagerModal from '@/components/StorageManagerModal';
 import FeedbackModal from '@/components/FeedbackModal';
 
 export default function Header() {
   const pathname = usePathname();
   const { isCollapsed, toggleCollapse } = useSidebar();
+  const { isColorblindMode, toggleColorblindMode } = useAccessibility();
   const [isStorageModalOpen, setIsStorageModalOpen] = useState(false);
   const [isFeedbackModalOpen, setIsFeedbackModalOpen] = useState(false);
 
@@ -47,13 +49,29 @@ export default function Header() {
           {getTitle()}
         </h1>
 
-        <div className="hidden md:flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200 ml-2">
-          <UserCheck className="h-3 w-3" />
+        <div className="hidden md:flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-slate-100 text-slate-700 border border-slate-200 ml-2">
+          <UserCheck className="h-3.5 w-3.5 text-indigo-600" />
           <span>Local Session</span>
         </div>
       </div>
 
       <div className="flex items-center gap-2 sm:gap-3">
+        {/* Colorblind / High-Contrast Mode Toggle */}
+        <button
+          type="button"
+          onClick={toggleColorblindMode}
+          className={`flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer shadow-2xs border ${
+            isColorblindMode
+              ? 'bg-blue-600 text-white border-blue-700 shadow-xs ring-2 ring-blue-300'
+              : 'text-slate-600 hover:text-indigo-600 bg-slate-50 hover:bg-indigo-50/70 border-slate-200 hover:border-indigo-200'
+          }`}
+          title={isColorblindMode ? "Colorblind Mode is ON (Click to switch to standard)" : "Enable Colorblind-Friendly & High-Contrast Mode"}
+          aria-pressed={isColorblindMode}
+        >
+          <Eye className={`h-3.5 w-3.5 ${isColorblindMode ? 'text-white' : 'text-slate-500'}`} />
+          <span>{isColorblindMode ? 'Colorblind: ON' : 'Colorblind'}</span>
+        </button>
+
         {/* Feedback Button */}
         <button
           type="button"
