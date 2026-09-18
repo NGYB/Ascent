@@ -21,6 +21,7 @@ import {
   Filter,
   ArrowDownWideNarrow
 } from 'lucide-react';
+import { isBlockedJob } from '@/lib/job-blocklist';
 
 interface RadarJob {
   id: string;
@@ -140,7 +141,7 @@ export default function RadarPage() {
 
       if (res.ok) {
         const data = await res.json();
-        const returnedJobs: RadarJob[] = data.jobs || [];
+        const returnedJobs: RadarJob[] = (data.jobs || []).filter((j: RadarJob) => !isBlockedJob(j));
         // Ensure sorted by matchScore descending (highest match on top)
         returnedJobs.sort((a, b) => (b.matchScore ?? 0) - (a.matchScore ?? 0));
         setJobs(returnedJobs);
@@ -204,6 +205,10 @@ export default function RadarPage() {
 
   // 1-Click Tailor CV: transfers role info directly into Tailoring workspace
   const handleTailorForJob = (job: RadarJob) => {
+    if (isBlockedJob(job)) {
+      alert('This posting has been flagged and blocked as an unverified/scam source.');
+      return;
+    }
     try {
       const payload = {
         jobTitle: job.title,
@@ -220,6 +225,10 @@ export default function RadarPage() {
 
   // 1-Click Save to Pipeline: Adds card into tracker under DRAFT
   const handleSaveToPipeline = (job: RadarJob) => {
+    if (isBlockedJob(job)) {
+      alert('This posting has been flagged and blocked as an unverified/scam source.');
+      return;
+    }
     try {
       const apps = JSON.parse(localStorage.getItem('ascent_applications') || '[]');
       const newApp = {
@@ -564,7 +573,7 @@ export default function RadarPage() {
             )}
           </div>
         ) : (
-          jobs.map((job) => {
+          jobs.filter((j) => !isBlockedJob(j)).map((job) => {
             const isExpanded = expandedJobId === job.id;
             const isSaved = savedJobIds.has(`${job.title}-${job.company}`);
             const score = job.matchScore || 70;

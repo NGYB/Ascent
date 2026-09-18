@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { GoogleGenAI } from '@google/genai';
+import { isBlockedJob } from '@/lib/job-blocklist';
 
 interface SerpJob {
   title: string;
@@ -87,28 +88,35 @@ export async function POST(req: NextRequest) {
           }
         }
 
-        if (rawJobs.length === 0) {
+        // Filter out fraudulent, scam, or data-harvesting job postings (e.g. trabajo.org)
+        const validRawJobs = rawJobs.filter(j => !isBlockedJob(j));
+
+        if (validRawJobs.length === 0) {
           isDemo = true;
-          message = `No live Google Jobs found for "${fullQuery}". Showing sample opportunities. Try broadening your keywords.`;
-          jobs = getDemoJobs(searchQuery, searchLocation);
+          message = rawJobs.length > 0 
+            ? 'Results from suspicious or unverified job aggregators were filtered out. Showing sample opportunities.'
+            : `No live Google Jobs found for "${fullQuery}". Showing sample opportunities. Try broadening your keywords.`;
+          jobs = getDemoJobs(searchQuery, searchLocation).filter(j => !isBlockedJob(j));
         } else {
           isDemo = false;
-          jobs = rawJobs.map((j, idx) => {
-            const directApply = j.apply_options?.[0]?.link || j.related_links?.[0]?.link || '';
-            return {
-              id: j.job_id || `serp-${idx}-${Date.now()}`,
-              title: j.title || 'Untitled Role',
-              company: j.company_name || 'Target Company',
-              location: j.location || searchLocation || 'Remote / Flexible',
-              via: j.via || 'via Job Board',
-              description: j.description || 'No description provided.',
-              postedAt: j.detected_extensions?.posted_at || j.extensions?.[0] || 'Recently',
-              scheduleType: j.detected_extensions?.schedule_type || j.extensions?.[1] || 'Full-time',
-              salary: j.detected_extensions?.salary || undefined,
-              applyLink: directApply,
-              thumbnail: j.thumbnail || undefined
-            };
-          });
+          jobs = validRawJobs
+            .map((j, idx) => {
+              const directApply = j.apply_options?.[0]?.link || j.related_links?.[0]?.link || '';
+              return {
+                id: j.job_id || `serp-${idx}-${Date.now()}`,
+                title: j.title || 'Untitled Role',
+                company: j.company_name || 'Target Company',
+                location: j.location || searchLocation || 'Remote / Flexible',
+                via: j.via || 'via Job Board',
+                description: j.description || 'No description provided.',
+                postedAt: j.detected_extensions?.posted_at || j.extensions?.[0] || 'Recently',
+                scheduleType: j.detected_extensions?.schedule_type || j.extensions?.[1] || 'Full-time',
+                salary: j.detected_extensions?.salary || undefined,
+                applyLink: directApply,
+                thumbnail: j.thumbnail || undefined
+              };
+            })
+            .filter(j => !isBlockedJob(j));
         }
       } catch (fetchErr: any) {
         console.error('Failed to call SerpAPI:', fetchErr);
@@ -207,6 +215,9 @@ Respond strictly in valid JSON format matching this array:
         matchRationale: j.matchRationale || `Search relevance for "${searchQuery}". Upload Master CV for personalized AI fit scoring.`
       }));
     }
+
+    // Final safeguard: filter out any blocked or scam jobs
+    jobs = jobs.filter(j => !isBlockedJob(j));
 
     // Sort jobs strictly from highest match score to lowest match score (highest on top)
     jobs.sort((a, b) => (b.matchScore ?? 0) - (a.matchScore ?? 0));
