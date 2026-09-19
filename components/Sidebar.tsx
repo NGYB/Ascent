@@ -34,7 +34,7 @@ export default function Sidebar() {
   return (
     <aside 
       className={cn(
-        "bg-slate-900 text-white flex flex-col h-full border-r border-slate-800 transition-all duration-300 ease-in-out relative z-30 flex-shrink-0 select-none",
+        "hidden md:flex bg-slate-900 text-white flex-col h-full border-r border-slate-800 transition-all duration-300 ease-in-out relative z-30 flex-shrink-0 select-none",
         isCollapsed ? "w-[72px]" : "w-64"
       )}
     >

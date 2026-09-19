@@ -1,8 +1,9 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Sidebar from "../components/Sidebar";
 import Header from "../components/Header";
+import BottomNav from "../components/BottomNav";
 import { SidebarProvider } from "../context/SidebarContext";
 import { AccessibilityProvider } from "../context/AccessibilityContext";
 import { Analytics } from "@vercel/analytics/react";
@@ -22,6 +23,12 @@ export const metadata: Metadata = {
   description: "Tailor resumes, bypass ATS, and master interviews for mid-career transitions.",
 };
 
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 5,
+};
+
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`} suppressHydrationWarning>
@@ -32,9 +39,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               <Sidebar />
               <div className="flex-1 flex flex-col overflow-hidden min-w-0">
                 <Header />
-                <main className="flex-1 overflow-y-auto bg-slate-50 p-4 sm:p-6 lg:p-8">
+                <main className="flex-1 overflow-y-auto bg-slate-50 p-3 sm:p-6 lg:p-8 pb-20 md:pb-8">
                   {children}
                 </main>
+                <BottomNav />
               </div>
             </div>
           </SidebarProvider>

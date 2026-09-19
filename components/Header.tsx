@@ -2,7 +2,8 @@
 
 import { useState } from 'react';
 import { usePathname } from 'next/navigation';
-import { UserCheck, PanelLeftClose, PanelLeftOpen, HardDrive, MessageSquarePlus, Eye } from 'lucide-react';
+import Link from 'next/link';
+import { UserCheck, PanelLeftClose, PanelLeftOpen, HardDrive, MessageSquarePlus, Eye, ChevronsUp } from 'lucide-react';
 import { useSidebar } from '@/context/SidebarContext';
 import { useAccessibility } from '@/context/AccessibilityContext';
 import StorageManagerModal from '@/components/StorageManagerModal';
@@ -19,20 +20,20 @@ export default function Header() {
   const getTitle = () => {
     if (pathname.startsWith('/cv')) return 'CV Workspace';
     if (pathname.startsWith('/radar')) return 'Smart Job Radar';
-    if (pathname.startsWith('/tailor')) return 'Tailoring & ATS Scorecard';
+    if (pathname.startsWith('/tailor')) return 'Tailoring & ATS';
     if (pathname.startsWith('/interview')) return 'Mock Interview Room';
     if (pathname.startsWith('/tracker')) return 'Application Pipeline';
     return 'Dashboard';
   };
 
   return (
-    <header className="h-16 border-b border-slate-200 bg-white flex items-center justify-between px-4 sm:px-6 lg:px-8 shadow-xs flex-shrink-0">
-      <div className="flex items-center gap-3">
-        {/* Sidebar Toggle Button */}
+    <header className="h-16 border-b border-slate-200 bg-white flex items-center justify-between px-3 sm:px-6 lg:px-8 shadow-xs flex-shrink-0">
+      <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
+        {/* Desktop Sidebar Toggle Button */}
         <button
           type="button"
           onClick={toggleCollapse}
-          className="p-2 rounded-lg text-slate-500 hover:text-slate-800 hover:bg-slate-100 transition-colors cursor-pointer"
+          className="hidden md:inline-flex p-2 rounded-lg text-slate-500 hover:text-slate-800 hover:bg-slate-100 transition-colors cursor-pointer flex-shrink-0"
           title={isCollapsed ? "Expand sidebar (Cmd+B / Ctrl+B)" : "Collapse sidebar (Cmd+B / Ctrl+B)"}
           aria-label={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
         >
@@ -43,9 +44,20 @@ export default function Header() {
           )}
         </button>
 
-        <div className="h-5 w-[1px] bg-slate-200" />
+        {/* Mobile Brand Link to Home */}
+        <Link 
+          href="/" 
+          className="md:hidden flex items-center gap-1.5 flex-shrink-0 hover:opacity-85 transition-opacity"
+          title="Ascent Dashboard"
+        >
+          <div className="h-8 w-8 rounded-lg bg-indigo-600/15 border border-indigo-500/30 flex items-center justify-center flex-shrink-0">
+            <ChevronsUp className="h-4.5 w-4.5 text-indigo-600" />
+          </div>
+        </Link>
 
-        <h1 className="text-lg sm:text-xl font-bold text-slate-800 tracking-tight truncate">
+        <div className="hidden md:block h-5 w-[1px] bg-slate-200" />
+
+        <h1 className="text-base sm:text-lg md:text-xl font-bold text-slate-800 tracking-tight truncate">
           {getTitle()}
         </h1>
 
@@ -55,43 +67,46 @@ export default function Header() {
         </div>
       </div>
 
-      <div className="flex items-center gap-2 sm:gap-3">
+      <div className="flex items-center gap-1.5 sm:gap-3 flex-shrink-0">
         {/* Colorblind / High-Contrast Mode Toggle */}
         <button
           type="button"
           onClick={toggleColorblindMode}
-          className={`flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer shadow-2xs border ${
+          className={`flex items-center justify-center gap-1.5 p-2 sm:px-3 sm:py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer shadow-2xs border ${
             isColorblindMode
               ? 'bg-blue-600 text-white border-blue-700 shadow-xs ring-2 ring-blue-300'
               : 'text-slate-600 hover:text-indigo-600 bg-slate-50 hover:bg-indigo-50/70 border-slate-200 hover:border-indigo-200'
           }`}
           title={isColorblindMode ? "Colorblind Mode is ON (Click to switch to standard)" : "Enable Colorblind-Friendly & High-Contrast Mode"}
           aria-pressed={isColorblindMode}
+          aria-label={isColorblindMode ? "Colorblind Mode is ON" : "Enable Colorblind Mode"}
         >
-          <Eye className={`h-3.5 w-3.5 ${isColorblindMode ? 'text-white' : 'text-slate-500'}`} />
-          <span>{isColorblindMode ? 'Colorblind: ON' : 'Colorblind'}</span>
+          <Eye className={`h-4 w-4 sm:h-3.5 sm:w-3.5 ${isColorblindMode ? 'text-white' : 'text-slate-500'}`} />
+          <span className="hidden sm:inline">{isColorblindMode ? 'Colorblind: ON' : 'Colorblind'}</span>
         </button>
 
         {/* Feedback Button */}
         <button
           type="button"
           onClick={() => setIsFeedbackModalOpen(true)}
-          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600 hover:text-indigo-600 bg-slate-50 hover:bg-indigo-50/70 border border-slate-200 hover:border-indigo-200 transition-all cursor-pointer shadow-2xs group"
+          className="flex items-center justify-center gap-1.5 p-2 sm:px-3 sm:py-1.5 rounded-lg text-xs font-semibold text-slate-600 hover:text-indigo-600 bg-slate-50 hover:bg-indigo-50/70 border border-slate-200 hover:border-indigo-200 transition-all cursor-pointer shadow-2xs group"
           title="Share feedback or report an issue"
+          aria-label="Share feedback"
         >
-          <MessageSquarePlus className="h-3.5 w-3.5 text-slate-500 group-hover:text-indigo-600 transition-colors" />
-          <span>Feedback</span>
+          <MessageSquarePlus className="h-4 w-4 sm:h-3.5 sm:w-3.5 text-slate-500 group-hover:text-indigo-600 transition-colors" />
+          <span className="hidden sm:inline">Feedback</span>
         </button>
 
         {/* Storage Manager Button */}
         <button
           type="button"
           onClick={() => setIsStorageModalOpen(true)}
-          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600 hover:text-indigo-600 bg-slate-50 hover:bg-indigo-50/70 border border-slate-200 hover:border-indigo-200 transition-all cursor-pointer shadow-2xs group"
+          className="flex items-center justify-center gap-1.5 p-2 sm:px-3 sm:py-1.5 rounded-lg text-xs font-semibold text-slate-600 hover:text-indigo-600 bg-slate-50 hover:bg-indigo-50/70 border border-slate-200 hover:border-indigo-200 transition-all cursor-pointer shadow-2xs group"
           title="Manage locally stored data & privacy"
+          aria-label="Manage storage and privacy"
         >
-          <HardDrive className="h-3.5 w-3.5 text-slate-500 group-hover:text-indigo-600 transition-colors" />
-          <span>Storage</span>
+          <HardDrive className="h-4 w-4 sm:h-3.5 sm:w-3.5 text-slate-500 group-hover:text-indigo-600 transition-colors" />
+          <span className="hidden sm:inline">Storage</span>
         </button>
 
         <span className="hidden lg:inline-block text-[11px] text-slate-400 font-medium">
