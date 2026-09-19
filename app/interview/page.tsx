@@ -558,11 +558,15 @@ export default function InterviewPage() {
                     onChange={(e) => setSelectedResumeId(e.target.value)}
                     className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm bg-white focus:ring-2 focus:ring-indigo-500 outline-none cursor-pointer"
                   >
-                    {tailoredList.map((item) => (
-                      <option key={item.id} value={item.id}>
-                        {item.jobTitle} - {item.company} ({new Date(item.createdAt).toLocaleDateString()})
-                      </option>
-                    ))}
+                    {tailoredList.map((item) => {
+                      const d = new Date(item.createdAt);
+                      const dateStr = !isNaN(d.getTime()) ? ` (${d.toLocaleDateString()})` : '';
+                      return (
+                        <option key={item.id} value={item.id}>
+                          {item.jobTitle} - {item.company}{dateStr}
+                        </option>
+                      );
+                    })}
                   </select>
                 </div>
 

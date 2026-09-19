@@ -1501,7 +1501,10 @@ export default function TailorPage() {
                       </span>
                       <span className="text-slate-350 hidden sm:inline">•</span>
                       <span className="text-slate-400">
-                        {new Date(item.createdAt).toLocaleDateString()}
+                        {(() => {
+                          const d = new Date(item.createdAt);
+                          return !isNaN(d.getTime()) ? d.toLocaleDateString() : 'Recent';
+                        })()}
                       </span>
                     </div>
                   </div>

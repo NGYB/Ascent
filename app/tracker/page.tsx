@@ -48,6 +48,22 @@ interface ColumnDef {
   bg: string;
 }
 
+const isValidDate = (dateStr?: string): boolean => {
+  if (!dateStr) return false;
+  const d = new Date(dateStr);
+  return !isNaN(d.getTime());
+};
+
+const formatDate = (dateStr?: string, fallbackDateStr?: string): string => {
+  if (isValidDate(dateStr)) {
+    return new Date(dateStr!).toLocaleDateString();
+  }
+  if (isValidDate(fallbackDateStr)) {
+    return new Date(fallbackDateStr!).toLocaleDateString();
+  }
+  return new Date().toLocaleDateString();
+};
+
 const COLUMNS: ColumnDef[] = [
   { id: 'DRAFT', name: 'Draft / Tailored', icon: FileText, color: 'text-indigo-800 border-indigo-200', bg: 'bg-indigo-50/50' },
   { id: 'APPLIED', name: 'Applied', icon: Send, color: 'text-amber-800 border-amber-300', bg: 'bg-amber-50/50' },
@@ -71,11 +87,47 @@ export default function TrackerPage() {
 
   const loadTrackerData = () => {
     try {
-      const savedApps = JSON.parse(localStorage.getItem('ascent_applications') || '[]');
-      setApps(savedApps);
-
-      const savedResumes = JSON.parse(localStorage.getItem('ascent_tailored_resumes') || '[]');
+      const rawApps: Application[] = JSON.parse(localStorage.getItem('ascent_applications') || '[]');
+      const savedResumes: TailoredResumeItem[] = JSON.parse(localStorage.getItem('ascent_tailored_resumes') || '[]');
       setTailoredResumes(savedResumes);
+
+      let hasHealed = false;
+      const healedApps = rawApps.map(app => {
+        let createdAt = app.createdAt;
+        if (!isValidDate(createdAt)) {
+          if (isValidDate(app.updatedAt)) {
+            createdAt = app.updatedAt;
+          } else if (app.tailoredResumeId) {
+            const matched = savedResumes.find(r => r.id === app.tailoredResumeId);
+            if (matched && isValidDate(matched.createdAt)) {
+              createdAt = matched.createdAt;
+            } else {
+              createdAt = new Date().toISOString();
+            }
+          } else {
+            createdAt = new Date().toISOString();
+          }
+          hasHealed = true;
+        }
+
+        let updatedAt = app.updatedAt;
+        if (!isValidDate(updatedAt)) {
+          updatedAt = createdAt;
+          hasHealed = true;
+        }
+
+        return {
+          ...app,
+          createdAt,
+          updatedAt
+        };
+      });
+
+      setApps(healedApps);
+
+      if (hasHealed) {
+        localStorage.setItem('ascent_applications', JSON.stringify(healedApps));
+      }
     } catch {}
   };
 
@@ -343,7 +395,7 @@ export default function TrackerPage() {
                           <div className="flex items-center justify-between text-[9px] text-slate-400">
                             <div className="flex items-center gap-1">
                               <Calendar className="h-3 w-3" />
-                              <span>{new Date(app.createdAt).toLocaleDateString()}</span>
+                              <span>{formatDate(app.createdAt, app.updatedAt)}</span>
                             </div>
                             
                             {/* Board Transitions */}
@@ -472,7 +524,7 @@ export default function TrackerPage() {
                   <option value="">-- None --</option>
                   {tailoredResumes.map((resume) => (
                     <option key={resume.id} value={resume.id}>
-                      {resume.jobTitle} ({new Date(resume.createdAt).toLocaleDateString()})
+                      {resume.jobTitle} ({formatDate(resume.createdAt)})
                     </option>
                   ))}
                 </select>
