@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { GoogleGenAI } from '@google/genai';
 import { isBlockedJob } from '@/lib/job-blocklist';
 
+export const maxDuration = 60;
+
 interface SerpJob {
   title: string;
   company_name: string;
@@ -170,13 +172,20 @@ Respond strictly in valid JSON format matching this array:
           model: 'gemini-2.5-flash',
           contents: prompt,
           config: {
+            thinkingConfig: { thinkingBudget: 0 },
             responseMimeType: 'application/json',
             temperature: 0.2
           }
         });
 
         if (geminiRes.text) {
-          const matchData: Array<{ index: number; matchScore: number; matchRationale: string; topMatches: string[] }> = JSON.parse(geminiRes.text);
+          let cleaned = geminiRes.text.trim();
+          if (cleaned.startsWith('```json')) {
+            cleaned = cleaned.replace(/^```json\s*/, '').replace(/\s*```$/, '');
+          } else if (cleaned.startsWith('```')) {
+            cleaned = cleaned.replace(/^```\s*/, '').replace(/\s*```$/, '');
+          }
+          const matchData: Array<{ index: number; matchScore: number; matchRationale: string; topMatches: string[] }> = JSON.parse(cleaned);
           const matchMap = new Map(matchData.map(m => [Number(m.index), m]));
 
           jobs = jobs.map((j, idx) => {

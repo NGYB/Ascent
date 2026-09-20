@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { GoogleGenAI, Type } from '@google/genai';
 
+export const maxDuration = 60;
+
 export async function POST(req: NextRequest) {
   try {
     const { resumeText, jobTitle, company, jobDescription } = await req.json();
@@ -61,6 +63,7 @@ Generate the tailored resume in clean markdown format, perform the ATS gap analy
       model: 'gemini-2.5-flash',
       contents: prompt,
       config: {
+        thinkingConfig: { thinkingBudget: 0 },
         responseMimeType: 'application/json',
         responseSchema: {
           type: Type.OBJECT,
@@ -208,7 +211,14 @@ Generate the tailored resume in clean markdown format, perform the ATS gap analy
       throw new Error('Empty response from Gemini API');
     }
 
-    const data = JSON.parse(responseText);
+    let cleanedJson = responseText.trim();
+    if (cleanedJson.startsWith('```json')) {
+      cleanedJson = cleanedJson.replace(/^```json\s*/, '').replace(/\s*```$/, '');
+    } else if (cleanedJson.startsWith('```')) {
+      cleanedJson = cleanedJson.replace(/^```\s*/, '').replace(/\s*```$/, '');
+    }
+
+    const data = JSON.parse(cleanedJson);
     return NextResponse.json(data);
   } catch (error: any) {
     console.error('Tailoring error:', error);

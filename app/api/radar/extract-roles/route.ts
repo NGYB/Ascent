@@ -8,6 +8,8 @@ interface RoleExtractionResult {
   seniority?: string;
 }
 
+export const maxDuration = 60;
+
 export async function POST(req: NextRequest) {
   try {
     const { resumeText } = await req.json();
@@ -62,13 +64,20 @@ Respond strictly in valid JSON format:
           model: 'gemini-2.5-flash',
           contents: prompt,
           config: {
+            thinkingConfig: { thinkingBudget: 0 },
             responseMimeType: 'application/json',
             temperature: 0.2
           }
         });
 
         if (response.text) {
-          const parsed: RoleExtractionResult = JSON.parse(response.text);
+          let cleaned = response.text.trim();
+          if (cleaned.startsWith('```json')) {
+            cleaned = cleaned.replace(/^```json\s*/, '').replace(/\s*```$/, '');
+          } else if (cleaned.startsWith('```')) {
+            cleaned = cleaned.replace(/^```\s*/, '').replace(/\s*```$/, '');
+          }
+          const parsed: RoleExtractionResult = JSON.parse(cleaned);
           if (parsed.primaryRole) {
             return NextResponse.json({
               success: true,

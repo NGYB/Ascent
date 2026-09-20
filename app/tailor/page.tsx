@@ -334,8 +334,21 @@ export default function TailorPage() {
       });
 
       if (!res.ok) {
-        const errData = await res.json();
-        throw new Error(errData.error || 'Failed to tailor CV');
+        let errorMsg = 'Failed to tailor CV';
+        try {
+          const errData = await res.json();
+          errorMsg = errData.error || errorMsg;
+        } catch {
+          const text = await res.text().catch(() => '');
+          if (res.status === 504 || text.includes('FUNCTION_INVOCATION_TIMEOUT') || text.includes('Gateway Timeout')) {
+            errorMsg = 'AI analysis timed out. Processing speed has been optimized—please try clicking "Tailor & Score CV" again.';
+          } else if (res.status >= 500) {
+            errorMsg = `Server error (${res.status}). Please try again shortly.`;
+          } else {
+            errorMsg = text.slice(0, 150) || `Request failed with status ${res.status}`;
+          }
+        }
+        throw new Error(errorMsg);
       }
 
       const data = await res.json();
@@ -347,7 +360,11 @@ export default function TailorPage() {
       }
     } catch (err: any) {
       console.error(err);
-      setError(err.message || 'An error occurred during CV tailoring.');
+      if (err.name === 'TypeError' && err.message === 'Failed to fetch') {
+        setError('Network connection interrupted or server timed out while analyzing your CV. Please check your connection and click "Tailor & Score CV" again.');
+      } else {
+        setError(err.message || 'An error occurred during CV tailoring.');
+      }
     } finally {
       setLoading(false);
     }
