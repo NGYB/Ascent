@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { 
   ShieldCheck, 
   Lock, 
@@ -9,7 +9,8 @@ import {
   HardDrive, 
   Search,
   MessageSquare,
-  EyeOff
+  EyeOff,
+  X
 } from 'lucide-react';
 import StorageManagerModal from '@/components/StorageManagerModal';
 import FeedbackModal from '@/components/FeedbackModal';
@@ -19,6 +20,7 @@ interface FAQItem {
   category: 'privacy' | 'ai' | 'storage' | 'features';
   question: string;
   shortAnswer: string;
+  keywords: string[];
   fullAnswer: React.ReactNode;
 }
 
@@ -26,7 +28,7 @@ export default function FAQPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<'all' | 'privacy' | 'ai' | 'storage' | 'features'>('all');
   const [openItems, setOpenItems] = useState<Record<string, boolean>>({
-    'gemini-memory': true, // Open the user's primary question by default
+    'gemini-memory': true,
     'gemini-training': true
   });
   const [isStorageModalOpen, setIsStorageModalOpen] = useState(false);
@@ -39,12 +41,28 @@ export default function FAQPage() {
     }));
   };
 
-  const faqs: FAQItem[] = [
+  const faqs: FAQItem[] = useMemo(() => [
     {
       id: 'gemini-memory',
       category: 'privacy',
       question: 'Can the developer retrieve my CV details from Gemini using their API key?',
       shortAnswer: 'No, absolutely not. The Gemini API is 100% stateless with zero prompt history.',
+      keywords: [
+        'gemini memory',
+        'gemini',
+        'memory',
+        'retrieve',
+        'developer',
+        'api key',
+        'prompt history',
+        'retrieval',
+        'stateless',
+        'database',
+        'access',
+        'see my cv',
+        'read my cv',
+        'snoop'
+      ],
       fullAnswer: (
         <div className="space-y-3 text-sm text-slate-600 leading-relaxed">
           <p>
@@ -69,6 +87,20 @@ export default function FAQPage() {
       category: 'ai',
       question: 'Does Google Gemini \u201Cremember\u201D my CV or train its AI models on it?',
       shortAnswer: 'No. API calls are stateless and enterprise API terms prohibit model training on customer data.',
+      keywords: [
+        'gemini training',
+        'training',
+        'train',
+        'gemini',
+        'ai models',
+        'learning',
+        'google',
+        'privacy',
+        'commercial',
+        'data logging',
+        'human review',
+        'retention'
+      ],
       fullAnswer: (
         <div className="space-y-3 text-sm text-slate-600 leading-relaxed">
           <p>
@@ -91,6 +123,19 @@ export default function FAQPage() {
       category: 'storage',
       question: 'Where is my resume, tailored versions, and job pipeline actually stored?',
       shortAnswer: '100% inside your own device\u2019s browser via localStorage. Nothing is stored in the cloud.',
+      keywords: [
+        'local storage',
+        'localstorage',
+        'where is cv stored',
+        'where is data stored',
+        'storage',
+        'cloud',
+        'device',
+        'offline',
+        'browser',
+        'database',
+        'server'
+      ],
       fullAnswer: (
         <div className="space-y-3 text-sm text-slate-600 leading-relaxed">
           <p>
@@ -114,6 +159,17 @@ export default function FAQPage() {
       category: 'privacy',
       question: 'Can other users on Ascent see my CV or job applications?',
       shortAnswer: 'No. Each user\u2019s browser storage is completely sandboxed and private.',
+      keywords: [
+        'other users',
+        'see my cv',
+        'view my cv',
+        'leak',
+        'share',
+        'sandbox',
+        'isolation',
+        'privacy',
+        'cross user'
+      ],
       fullAnswer: (
         <div className="space-y-3 text-sm text-slate-600 leading-relaxed">
           <p>
@@ -130,6 +186,19 @@ export default function FAQPage() {
       category: 'storage',
       question: 'How do I inspect or permanently delete all my data?',
       shortAnswer: 'Click "Storage" in the top header anytime to inspect byte sizes or wipe data with 1 click.',
+      keywords: [
+        'delete data',
+        'delete',
+        'data',
+        'wipe',
+        'reset',
+        'clear',
+        'purge',
+        'storage manager',
+        'remove',
+        'erase',
+        'all data'
+      ],
       fullAnswer: (
         <div className="space-y-3 text-sm text-slate-600 leading-relaxed">
           <p>
@@ -159,6 +228,19 @@ export default function FAQPage() {
       category: 'privacy',
       question: 'Why doesn\u2019t Ascent require an account, email, or password?',
       shortAnswer: 'Designed intentionally for confidentiality during sensitive mid-career job transitions.',
+      keywords: [
+        'no login',
+        'why no login',
+        'login',
+        'account',
+        'sign in',
+        'signup',
+        'password',
+        'email',
+        'why no account',
+        'confidentiality',
+        'anonymous'
+      ],
       fullAnswer: (
         <div className="space-y-3 text-sm text-slate-600 leading-relaxed">
           <p>
@@ -180,6 +262,18 @@ export default function FAQPage() {
       category: 'features',
       question: 'How does client-side PDF parsing protect my CV?',
       shortAnswer: 'PDF text extraction happens entirely inside your browser, never uploading the file to S3 or cloud buckets.',
+      keywords: [
+        'pdf security',
+        'pdf',
+        'upload',
+        'parsing',
+        's3',
+        'bucket',
+        'extract',
+        'file',
+        'client side',
+        'document'
+      ],
       fullAnswer: (
         <div className="space-y-3 text-sm text-slate-600 leading-relaxed">
           <p>
@@ -199,6 +293,18 @@ export default function FAQPage() {
       category: 'features',
       question: 'Does the Smart Job Radar track or expose my job searches?',
       shortAnswer: 'No. Searches query public Google Jobs listings in real-time without user tracking.',
+      keywords: [
+        'radar privacy',
+        'radar',
+        'job radar',
+        'search',
+        'jobs',
+        'tracking',
+        'anonymous',
+        'google jobs',
+        'serpapi',
+        'job search'
+      ],
       fullAnswer: (
         <div className="space-y-3 text-sm text-slate-600 leading-relaxed">
           <p>
@@ -212,16 +318,44 @@ export default function FAQPage() {
         </div>
       )
     }
-  ];
+  ], []);
+
+  // Smart tokenized search matching
+  const query = searchQuery.toLowerCase().trim();
+  const searchTerms = useMemo(() => query.split(/\s+/).filter(Boolean), [query]);
+
+  const matchesSearch = (item: FAQItem) => {
+    if (searchTerms.length === 0) return true;
+    const corpus = [
+      item.question,
+      item.shortAnswer,
+      item.category,
+      item.id.replace(/-/g, ' '),
+      ...(item.keywords || [])
+    ].join(' ').toLowerCase();
+
+    return searchTerms.every(term => corpus.includes(term));
+  };
 
   const filteredFaqs = faqs.filter(item => {
-    const matchesCategory = selectedCategory === 'all' || item.category === selectedCategory;
-    const query = searchQuery.toLowerCase().trim();
-    const matchesSearch = !query || 
-      item.question.toLowerCase().includes(query) || 
-      item.shortAnswer.toLowerCase().includes(query);
-    return matchesCategory && matchesSearch;
+    const inCategory = selectedCategory === 'all' || item.category === selectedCategory;
+    return inCategory && matchesSearch(item);
   });
+
+  // Count matches across ALL categories for helpful UI guidance
+  const totalMatchesAcrossAll = useMemo(() => {
+    if (searchTerms.length === 0) return faqs.length;
+    return faqs.filter(matchesSearch).length;
+  }, [faqs, searchTerms]);
+
+  const popularChips = [
+    'Gemini memory',
+    'Delete data',
+    'Local storage',
+    'Why no login?',
+    'Google training',
+    'Radar privacy'
+  ];
 
   return (
     <div className="max-w-4xl w-full mx-auto space-y-8 pb-12">
@@ -283,11 +417,40 @@ export default function FAQPage() {
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search questions (e.g., 'Gemini memory', 'delete data', 'storage')..."
-            className="w-full pl-10 pr-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm text-slate-800 placeholder:text-slate-400 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none shadow-2xs"
+            className="w-full pl-10 pr-10 py-2.5 bg-white border border-slate-200 rounded-xl text-sm text-slate-800 placeholder:text-slate-400 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none shadow-2xs"
           />
+          {searchQuery && (
+            <button
+              type="button"
+              onClick={() => setSearchQuery('')}
+              className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-slate-400 hover:text-slate-600 rounded-full cursor-pointer"
+              title="Clear search"
+            >
+              <X className="h-4 w-4" />
+            </button>
+          )}
         </div>
 
-        <div className="flex items-center gap-1.5 overflow-x-auto pb-1 text-xs">
+        {/* Quick Suggestion Chips */}
+        <div className="flex items-center gap-1.5 flex-wrap text-xs text-slate-500 pt-0.5">
+          <span className="font-medium text-slate-400">Try searching:</span>
+          {popularChips.map(chip => (
+            <button
+              key={chip}
+              type="button"
+              onClick={() => {
+                setSearchQuery(chip);
+                setSelectedCategory('all');
+              }}
+              className="px-2.5 py-1 bg-white hover:bg-indigo-50 hover:text-indigo-600 text-slate-600 rounded-full border border-slate-200 shadow-2xs transition-colors cursor-pointer"
+            >
+              {chip}
+            </button>
+          ))}
+        </div>
+
+        {/* Category Tabs */}
+        <div className="flex items-center gap-1.5 overflow-x-auto pb-1 text-xs pt-1">
           {[
             { id: 'all', label: 'All Questions' },
             { id: 'privacy', label: 'Privacy & Security' },
@@ -314,14 +477,29 @@ export default function FAQPage() {
       {/* FAQ Accordion List */}
       <div className="space-y-3">
         {filteredFaqs.length === 0 ? (
-          <div className="text-center py-12 bg-white rounded-xl border border-slate-200 p-6 space-y-2">
+          <div className="text-center py-12 bg-white rounded-xl border border-slate-200 p-6 space-y-3">
             <HelpCircle className="h-8 w-8 text-slate-300 mx-auto" />
-            <p className="text-sm font-semibold text-slate-700">No questions found matching your search.</p>
-            <p className="text-xs text-slate-400">Try searching for a different keyword or view all categories.</p>
+            <p className="text-sm font-semibold text-slate-700">
+              No questions found for &ldquo;{searchQuery}&rdquo; {selectedCategory !== 'all' && `in this category`}.
+            </p>
+            {selectedCategory !== 'all' && totalMatchesAcrossAll > 0 ? (
+              <div className="pt-1">
+                <button
+                  type="button"
+                  onClick={() => setSelectedCategory('all')}
+                  className="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-semibold cursor-pointer transition-colors shadow-2xs"
+                >
+                  View {totalMatchesAcrossAll} matching {totalMatchesAcrossAll === 1 ? 'question' : 'questions'} across All Categories
+                </button>
+              </div>
+            ) : (
+              <p className="text-xs text-slate-400">Try one of the suggested search tags above or view all questions.</p>
+            )}
           </div>
         ) : (
           filteredFaqs.map((faq) => {
-            const isOpen = Boolean(openItems[faq.id]);
+            // Auto-expand when actively searching so the answer is immediately visible!
+            const isOpen = searchTerms.length > 0 ? true : Boolean(openItems[faq.id]);
             return (
               <div 
                 key={faq.id}
