@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
-import { UserCheck, PanelLeftClose, PanelLeftOpen, HardDrive, MessageSquarePlus, Eye, ChevronsUp } from 'lucide-react';
+import { UserCheck, PanelLeftClose, PanelLeftOpen, HardDrive, MessageSquarePlus, Eye, ChevronsUp, HelpCircle } from 'lucide-react';
 import { useSidebar } from '@/context/SidebarContext';
 import { useAccessibility } from '@/context/AccessibilityContext';
 import StorageManagerModal from '@/components/StorageManagerModal';
@@ -23,6 +23,7 @@ export default function Header() {
     if (pathname.startsWith('/tailor')) return 'Tailoring & ATS';
     if (pathname.startsWith('/interview')) return 'Mock Interview Room';
     if (pathname.startsWith('/tracker')) return 'Application Pipeline';
+    if (pathname.startsWith('/faq')) return 'Privacy & FAQ';
     return 'Dashboard';
   };
 
@@ -84,6 +85,21 @@ export default function Header() {
           <Eye className={`h-4 w-4 sm:h-3.5 sm:w-3.5 ${isColorblindMode ? 'text-white' : 'text-slate-500'}`} />
           <span className="hidden sm:inline">{isColorblindMode ? 'Colorblind: ON' : 'Colorblind'}</span>
         </button>
+
+        {/* Privacy & FAQ Link */}
+        <Link
+          href="/faq"
+          className={`flex items-center justify-center gap-1.5 p-2 sm:px-3 sm:py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer shadow-2xs border ${
+            pathname === '/faq'
+              ? 'bg-indigo-600 text-white border-indigo-700 shadow-xs'
+              : 'text-slate-600 hover:text-indigo-600 bg-slate-50 hover:bg-indigo-50/70 border-slate-200 hover:border-indigo-200'
+          }`}
+          title="Privacy & AI Architecture FAQ"
+          aria-label="Privacy and AI FAQ"
+        >
+          <HelpCircle className={`h-4 w-4 sm:h-3.5 sm:w-3.5 ${pathname === '/faq' ? 'text-white' : 'text-slate-500'}`} />
+          <span className="hidden sm:inline">FAQ</span>
+        </Link>
 
         {/* Feedback Button */}
         <button

@@ -13,7 +13,8 @@ import {
   PanelLeftOpen,
   ChevronLeft,
   ChevronRight,
-  Radar
+  Radar,
+  ShieldCheck
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useSidebar } from '@/context/SidebarContext';
@@ -25,6 +26,7 @@ const navItems = [
   { name: 'Tailoring & ATS', href: '/tailor', icon: Sparkles },
   { name: 'Interview Prep', href: '/interview', icon: MessageSquare },
   { name: 'Job Tracker', href: '/tracker', icon: Kanban },
+  { name: 'Privacy & FAQ', href: '/faq', icon: ShieldCheck },
 ];
 
 export default function Sidebar() {

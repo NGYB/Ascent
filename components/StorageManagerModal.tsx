@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Link from 'next/link';
 import { 
   Database, 
   X, 
@@ -280,9 +281,16 @@ export default function StorageManagerModal({ isOpen, onClose, onStorageCleared 
               />
             </div>
 
-            <p className="text-[11px] text-slate-500 leading-relaxed">
-              Standard web browsers allocate <strong>5 MB to 10 MB</strong> for local storage. This is plenty of space for hundreds of interview sessions, resumes, and tracked jobs.
-            </p>
+            <div className="flex items-center justify-between text-[11px] text-slate-500 leading-relaxed flex-wrap gap-1">
+              <span>Standard web browsers allocate <strong>5 MB to 10 MB</strong> for local storage.</span>
+              <Link 
+                href="/faq" 
+                onClick={onClose}
+                className="text-indigo-600 hover:text-indigo-800 font-semibold underline whitespace-nowrap"
+              >
+                Privacy & AI FAQ →
+              </Link>
+            </div>
           </div>
 
           {/* Breakdown by Category */}

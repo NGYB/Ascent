@@ -70,11 +70,19 @@ export default function Home() {
       </div>
 
       {/* Privacy Alert Info Box */}
-      <div className="bg-indigo-50/40 border border-indigo-100 p-4 rounded-xl flex items-start gap-3.5 text-sm text-indigo-700 max-w-3xl">
-        <AlertCircle className="h-5 w-5 text-indigo-500 flex-shrink-0 mt-0.5" />
-        <div>
-          <span className="font-bold">Privacy First:</span> All session data is kept strictly inside your browser's local storage—we never store any of your files or personal data on our servers.
+      <div className="bg-indigo-50/40 border border-indigo-100 p-4 rounded-xl flex items-start justify-between gap-3.5 text-sm text-indigo-700 max-w-3xl flex-wrap sm:flex-nowrap">
+        <div className="flex items-start gap-3.5">
+          <AlertCircle className="h-5 w-5 text-indigo-500 flex-shrink-0 mt-0.5" />
+          <div>
+            <span className="font-bold">Privacy First:</span> All session data is kept strictly inside your browser&apos;s local storage—we never store any of your files or personal data on our servers.
+          </div>
         </div>
+        <Link 
+          href="/faq"
+          className="text-xs font-bold text-indigo-600 hover:text-indigo-900 underline whitespace-nowrap self-center sm:self-auto flex-shrink-0"
+        >
+          Privacy & AI FAQ →
+        </Link>
       </div>
 
       {/* Quick Stats / Session Overview */}
