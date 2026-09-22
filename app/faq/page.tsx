@@ -320,21 +320,30 @@ export default function FAQPage() {
     }
   ], []);
 
-  // Smart tokenized search matching
-  const query = searchQuery.toLowerCase().trim();
-  const searchTerms = useMemo(() => query.split(/\s+/).filter(Boolean), [query]);
+  // Smart tokenized search matching with punctuation normalization
+  const searchTerms = useMemo(() => {
+    return searchQuery
+      .toLowerCase()
+      .replace(/[^\p{L}\p{N}\s]/gu, ' ')
+      .split(/\s+/)
+      .filter(Boolean);
+  }, [searchQuery]);
 
   const matchesSearch = (item: FAQItem) => {
     if (searchTerms.length === 0) return true;
-    const corpus = [
+    const rawCorpus = [
       item.question,
       item.shortAnswer,
       item.category,
       item.id.replace(/-/g, ' '),
       ...(item.keywords || [])
-    ].join(' ').toLowerCase();
+    ].join(' ');
 
-    return searchTerms.every(term => corpus.includes(term));
+    const normalizedCorpus = rawCorpus
+      .toLowerCase()
+      .replace(/[^\p{L}\p{N}\s]/gu, ' ');
+
+    return searchTerms.every(term => normalizedCorpus.includes(term));
   };
 
   const filteredFaqs = faqs.filter(item => {
@@ -352,7 +361,7 @@ export default function FAQPage() {
     'Gemini memory',
     'Delete data',
     'Local storage',
-    'Why no login?',
+    'Why no login',
     'Google training',
     'Radar privacy'
   ];
