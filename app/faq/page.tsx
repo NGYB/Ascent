@@ -10,14 +10,17 @@ import {
   Search,
   MessageSquare,
   EyeOff,
-  X
+  X,
+  Coffee,
+  HeartHandshake,
+  ExternalLink
 } from 'lucide-react';
 import StorageManagerModal from '@/components/StorageManagerModal';
 import FeedbackModal from '@/components/FeedbackModal';
 
 interface FAQItem {
   id: string;
-  category: 'privacy' | 'ai' | 'storage' | 'features';
+  category: 'privacy' | 'ai' | 'storage' | 'features' | 'support';
   question: string;
   shortAnswer: string;
   keywords: string[];
@@ -26,10 +29,11 @@ interface FAQItem {
 
 export default function FAQPage() {
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState<'all' | 'privacy' | 'ai' | 'storage' | 'features'>('all');
+  const [selectedCategory, setSelectedCategory] = useState<'all' | 'privacy' | 'ai' | 'storage' | 'features' | 'support'>('all');
   const [openItems, setOpenItems] = useState<Record<string, boolean>>({
     'gemini-memory': true,
-    'gemini-training': true
+    'gemini-training': true,
+    'support-me': true
   });
   const [isStorageModalOpen, setIsStorageModalOpen] = useState(false);
   const [isFeedbackModalOpen, setIsFeedbackModalOpen] = useState(false);
@@ -317,6 +321,86 @@ export default function FAQPage() {
           </ul>
         </div>
       )
+    },
+    {
+      id: 'support-me',
+      category: 'support',
+      question: 'How can I support you and the Ascent project?',
+      shortAnswer: 'Buy me a coffee or share your story through feedback—I would love to meet for coffee!',
+      keywords: [
+        'how to support me',
+        'support',
+        'support me',
+        'how to support',
+        'buy me a coffee',
+        'buymeacoffee',
+        'coffee',
+        'donate',
+        'donation',
+        'contribution',
+        'share feedback',
+        'feedback',
+        'story',
+        'meet for coffee',
+        'meet'
+      ],
+      fullAnswer: (
+        <div className="space-y-4 text-sm text-slate-600 leading-relaxed">
+          <p>
+            Ascent was built as a passion project to help mid-career professionals navigate career transitions with confidence and zero privacy compromises. If Ascent has helped you in your journey, there are 2 wonderful ways you can support me:
+          </p>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 pt-1">
+            {/* Option 1: Buy me a coffee */}
+            <div className="p-4 sm:p-5 bg-amber-50/70 border border-amber-200/80 rounded-xl space-y-3.5 flex flex-col justify-between shadow-2xs">
+              <div className="space-y-2">
+                <div className="flex items-center gap-2 text-amber-800 font-bold text-xs uppercase tracking-wider">
+                  <Coffee className="h-4 w-4 text-amber-600" />
+                  <span>Option 1: Buy Me a Coffee</span>
+                </div>
+                <h3 className="font-extrabold text-slate-900 text-sm">Fuel Development & API Costs</h3>
+                <p className="text-xs text-slate-600 leading-relaxed">
+                  Support the project directly to help cover Gemini AI compute and server infrastructure, keeping Ascent free and accessible for all job seekers.
+                </p>
+              </div>
+
+              <a
+                href="https://buymeacoffee.com/ngyibin"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs rounded-xl transition-all shadow-xs group cursor-pointer"
+              >
+                <Coffee className="h-4 w-4" />
+                <span>buymeacoffee.com/ngyibin</span>
+                <ExternalLink className="h-3.5 w-3.5 opacity-80 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+              </a>
+            </div>
+
+            {/* Option 2: Share Feedback & Meet for Coffee */}
+            <div className="p-4 sm:p-5 bg-indigo-50/70 border border-indigo-200/80 rounded-xl space-y-3.5 flex flex-col justify-between shadow-2xs">
+              <div className="space-y-2">
+                <div className="flex items-center gap-2 text-indigo-800 font-bold text-xs uppercase tracking-wider">
+                  <HeartHandshake className="h-4 w-4 text-indigo-600" />
+                  <span>Option 2: Share Your Story</span>
+                </div>
+                <h3 className="font-extrabold text-slate-900 text-sm">Send Feedback & Connect</h3>
+                <p className="text-xs text-slate-600 leading-relaxed">
+                  Go to <strong>Share Feedback</strong> and send me a message on how the app has helped you. I would love to meet you for coffee and hear all about your story!
+                </p>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => setIsFeedbackModalOpen(true)}
+                className="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs rounded-xl transition-all shadow-xs cursor-pointer"
+              >
+                <MessageSquare className="h-4 w-4" />
+                <span>Open Share Feedback</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )
     }
   ], []);
 
@@ -359,6 +443,7 @@ export default function FAQPage() {
 
   const popularChips = [
     'Gemini memory',
+    'How to support me',
     'Delete data',
     'Local storage',
     'Why no login',
@@ -462,6 +547,7 @@ export default function FAQPage() {
         <div className="flex items-center gap-1.5 overflow-x-auto pb-1 text-xs pt-1">
           {[
             { id: 'all', label: 'All Questions' },
+            { id: 'support', label: 'Support Me ☕' },
             { id: 'privacy', label: 'Privacy & Security' },
             { id: 'ai', label: 'AI & Gemini' },
             { id: 'storage', label: 'Local Storage' },
