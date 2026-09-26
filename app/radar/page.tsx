@@ -352,20 +352,20 @@ export default function RadarPage() {
   return (
     <div className="max-w-7xl 2xl:max-w-[1600px] w-full mx-auto space-y-6">
       {/* Top Banner Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-sand-200 pb-5">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-200 pb-5">
         <div className="space-y-1">
           <div className="flex items-center gap-2.5">
-            <div className="p-2 bg-pine-50 border border-pine-200 rounded-xl text-pine-700">
+            <div className="p-2 bg-indigo-50 border border-indigo-100 rounded-lg text-indigo-600">
               <Radar className="h-6 w-6 animate-spin-slow" />
             </div>
-            <h2 className="text-2xl sm:text-3xl font-extrabold text-ink-900 tracking-tight">
+            <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-800 tracking-tight">
               Smart Job Radar
             </h2>
-            <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-sand-100 text-ink-700 border border-sand-200">
+            <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-indigo-50 text-indigo-700 border border-indigo-200">
               SerpAPI + Google Jobs
             </span>
           </div>
-          <p className="text-ink-500 text-sm max-w-3xl leading-relaxed">
+          <p className="text-slate-500 text-sm max-w-3xl leading-relaxed">
             Live opportunity scanner aggregating active listings from LinkedIn, Indeed, Greenhouse, and company career pages. Evaluated with AI fit scoring against your Master CV.
           </p>
         </div>
@@ -374,17 +374,17 @@ export default function RadarPage() {
           type="button"
           onClick={handleScanFromCV}
           disabled={isExtractingRoles || loading}
-          className="flex items-center justify-center gap-2.5 px-5 py-2.5 sm:py-3 bg-pine-900 hover:bg-pine-950 text-white rounded-xl shadow-xs font-bold text-sm sm:text-base transition-all w-full sm:w-auto flex-shrink-0 cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed border border-pine-800"
+          className="flex items-center justify-center gap-2.5 px-5 py-2.5 sm:py-3 bg-gradient-to-r from-indigo-600 via-indigo-700 to-violet-700 hover:from-indigo-700 hover:via-indigo-800 hover:to-violet-800 text-white rounded-xl shadow-md hover:shadow-lg hover:shadow-indigo-500/25 font-bold text-sm sm:text-base transition-all w-full sm:w-auto flex-shrink-0 cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed border border-indigo-400/30 ring-2 ring-indigo-500/20"
           title={hasMasterResume ? "Intelligently analyze your CV with AI to scan target roles in your specific domain" : "Upload your Master CV to auto-scan matching roles with AI"}
         >
           {isExtractingRoles ? (
             <>
-              <Sparkles className="h-5 w-5 animate-spin text-terracotta-300" />
+              <Sparkles className="h-5 w-5 animate-spin text-amber-300" />
               <span>Analyzing CV with AI...</span>
             </>
           ) : (
             <>
-              <Zap className="h-5 w-5 text-terracotta-400 fill-terracotta-400 animate-pulse" />
+              <Zap className="h-5 w-5 text-amber-300 fill-amber-300 animate-pulse" />
               <span>Auto-Scan for My CV</span>
             </>
           )}
@@ -408,16 +408,16 @@ export default function RadarPage() {
       )}
 
       {/* Search & Filter Bar */}
-      <form onSubmit={handleSearch} className="bg-white p-4 sm:p-5 rounded-2xl border border-sand-300 shadow-2xs space-y-4">
+      <form onSubmit={handleSearch} className="bg-white p-4 sm:p-5 rounded-xl border border-slate-300 shadow-sm space-y-4">
         <div className="grid grid-cols-1 md:grid-cols-12 gap-3.5 items-end">
           {/* Role Query Input */}
           <div className="md:col-span-6 space-y-1.5">
-            <label htmlFor="radar-role-input" className="text-xs font-bold text-ink-800 uppercase tracking-wider flex items-center gap-1.5">
-              <Search className="h-3.5 w-3.5 text-pine-700" />
+            <label htmlFor="radar-role-input" className="text-xs font-bold text-slate-800 uppercase tracking-wider flex items-center gap-1.5">
+              <Search className="h-3.5 w-3.5 text-indigo-700" />
               <span>Target Role / Job Title</span>
             </label>
             <div className="relative">
-              <Search className="h-4 w-4 text-ink-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+              <Search className="h-4 w-4 text-slate-500 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
               <input
                 id="radar-role-input"
                 type="text"
@@ -430,7 +430,7 @@ export default function RadarPage() {
                   } catch {}
                 }}
                 placeholder="e.g. Product Manager, Data Scientist, AI Engineer..."
-                className="w-full pl-10 pr-9 py-2.5 text-base md:text-sm font-semibold text-ink-900 placeholder:text-ink-400 placeholder:font-normal bg-white border border-sand-300 rounded-xl outline-none focus:border-terracotta-600 focus:ring-2 focus:ring-terracotta-100 shadow-2xs transition-all"
+                className="w-full pl-10 pr-9 py-2.5 text-base md:text-sm font-semibold text-slate-950 placeholder:text-slate-500 placeholder:font-normal bg-white border-2 border-slate-300 rounded-lg outline-none focus:border-indigo-600 focus:ring-2 focus:ring-indigo-100 shadow-2xs transition-all"
               />
               {roleQuery && (
                 <button
@@ -446,7 +446,7 @@ export default function RadarPage() {
                       sessionStorage.removeItem('ascent_radar_cached_jobs');
                     } catch {}
                   }}
-                  className="absolute right-2.5 top-1/2 -translate-y-1/2 p-1 text-ink-400 hover:text-ink-700 rounded-md transition-colors"
+                  className="absolute right-2.5 top-1/2 -translate-y-1/2 p-1 text-slate-400 hover:text-slate-700 rounded-md transition-colors"
                   title="Clear input"
                   aria-label="Clear role input"
                 >
@@ -458,12 +458,12 @@ export default function RadarPage() {
 
           {/* Location Input */}
           <div className="md:col-span-4 space-y-1.5">
-            <label htmlFor="radar-location-input" className="text-xs font-bold text-ink-800 uppercase tracking-wider flex items-center gap-1.5">
-              <MapPin className="h-3.5 w-3.5 text-pine-700" />
+            <label htmlFor="radar-location-input" className="text-xs font-bold text-slate-800 uppercase tracking-wider flex items-center gap-1.5">
+              <MapPin className="h-3.5 w-3.5 text-indigo-700" />
               <span>Location</span>
             </label>
             <div className="relative">
-              <MapPin className="h-4 w-4 text-ink-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+              <MapPin className="h-4 w-4 text-slate-500 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
               <input
                 id="radar-location-input"
                 type="text"
@@ -476,7 +476,7 @@ export default function RadarPage() {
                   } catch {}
                 }}
                 placeholder="e.g. Singapore, Remote, London..."
-                className="w-full pl-10 pr-9 py-2.5 text-base md:text-sm font-semibold text-ink-900 placeholder:text-ink-400 placeholder:font-normal bg-white border border-sand-300 rounded-xl outline-none focus:border-terracotta-600 focus:ring-2 focus:ring-terracotta-100 shadow-2xs transition-all"
+                className="w-full pl-10 pr-9 py-2.5 text-base md:text-sm font-semibold text-slate-950 placeholder:text-slate-500 placeholder:font-normal bg-white border-2 border-slate-300 rounded-lg outline-none focus:border-indigo-600 focus:ring-2 focus:ring-indigo-100 shadow-2xs transition-all"
               />
               {locationQuery && (
                 <button
@@ -488,7 +488,7 @@ export default function RadarPage() {
                       sessionStorage.removeItem('ascent_radar_cached_location');
                     } catch {}
                   }}
-                  className="absolute right-2.5 top-1/2 -translate-y-1/2 p-1 text-ink-400 hover:text-ink-700 rounded-md transition-colors"
+                  className="absolute right-2.5 top-1/2 -translate-y-1/2 p-1 text-slate-400 hover:text-slate-700 rounded-md transition-colors"
                   title="Clear location"
                   aria-label="Clear location input"
                 >
@@ -503,7 +503,7 @@ export default function RadarPage() {
             <button
               type="submit"
               disabled={loading || isExtractingRoles || !roleQuery.trim()}
-              className="w-full py-2.5 px-4 bg-terracotta-600 hover:bg-terracotta-700 text-white rounded-xl font-bold text-sm transition-colors flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 h-[42px] shadow-xs"
+              className="w-full py-2.5 px-4 bg-slate-900 hover:bg-slate-800 text-white rounded-lg font-bold text-sm transition-colors flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 h-[42px] shadow-sm"
             >
               {loading ? (
                 <>
@@ -513,7 +513,7 @@ export default function RadarPage() {
               ) : (
                 <>
                   <Search className="h-4 w-4" />
-                  <span>Scan Jobs</span>
+                  <span>Scan Radar</span>
                 </>
               )}
             </button>
@@ -522,9 +522,9 @@ export default function RadarPage() {
 
         {/* AI Suggested Roles from CV Analysis */}
         {suggestedRoles.length > 0 && (
-          <div className="flex items-center gap-2 overflow-x-auto pb-1.5 -mx-1 px-1 flex-nowrap md:flex-wrap pt-2 border-t border-sand-200 text-xs">
-            <span className="font-semibold text-pine-900 flex items-center gap-1.5 bg-pine-50/90 px-2.5 py-1 rounded-lg border border-pine-200/80 flex-shrink-0">
-              <Sparkles className="h-3.5 w-3.5 text-pine-700" />
+          <div className="flex items-center gap-2 overflow-x-auto pb-1.5 -mx-1 px-1 flex-nowrap md:flex-wrap pt-2 border-t border-slate-100 text-xs">
+            <span className="font-semibold text-indigo-800 flex items-center gap-1.5 bg-indigo-50/90 px-2.5 py-1 rounded-md border border-indigo-200/70 flex-shrink-0">
+              <Sparkles className="h-3.5 w-3.5 text-indigo-600" />
               <span>{detectedDomain ? `Target Roles (${detectedDomain}):` : 'AI Suggested Roles:'}</span>
             </span>
             {suggestedRoles.map((tag) => {
@@ -538,16 +538,16 @@ export default function RadarPage() {
                   key={tag}
                   type="button"
                   onClick={() => handleToggleSuggestedRole(tag)}
-                  className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium border transition-colors cursor-pointer flex-shrink-0 ${
+                  className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium border transition-colors cursor-pointer flex-shrink-0 ${
                     isSuggestedChecked
-                      ? 'bg-pine-900 text-white border-pine-900 font-bold shadow-xs'
-                      : 'bg-white hover:bg-sand-50 text-ink-700 border-sand-200'
+                      ? 'bg-indigo-600 text-white border-indigo-600 font-bold shadow-xs'
+                      : 'bg-white hover:bg-slate-50 text-slate-700 border-slate-200'
                   }`}
                 >
                   <span className={`w-3.5 h-3.5 rounded border flex items-center justify-center transition-colors ${
                     isSuggestedChecked 
-                      ? 'bg-white border-white text-pine-900' 
-                      : 'border-sand-300 bg-white'
+                      ? 'bg-white border-white text-indigo-600' 
+                      : 'border-slate-300 bg-white'
                   }`}>
                     {isSuggestedChecked && <Check className="h-2.5 w-2.5 stroke-[3]" />}
                   </span>
@@ -559,9 +559,9 @@ export default function RadarPage() {
         )}
 
         {/* Quick Roles & Remote Toggle */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 pt-2 border-t border-sand-200 text-xs text-ink-500">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 pt-2 border-t border-slate-100 text-xs text-slate-500">
           <div className="flex items-center gap-2 overflow-x-auto pb-1.5 -mx-1 px-1 flex-nowrap md:flex-wrap">
-            <span className="font-semibold text-ink-800 flex items-center gap-1 flex-shrink-0">
+            <span className="font-semibold text-slate-700 flex items-center gap-1 flex-shrink-0">
               <Filter className="h-3 w-3" /> Quick Roles:
             </span>
             {QUICK_ROLES.map((tag) => {
@@ -575,16 +575,16 @@ export default function RadarPage() {
                   key={tag}
                   type="button"
                   onClick={() => handleToggleQuickRole(tag)}
-                  className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium border transition-all cursor-pointer flex-shrink-0 ${
+                  className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium border transition-all cursor-pointer flex-shrink-0 ${
                     isChecked 
-                      ? 'bg-terracotta-50 text-terracotta-700 border-terracotta-300 font-bold shadow-xs ring-1 ring-terracotta-200' 
-                      : 'bg-sand-50 hover:bg-sand-100 text-ink-700 border-sand-200'
+                      ? 'bg-indigo-50 text-indigo-700 border-indigo-300 font-bold shadow-xs ring-1 ring-indigo-200' 
+                      : 'bg-slate-50 hover:bg-slate-100 text-slate-600 border-slate-200'
                   }`}
                 >
                   <span className={`w-3.5 h-3.5 rounded border flex items-center justify-center transition-colors ${
                     isChecked 
-                      ? 'bg-terracotta-600 border-terracotta-600 text-white' 
-                      : 'bg-white border-sand-300'
+                      ? 'bg-indigo-600 border-indigo-600 text-white' 
+                      : 'bg-white border-slate-300'
                   }`}>
                     {isChecked && <Check className="h-2.5 w-2.5 stroke-[3]" />}
                   </span>
@@ -609,15 +609,15 @@ export default function RadarPage() {
                   fetchRadarJobs(searchedRole, locationQuery, nextRemote);
                 }
               }}
-              className="rounded border-sand-300 text-terracotta-600 focus:ring-terracotta-500"
+              className="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500"
             />
-            <span className="text-xs font-medium text-ink-700">Remote / Flexible only</span>
+            <span className="text-xs font-medium text-slate-700">Remote / Flexible only</span>
           </label>
         </div>
       </form>
 
       {/* Results Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs text-ink-500 px-1">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs text-slate-500 px-1">
         <div className="flex items-center gap-2.5 flex-wrap">
           {loading ? (
             <span>
@@ -637,20 +637,20 @@ export default function RadarPage() {
             </span>
           )}
           {jobs.length > 1 && !loading && (
-            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-pine-50/90 text-pine-800 border border-pine-200/80 font-semibold text-[11px]">
-              <ArrowDownWideNarrow className="h-3 w-3 text-pine-700" />
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-indigo-50/90 text-indigo-700 border border-indigo-200/80 font-semibold text-[11px]">
+              <ArrowDownWideNarrow className="h-3 w-3 text-indigo-600" />
               Highest Match on Top
             </span>
           )}
         </div>
         {hasMasterResume ? (
-          <span className="text-pine-700 font-semibold flex items-center gap-1">
+          <span className="text-indigo-600 font-semibold flex items-center gap-1">
             <Sparkles className="h-3.5 w-3.5" />
             AI Fit Score matched against your Master CV
           </span>
         ) : (
-          <span className="text-ink-500 font-medium flex items-center gap-1">
-            <Sparkles className="h-3.5 w-3.5 text-ink-400" />
+          <span className="text-slate-500 font-medium flex items-center gap-1">
+            <Sparkles className="h-3.5 w-3.5 text-slate-400" />
             Search Relevance Score (Upload Master CV in CV Workspace for personalized AI fit scoring)
           </span>
         )}
@@ -659,21 +659,21 @@ export default function RadarPage() {
       {/* Jobs Feed Grid */}
       <div className="space-y-4">
         {loading && jobs.length === 0 ? (
-          <div className="p-12 text-center bg-white rounded-xl border border-dashed border-sand-300 space-y-3">
-            <Radar className="h-10 w-10 text-pine-700 mx-auto animate-spin" />
-            <h4 className="text-base font-bold text-ink-800">Scanning Radar...</h4>
-            <p className="text-xs text-ink-500 max-w-sm mx-auto">
+          <div className="p-12 text-center bg-white rounded-xl border border-dashed border-slate-200 space-y-3">
+            <Radar className="h-10 w-10 text-indigo-600 mx-auto animate-spin" />
+            <h4 className="text-base font-bold text-slate-700">Scanning Radar...</h4>
+            <p className="text-xs text-slate-500 max-w-sm mx-auto">
               Gathering active listings and evaluating AI fit scores.
             </p>
           </div>
         ) : jobs.length === 0 && !loading ? (
-          <div className="p-12 text-center bg-white rounded-xl border border-dashed border-sand-300 space-y-4">
-            <Radar className="h-10 w-10 text-ink-300 mx-auto animate-pulse" />
+          <div className="p-12 text-center bg-white rounded-xl border border-dashed border-slate-200 space-y-4">
+            <Radar className="h-10 w-10 text-slate-300 mx-auto animate-pulse" />
             <div className="space-y-1">
-              <h4 className="text-base font-bold text-ink-800">
+              <h4 className="text-base font-bold text-slate-700">
                 {searchedRole ? 'No Postings Detected' : 'No Active Opportunities'}
               </h4>
-              <p className="text-xs text-ink-500 max-w-sm mx-auto">
+              <p className="text-xs text-slate-500 max-w-sm mx-auto">
                 {searchedRole 
                   ? 'Try adjusting your target role or location keywords to broaden the radar scan.' 
                   : 'Select a quick role above, click "Auto-Scan for My CV", or enter a target role in the search box and click "Scan Radar".'}
@@ -685,7 +685,7 @@ export default function RadarPage() {
                   type="button"
                   onClick={handleScanFromCV}
                   disabled={isExtractingRoles || loading}
-                  className="inline-flex items-center gap-2 px-5 py-2.5 bg-terracotta-600 hover:bg-terracotta-700 text-white rounded-xl shadow-md hover:shadow-lg font-bold text-sm transition-all cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed border border-terracotta-500/30 ring-2 ring-terracotta-500/20"
+                  className="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-indigo-600 via-indigo-700 to-violet-700 hover:from-indigo-700 hover:to-violet-800 text-white rounded-xl shadow-md hover:shadow-lg font-bold text-sm transition-all cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed border border-indigo-400/30 ring-2 ring-indigo-500/20"
                 >
                   <Zap className="h-4.5 w-4.5 text-amber-300 fill-amber-300 animate-pulse" />
                   <span>Auto-Scan for My CV</span>
@@ -700,10 +700,10 @@ export default function RadarPage() {
             const score = job.matchScore || 70;
 
             const scoreColor = score >= 80 
-              ? 'bg-pine-50 text-pine-900 border-pine-200' 
+              ? 'bg-blue-50 text-blue-900 border-blue-200' 
               : score >= 65 
-              ? 'bg-amber-50 text-amber-900 border-amber-200' 
-              : 'bg-sand-100 text-ink-800 border-sand-300';
+              ? 'bg-indigo-50 text-indigo-900 border-indigo-200' 
+              : 'bg-amber-50 text-amber-950 border-amber-300';
 
             const matchTier = score >= 80 
               ? 'High Fit' 
@@ -714,13 +714,13 @@ export default function RadarPage() {
             return (
               <div 
                 key={job.id} 
-                className="bg-white rounded-xl border border-sand-200 shadow-xs hover:border-sand-300 transition-all p-5 space-y-4 group relative"
+                className="bg-white rounded-xl border border-slate-200 shadow-xs hover:border-slate-300 transition-all p-5 space-y-4 group relative"
               >
                 {/* Header Row: Title, Company, Match Score */}
                 <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
                   <div className="space-y-1.5 flex-1 min-w-0">
                     <div className="flex items-center gap-2 flex-wrap">
-                      <h3 className="font-bold text-base text-ink-900 group-hover:text-terracotta-600 transition-colors">
+                      <h3 className="font-bold text-base text-slate-900 group-hover:text-indigo-600 transition-colors">
                         {job.title}
                       </h3>
                       <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 border border-slate-200">
@@ -811,7 +811,7 @@ export default function RadarPage() {
                   <button
                     type="button"
                     onClick={() => setExpandedJobId(isExpanded ? null : job.id)}
-                    className="text-xs font-semibold text-terracotta-600 hover:text-terracotta-700 flex items-center gap-1 cursor-pointer py-1 touch-manipulation"
+                    className="text-xs font-semibold text-indigo-600 hover:text-indigo-800 flex items-center gap-1 cursor-pointer py-1 touch-manipulation"
                   >
                     {isExpanded ? (
                       <>
@@ -828,13 +828,13 @@ export default function RadarPage() {
                 </div>
 
                 {/* Action Footer Bar */}
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 pt-3 border-t border-sand-200">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 pt-3 border-t border-slate-100">
                   {/* Primary 1-Click Action: Tailor CV */}
                   <div className="flex items-center gap-2 w-full sm:w-auto">
                     <button
                       type="button"
                       onClick={() => handleTailorForJob(job)}
-                      className="flex-1 sm:flex-initial flex items-center justify-center gap-1.5 px-4 py-2.5 sm:py-2 bg-terracotta-600 hover:bg-terracotta-700 text-white rounded-xl text-xs font-bold shadow-xs transition-colors cursor-pointer min-h-[40px] sm:min-h-[36px]"
+                      className="flex-1 sm:flex-initial flex items-center justify-center gap-1.5 px-4 py-2.5 sm:py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-bold shadow-sm transition-colors cursor-pointer min-h-[40px] sm:min-h-[36px]"
                       title="Pre-fill this job description into Tailor & ATS Scorecard"
                     >
                       <Sparkles className="h-3.5 w-3.5" />

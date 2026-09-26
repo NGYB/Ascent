@@ -1,58 +1,28 @@
 @import "tailwindcss";
 
 :root {
-  --background: #f9f8f5;
-  --foreground: #1d2220;
+  --background: #ffffff;
+  --foreground: #171717;
 }
 
-@theme {
-  --color-pine-950: #0d1f18;
-  --color-pine-900: #142a21;
-  --color-pine-800: #1b3d30;
-  --color-pine-700: #255342;
-  --color-pine-600: #316d57;
-  --color-pine-500: #42896f;
-  --color-pine-200: #c6ddd3;
-  --color-pine-100: #e3efe9;
-  --color-pine-50: #f1f7f4;
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
 
-  --color-terracotta-900: #5c220f;
-  --color-terracotta-800: #873318;
-  --color-terracotta-700: #ad4220;
-  --color-terracotta-600: #c85a32;
-  --color-terracotta-500: #dc6f48;
-  --color-terracotta-400: #ea8a67;
-  --color-terracotta-200: #f7cbba;
-  --color-terracotta-100: #fce4da;
-  --color-terracotta-50: #fdf5f0;
-
-  --color-sand-900: #2d2925;
-  --color-sand-800: #49443e;
-  --color-sand-700: #69625a;
-  --color-sand-600: #8a8277;
-  --color-sand-500: #ada59a;
-  --color-sand-400: #cac3b8;
-  --color-sand-300: #ded8ce;
-  --color-sand-200: #eae5dc;
-  --color-sand-100: #f3efe7;
-  --color-sand-50: #f9f8f5;
-
-  --color-ink-950: #111413;
-  --color-ink-900: #1d2220;
-  --color-ink-800: #2d3330;
-  --color-ink-700: #414945;
-  --color-ink-600: #56605b;
-  --color-ink-500: #6d7872;
-  --color-ink-400: #939d98;
-
-  --font-sans: var(--font-geist-sans), system-ui, -apple-system, sans-serif;
-  --font-mono: var(--font-geist-mono), monospace;
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
 }
 
 body {
-  background-color: var(--background);
+  background: var(--background);
   color: var(--foreground);
-  font-family: var(--font-sans);
+  font-family: Arial, Helvetica, sans-serif;
 }
 
 /* Colorblind & High-Contrast Universal Design Overrides */
@@ -61,20 +31,16 @@ body {
   --tw-text-opacity: 1;
 }
 
-.colorblind-mode .text-slate-400,
-.colorblind-mode .text-ink-400 {
+.colorblind-mode .text-slate-400 {
   color: #475569 !important; /* slate-600 for AA compliance */
 }
 
-.colorblind-mode .text-slate-500,
-.colorblind-mode .text-ink-500 {
+.colorblind-mode .text-slate-500 {
   color: #334155 !important; /* slate-700 */
 }
 
-.colorblind-mode .border-slate-200,
-.colorblind-mode .border-sand-200,
-.colorblind-mode .border-sand-300 {
-  border-color: #94a3b8 !important; /* crisp visual boundary */
+.colorblind-mode .border-slate-200 {
+  border-color: #94a3b8 !important; /* slate-400 for crisp visual boundary */
 }
 
 .colorblind-mode .border-dashed {

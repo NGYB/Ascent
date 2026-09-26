@@ -65,11 +65,11 @@ const formatDate = (dateStr?: string, fallbackDateStr?: string): string => {
 };
 
 const COLUMNS: ColumnDef[] = [
-  { id: 'DRAFT', name: 'Draft / Tailored', icon: FileText, color: 'text-pine-800 border-pine-200', bg: 'bg-pine-50/60' },
-  { id: 'APPLIED', name: 'Applied', icon: Send, color: 'text-terracotta-800 border-terracotta-200', bg: 'bg-terracotta-50/60' },
-  { id: 'INTERVIEWING', name: 'Interviewing', icon: Calendar, color: 'text-amber-800 border-amber-200', bg: 'bg-amber-50/50' },
-  { id: 'OFFER', name: 'Offers', icon: Award, color: 'text-emerald-800 border-emerald-200', bg: 'bg-emerald-50/50' },
-  { id: 'REJECTED', name: 'Archived / Reject', icon: ArchiveX, color: 'text-sand-700 border-sand-300', bg: 'bg-sand-100/60' }
+  { id: 'DRAFT', name: 'Draft / Tailored', icon: FileText, color: 'text-indigo-800 border-indigo-200', bg: 'bg-indigo-50/50' },
+  { id: 'APPLIED', name: 'Applied', icon: Send, color: 'text-amber-800 border-amber-300', bg: 'bg-amber-50/50' },
+  { id: 'INTERVIEWING', name: 'Interviewing', icon: Calendar, color: 'text-sky-800 border-sky-300', bg: 'bg-sky-50/50' },
+  { id: 'OFFER', name: 'Offers', icon: Award, color: 'text-blue-800 border-blue-300', bg: 'bg-blue-50/50' },
+  { id: 'REJECTED', name: 'Archived / Reject', icon: ArchiveX, color: 'text-slate-700 border-slate-300', bg: 'bg-slate-50/50' }
 ];
 
 export default function TrackerPage() {
@@ -244,15 +244,15 @@ export default function TrackerPage() {
     <div className="max-w-7xl 2xl:max-w-[1600px] w-full mx-auto space-y-6">
       <div className="flex items-center justify-between flex-wrap gap-4">
         <div className="space-y-1">
-          <h2 className="text-2xl font-extrabold text-ink-900 tracking-tight">Application Pipeline</h2>
-          <p className="text-ink-500 text-sm">
+          <h2 className="text-2xl font-extrabold text-slate-800 tracking-tight">Application Pipeline</h2>
+          <p className="text-slate-500 text-sm">
             Track and manage your target opportunities. Cards generated during tailoring automatically appear here.
           </p>
         </div>
 
         <button
           onClick={() => setShowAddModal(true)}
-          className="flex items-center gap-1.5 bg-terracotta-600 hover:bg-terracotta-700 text-white text-sm font-bold px-4 py-2.5 rounded-xl shadow-xs transition-colors cursor-pointer"
+          className="flex items-center gap-1.5 bg-slate-900 hover:bg-slate-800 text-white text-sm font-semibold px-4 py-2.5 rounded-lg shadow-sm transition-colors"
         >
           <Plus className="h-4 w-4" />
           <span>Add Opportunity</span>
@@ -267,43 +267,43 @@ export default function TrackerPage() {
         {COLUMNS.map((col) => {
           const colApps = apps.filter((a) => a.status === col.id);
           return (
-            <div key={col.id} className="bg-white rounded-2xl border border-sand-200 shadow-2xs flex flex-col min-w-[200px] h-[550px]">
+            <div key={col.id} className="bg-white rounded-xl border border-slate-200 shadow-sm flex flex-col min-w-[200px] h-[550px]">
               {/* Column Header */}
-              <div className="px-4 py-3 border-b border-sand-200 flex items-center justify-between bg-sand-50/80 rounded-t-2xl">
+              <div className="px-4 py-3 border-b border-slate-200 flex items-center justify-between bg-slate-50 rounded-t-xl">
                 <div className="flex items-center gap-2 min-w-0">
-                  <col.icon className="h-4 w-4 text-ink-700 flex-shrink-0" />
-                  <span className="font-bold text-xs text-ink-900 tracking-wide uppercase truncate">
+                  <col.icon className="h-4 w-4 text-slate-700 flex-shrink-0" />
+                  <span className="font-bold text-xs text-slate-800 tracking-wide uppercase truncate">
                     {col.name}
                   </span>
                 </div>
-                <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-sand-200 text-ink-700 flex-shrink-0 ml-1">
+                <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-200 text-slate-700 flex-shrink-0 ml-1">
                   {colApps.length}
                 </span>
               </div>
 
               {/* Cards List */}
-              <div className="flex-1 p-3 space-y-3 overflow-y-auto bg-sand-50/30">
+              <div className="flex-1 p-3 space-y-3 overflow-y-auto bg-slate-50/30">
                 {colApps.length === 0 ? (
-                  <div className="flex flex-col items-center justify-center h-32 text-ink-400 text-center p-4">
-                    <Briefcase className="h-6 w-6 stroke-[1.2] mb-1 text-ink-400" />
-                    <span className="text-[10px] italic text-ink-400">No jobs in this stage</span>
+                  <div className="flex flex-col items-center justify-center h-32 text-slate-400 text-center p-4">
+                    <Briefcase className="h-6 w-6 stroke-[1.2] mb-1" />
+                    <span className="text-[10px] italic">No jobs in this stage</span>
                   </div>
                 ) : (
                   colApps.map((app) => {
                     const matchedCV = getCVName(app.tailoredResumeId);
                     return (
-                      <div key={app.id} className="bg-white p-4 rounded-xl border border-sand-200 shadow-2xs hover:border-sand-300 transition-all flex flex-col justify-between group gap-3 relative">
+                      <div key={app.id} className="bg-white p-4 rounded-lg border border-slate-200 shadow-sm hover:border-slate-300 transition-colors flex flex-col justify-between group gap-3 relative">
                         <div className="space-y-1">
-                          <h4 className="font-bold text-xs text-ink-900 leading-tight pr-6">
+                          <h4 className="font-bold text-xs text-slate-800 leading-tight pr-6">
                             {app.jobTitle}
                           </h4>
-                          <p className="text-[10px] text-ink-500 font-medium">{app.company}</p>
+                          <p className="text-[10px] text-slate-500 font-medium">{app.company}</p>
                         </div>
 
                         <div className="flex flex-wrap items-center gap-1.5">
                           {matchedCV && (
-                            <div className="flex items-center gap-1 text-[9px] font-semibold text-pine-800 bg-pine-50/70 border border-pine-200 rounded px-1.5 py-0.5 w-fit">
-                              <FileText className="h-3 w-3 flex-shrink-0 text-pine-700" />
+                            <div className="flex items-center gap-1 text-[9px] font-semibold text-indigo-600 bg-indigo-50/60 border border-indigo-100 rounded px-1.5 py-0.5 w-fit">
+                              <FileText className="h-3 w-3 flex-shrink-0" />
                               <span className="truncate max-w-[120px]">{matchedCV}</span>
                             </div>
                           )}
@@ -452,46 +452,46 @@ export default function TrackerPage() {
 
             <form onSubmit={handleAddApp} className="space-y-4">
               <div className="space-y-1">
-                <label className="text-xs font-bold text-ink-700">Job Title</label>
+                <label className="text-xs font-bold text-slate-600">Job Title</label>
                 <input
                   type="text"
                   required
                   value={newTitle}
                   onChange={(e) => setNewTitle(e.target.value)}
                   placeholder="e.g. Director of Operations"
-                  className="w-full px-3.5 py-2.5 bg-white border border-sand-300 rounded-xl text-sm text-ink-900 placeholder:text-ink-400 focus:ring-2 focus:ring-terracotta-500 focus:border-terracotta-500 outline-none shadow-2xs"
+                  className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none"
                 />
               </div>
 
               <div className="space-y-1">
-                <label className="text-xs font-bold text-ink-700">Company Name</label>
+                <label className="text-xs font-bold text-slate-600">Company Name</label>
                 <input
                   type="text"
                   required
                   value={newCompany}
                   onChange={(e) => setNewCompany(e.target.value)}
                   placeholder="e.g. Acme Corporation"
-                  className="w-full px-3.5 py-2.5 bg-white border border-sand-300 rounded-xl text-sm text-ink-900 placeholder:text-ink-400 focus:ring-2 focus:ring-terracotta-500 focus:border-terracotta-500 outline-none shadow-2xs"
+                  className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none"
                 />
               </div>
 
               <div className="space-y-1">
-                <label className="text-xs font-bold text-ink-700">Application / Posting Link (Optional)</label>
+                <label className="text-xs font-bold text-slate-600">Application / Posting Link (Optional)</label>
                 <input
                   type="url"
                   value={newApplyUrl}
                   onChange={(e) => setNewApplyUrl(e.target.value)}
                   placeholder="e.g. https://careers.company.com/job/123"
-                  className="w-full px-3.5 py-2.5 bg-white border border-sand-300 rounded-xl text-sm text-ink-900 placeholder:text-ink-400 focus:ring-2 focus:ring-terracotta-500 focus:border-terracotta-500 outline-none shadow-2xs"
+                  className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none"
                 />
               </div>
 
               <div className="space-y-1">
-                <label className="text-xs font-bold text-ink-700">Initial Status</label>
+                <label className="text-xs font-bold text-slate-600">Initial Status</label>
                 <select
                   value={newStatus}
                   onChange={(e) => setNewStatus(e.target.value as Application['status'])}
-                  className="w-full px-3.5 py-2.5 border border-sand-300 rounded-xl text-sm bg-white text-ink-900 focus:ring-2 focus:ring-terracotta-500 focus:border-terracotta-500 outline-none cursor-pointer shadow-2xs"
+                  className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm bg-white focus:ring-2 focus:ring-indigo-500 outline-none cursor-pointer"
                 >
                   {COLUMNS.map(col => (
                     <option key={col.id} value={col.id}>{col.name}</option>
@@ -500,26 +500,26 @@ export default function TrackerPage() {
               </div>
 
               {newStatus === 'REJECTED' && (
-                <div className="space-y-1 bg-sand-50 p-3 rounded-xl border border-sand-200">
-                  <label className="text-xs font-bold text-ink-700">Rejection Stage</label>
+                <div className="space-y-1 bg-slate-50 p-3 rounded-lg border border-slate-200">
+                  <label className="text-xs font-bold text-slate-700">Rejection Stage</label>
                   <select
                     value={newRejectedStage === 'OFFER' ? 'INTERVIEWING' : newRejectedStage}
                     onChange={(e) => setNewRejectedStage(e.target.value as 'APPLIED' | 'INTERVIEWING')}
-                    className="w-full px-3.5 py-2.5 border border-sand-300 rounded-xl text-sm bg-white text-ink-900 focus:ring-2 focus:ring-terracotta-500 focus:border-terracotta-500 outline-none cursor-pointer"
+                    className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm bg-white focus:ring-2 focus:ring-indigo-500 outline-none cursor-pointer"
                   >
                     <option value="APPLIED">Rejected after applied</option>
                     <option value="INTERVIEWING">Rejected after interviewing</option>
                   </select>
-                  <p className="text-[11px] text-ink-400">Specifies whether rejection occurred after application or after interviewing.</p>
+                  <p className="text-[11px] text-slate-400">Specifies whether rejection occurred after application or after interviewing.</p>
                 </div>
               )}
 
               <div className="space-y-1">
-                <label className="text-xs font-bold text-ink-700">Linked Tailored CV (Optional)</label>
+                <label className="text-xs font-bold text-slate-600">Linked Tailored CV (Optional)</label>
                 <select
                   value={selectedResume}
                   onChange={(e) => setSelectedResume(e.target.value)}
-                  className="w-full px-3.5 py-2.5 border border-sand-300 rounded-xl text-sm bg-white text-ink-900 focus:ring-2 focus:ring-terracotta-500 focus:border-terracotta-500 outline-none cursor-pointer shadow-2xs"
+                  className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm bg-white focus:ring-2 focus:ring-indigo-500 outline-none cursor-pointer"
                 >
                   <option value="">-- None --</option>
                   {tailoredResumes.map((resume) => (
@@ -534,13 +534,13 @@ export default function TrackerPage() {
                 <button
                   type="button"
                   onClick={() => setShowAddModal(false)}
-                  className="px-4 py-2 border border-sand-200 rounded-xl text-xs font-semibold text-ink-700 hover:bg-sand-100 transition-colors cursor-pointer"
+                  className="px-4 py-2 border border-slate-200 rounded-lg text-xs font-semibold text-slate-600 hover:bg-slate-50"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-terracotta-600 hover:bg-terracotta-700 text-white rounded-xl text-xs font-bold transition-colors cursor-pointer shadow-xs"
+                  className="px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-lg text-xs font-semibold"
                 >
                   Save Opportunity
                 </button>

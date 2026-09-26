@@ -32,14 +32,14 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`} suppressHydrationWarning>
-      <body className="h-full bg-sand-50 text-ink-900 font-sans antialiased" suppressHydrationWarning>
+      <body className="h-full bg-slate-50 text-slate-900 font-sans antialiased" suppressHydrationWarning>
         <AccessibilityProvider>
           <SidebarProvider>
             <div className="flex h-full overflow-hidden">
               <Sidebar />
               <div className="flex-1 flex flex-col overflow-hidden min-w-0">
                 <Header />
-                <main className="flex-1 overflow-y-auto bg-sand-50 p-3 sm:p-6 lg:p-8 pb-20 md:pb-8">
+                <main className="flex-1 overflow-y-auto bg-slate-50 p-3 sm:p-6 lg:p-8 pb-20 md:pb-8">
                   {children}
                 </main>
                 <BottomNav />

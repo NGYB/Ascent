@@ -218,7 +218,7 @@ export default function FAQPage() {
             <button
               type="button"
               onClick={() => setIsStorageModalOpen(true)}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-pine-50 hover:bg-pine-100 text-pine-800 border border-pine-200 rounded-lg text-xs font-semibold transition-colors cursor-pointer"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 rounded-lg text-xs font-semibold transition-colors cursor-pointer"
             >
               <HardDrive className="h-3.5 w-3.5" />
               <span>Open Storage Manager Now</span>
@@ -377,14 +377,14 @@ export default function FAQPage() {
             </div>
 
             {/* Option 2: Share Feedback & Meet for Coffee */}
-            <div className="p-4 sm:p-5 bg-terracotta-50/70 border border-terracotta-200/80 rounded-xl space-y-3.5 flex flex-col justify-between shadow-2xs">
+            <div className="p-4 sm:p-5 bg-indigo-50/70 border border-indigo-200/80 rounded-xl space-y-3.5 flex flex-col justify-between shadow-2xs">
               <div className="space-y-2">
-                <div className="flex items-center gap-2 text-terracotta-800 font-bold text-xs uppercase tracking-wider">
-                  <HeartHandshake className="h-4 w-4 text-terracotta-600" />
+                <div className="flex items-center gap-2 text-indigo-800 font-bold text-xs uppercase tracking-wider">
+                  <HeartHandshake className="h-4 w-4 text-indigo-600" />
                   <span>Option 2: Share Your Story</span>
                 </div>
-                <h3 className="font-extrabold text-ink-900 text-sm">Send Feedback & Connect</h3>
-                <p className="text-xs text-ink-600 leading-relaxed">
+                <h3 className="font-extrabold text-slate-900 text-sm">Send Feedback & Connect</h3>
+                <p className="text-xs text-slate-600 leading-relaxed">
                   Go to <strong>Share Feedback</strong> and send me a message on how the app has helped you. I would love to meet you for coffee and hear all about your story!
                 </p>
               </div>
@@ -392,7 +392,7 @@ export default function FAQPage() {
               <button
                 type="button"
                 onClick={() => setIsFeedbackModalOpen(true)}
-                className="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-terracotta-600 hover:bg-terracotta-700 text-white font-bold text-xs rounded-xl transition-all shadow-xs cursor-pointer"
+                className="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs rounded-xl transition-all shadow-xs cursor-pointer"
               >
                 <MessageSquare className="h-4 w-4" />
                 <span>Open Share Feedback</span>
@@ -454,16 +454,16 @@ export default function FAQPage() {
   return (
     <div className="max-w-4xl w-full mx-auto space-y-8 pb-12">
       {/* Header Banner */}
-      <div className="bg-gradient-to-r from-pine-950 via-pine-900 to-pine-950 text-white rounded-2xl p-6 sm:p-8 shadow-sm border border-pine-850/80 relative overflow-hidden">
+      <div className="bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white rounded-2xl p-6 sm:p-8 shadow-md relative overflow-hidden">
         <div className="max-w-2xl space-y-3">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-terracotta-500/20 text-terracotta-300 border border-terracotta-500/35">
-            <ShieldCheck className="h-4 w-4 text-terracotta-400" />
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
+            <ShieldCheck className="h-4 w-4 text-indigo-400" />
             <span>Privacy & AI Architecture</span>
           </div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-sand-50">
+          <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight">
             Frequently Asked Questions
           </h1>
-          <p className="text-sand-200 text-sm sm:text-base leading-relaxed">
+          <p className="text-slate-300 text-sm sm:text-base leading-relaxed">
             Ascent is engineered from the ground up with a privacy-first, zero-knowledge architecture. Here is transparently how your data and AI processing work.
           </p>
         </div>
@@ -471,32 +471,32 @@ export default function FAQPage() {
 
       {/* 3 Core Trust Pillars */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <div className="bg-white p-5 rounded-2xl border border-sand-200 shadow-2xs space-y-2">
-          <div className="h-10 w-10 rounded-xl bg-pine-50 border border-pine-100 flex items-center justify-center text-pine-700">
+        <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-2xs space-y-2">
+          <div className="h-10 w-10 rounded-lg bg-indigo-50 border border-indigo-100 flex items-center justify-center text-indigo-600">
             <Lock className="h-5 w-5" />
           </div>
-          <h2 className="font-bold text-ink-900 text-sm">Stateless AI Calls</h2>
-          <p className="text-xs text-ink-500 leading-relaxed">
+          <h2 className="font-bold text-slate-800 text-sm">Stateless AI Calls</h2>
+          <p className="text-xs text-slate-500 leading-relaxed">
             Gemini processes prompts in-memory and immediately frees context. There is no prompt history or memory archive accessible to API key holders.
           </p>
         </div>
 
-        <div className="bg-white p-5 rounded-2xl border border-sand-200 shadow-2xs space-y-2">
-          <div className="h-10 w-10 rounded-xl bg-pine-50 border border-pine-100 flex items-center justify-center text-pine-700">
+        <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-2xs space-y-2">
+          <div className="h-10 w-10 rounded-lg bg-emerald-50 border border-emerald-100 flex items-center justify-center text-emerald-600">
             <HardDrive className="h-5 w-5" />
           </div>
-          <h2 className="font-bold text-ink-900 text-sm">100% Local Storage</h2>
-          <p className="text-xs text-ink-500 leading-relaxed">
+          <h2 className="font-bold text-slate-800 text-sm">100% Local Storage</h2>
+          <p className="text-xs text-slate-500 leading-relaxed">
             Your master resume, tailored CV versions, and Kanban applications live exclusively in your device&rsquo;s browser sandbox.
           </p>
         </div>
 
-        <div className="bg-white p-5 rounded-2xl border border-sand-200 shadow-2xs space-y-2">
-          <div className="h-10 w-10 rounded-xl bg-terracotta-50 border border-terracotta-100 flex items-center justify-center text-terracotta-600">
+        <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-2xs space-y-2">
+          <div className="h-10 w-10 rounded-lg bg-amber-50 border border-amber-100 flex items-center justify-center text-amber-600">
             <EyeOff className="h-5 w-5" />
           </div>
-          <h2 className="font-bold text-ink-900 text-sm">Zero Server Database</h2>
-          <p className="text-xs text-ink-500 leading-relaxed">
+          <h2 className="font-bold text-slate-800 text-sm">Zero Server Database</h2>
+          <p className="text-xs text-slate-500 leading-relaxed">
             We operate no cloud database storing user resumes, accounts, or tracking data. No login is required.
           </p>
         </div>
@@ -505,19 +505,19 @@ export default function FAQPage() {
       {/* Search & Category Filter */}
       <div className="space-y-3">
         <div className="relative">
-          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-ink-400" />
+          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
           <input
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search questions (e.g., 'Gemini memory', 'delete data', 'storage')..."
-            className="w-full pl-10 pr-10 py-2.5 bg-white border border-sand-300 rounded-xl text-sm text-ink-900 placeholder:text-ink-400 focus:ring-2 focus:ring-terracotta-500 focus:border-terracotta-500 outline-none shadow-2xs"
+            className="w-full pl-10 pr-10 py-2.5 bg-white border border-slate-200 rounded-xl text-sm text-slate-800 placeholder:text-slate-400 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none shadow-2xs"
           />
           {searchQuery && (
             <button
               type="button"
               onClick={() => setSearchQuery('')}
-              className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-ink-400 hover:text-ink-700 rounded-full cursor-pointer"
+              className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-slate-400 hover:text-slate-600 rounded-full cursor-pointer"
               title="Clear search"
             >
               <X className="h-4 w-4" />
@@ -526,8 +526,8 @@ export default function FAQPage() {
         </div>
 
         {/* Quick Suggestion Chips */}
-        <div className="flex items-center gap-1.5 flex-wrap text-xs text-ink-500 pt-0.5">
-          <span className="font-medium text-ink-400">Try searching:</span>
+        <div className="flex items-center gap-1.5 flex-wrap text-xs text-slate-500 pt-0.5">
+          <span className="font-medium text-slate-400">Try searching:</span>
           {popularChips.map(chip => (
             <button
               key={chip}
@@ -536,7 +536,7 @@ export default function FAQPage() {
                 setSearchQuery(chip);
                 setSelectedCategory('all');
               }}
-              className="px-2.5 py-1 bg-white hover:bg-sand-100 hover:text-ink-900 text-ink-700 rounded-full border border-sand-200 shadow-2xs transition-colors cursor-pointer"
+              className="px-2.5 py-1 bg-white hover:bg-indigo-50 hover:text-indigo-600 text-slate-600 rounded-full border border-slate-200 shadow-2xs transition-colors cursor-pointer"
             >
               {chip}
             </button>
@@ -557,10 +557,10 @@ export default function FAQPage() {
               key={tab.id}
               type="button"
               onClick={() => setSelectedCategory(tab.id as any)}
-              className={`px-3 py-1.5 rounded-xl font-semibold whitespace-nowrap transition-colors cursor-pointer border ${
+              className={`px-3 py-1.5 rounded-lg font-semibold whitespace-nowrap transition-colors cursor-pointer border ${
                 selectedCategory === tab.id
-                  ? 'bg-pine-900 text-white border-pine-900'
-                  : 'bg-white text-ink-700 border-sand-200 hover:bg-sand-100 hover:text-ink-900'
+                  ? 'bg-slate-900 text-white border-slate-900'
+                  : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-100 hover:text-slate-900'
               }`}
             >
               {tab.label}
@@ -582,13 +582,13 @@ export default function FAQPage() {
                 <button
                   type="button"
                   onClick={() => setSelectedCategory('all')}
-                  className="px-3 py-1.5 bg-pine-900 hover:bg-pine-800 text-white rounded-lg text-xs font-semibold cursor-pointer transition-colors shadow-2xs"
+                  className="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-semibold cursor-pointer transition-colors shadow-2xs"
                 >
                   View {totalMatchesAcrossAll} matching {totalMatchesAcrossAll === 1 ? 'question' : 'questions'} across All Categories
                 </button>
               </div>
             ) : (
-              <p className="text-xs text-ink-400">Try one of the suggested search tags above or view all questions.</p>
+              <p className="text-xs text-slate-400">Try one of the suggested search tags above or view all questions.</p>
             )}
           </div>
         ) : (
@@ -598,7 +598,7 @@ export default function FAQPage() {
             return (
               <div 
                 key={faq.id}
-                className="bg-white border border-sand-200 hover:border-sand-300 rounded-xl overflow-hidden transition-all shadow-2xs"
+                className="bg-white border border-slate-200 hover:border-slate-300 rounded-xl overflow-hidden transition-all shadow-2xs"
               >
                 <button
                   type="button"
@@ -607,20 +607,20 @@ export default function FAQPage() {
                   aria-expanded={isOpen}
                 >
                   <div className="space-y-1">
-                    <h2 className="text-sm sm:text-base font-bold text-ink-900 flex items-center gap-2">
+                    <h2 className="text-sm sm:text-base font-bold text-slate-900 flex items-center gap-2">
                       <span>{faq.question}</span>
                     </h2>
                     {!isOpen && (
-                      <p className="text-xs text-ink-500 line-clamp-1">{faq.shortAnswer}</p>
+                      <p className="text-xs text-slate-500 line-clamp-1">{faq.shortAnswer}</p>
                     )}
                   </div>
-                  <div className={`p-1.5 rounded-lg bg-sand-50 text-ink-400 transition-transform duration-200 flex-shrink-0 ${isOpen ? 'rotate-180 text-terracotta-600 bg-terracotta-50' : ''}`}>
+                  <div className={`p-1.5 rounded-lg bg-slate-50 text-slate-400 transition-transform duration-200 flex-shrink-0 ${isOpen ? 'rotate-180 text-indigo-600 bg-indigo-50' : ''}`}>
                     <ChevronDown className="h-4 w-4" />
                   </div>
                 </button>
 
                 {isOpen && (
-                  <div className="px-4 pb-5 sm:px-5 border-t border-sand-100 pt-4 animate-in fade-in duration-150">
+                  <div className="px-4 pb-5 sm:px-5 border-t border-slate-100 pt-4 animate-in fade-in duration-150">
                     {faq.fullAnswer}
                   </div>
                 )}
@@ -631,10 +631,10 @@ export default function FAQPage() {
       </div>
 
       {/* Action / Help Footer */}
-      <div className="p-6 bg-sand-100/70 border border-sand-200 rounded-2xl flex flex-col sm:flex-row items-center justify-between gap-4">
+      <div className="p-6 bg-indigo-50/50 border border-indigo-100 rounded-2xl flex flex-col sm:flex-row items-center justify-between gap-4">
         <div className="space-y-1 text-center sm:text-left">
-          <h2 className="text-sm font-bold text-ink-900">Still have a question or concern?</h2>
-          <p className="text-xs text-ink-600">
+          <h2 className="text-sm font-bold text-slate-900">Still have a question or concern?</h2>
+          <p className="text-xs text-slate-600">
             You can manage your stored data or send our team feedback directly.
           </p>
         </div>
@@ -642,15 +642,15 @@ export default function FAQPage() {
           <button
             type="button"
             onClick={() => setIsStorageModalOpen(true)}
-            className="px-3.5 py-2 bg-white hover:bg-sand-50 text-ink-700 border border-sand-200 rounded-xl text-xs font-semibold transition-colors cursor-pointer shadow-2xs flex items-center gap-1.5"
+            className="px-3.5 py-2 bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 rounded-xl text-xs font-semibold transition-colors cursor-pointer shadow-2xs flex items-center gap-1.5"
           >
-            <HardDrive className="h-3.5 w-3.5 text-ink-500" />
+            <HardDrive className="h-3.5 w-3.5 text-slate-500" />
             <span>Manage Storage</span>
           </button>
           <button
             type="button"
             onClick={() => setIsFeedbackModalOpen(true)}
-            className="px-3.5 py-2 bg-terracotta-600 hover:bg-terracotta-700 text-white rounded-xl text-xs font-semibold transition-colors cursor-pointer shadow-2xs flex items-center gap-1.5"
+            className="px-3.5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-semibold transition-colors cursor-pointer shadow-2xs flex items-center gap-1.5"
           >
             <MessageSquare className="h-3.5 w-3.5" />
             <span>Send Feedback</span>
