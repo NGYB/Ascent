@@ -107,25 +107,25 @@ export default function FeedbackModal({ isOpen, onClose }: FeedbackModalProps) {
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto animate-in fade-in duration-150">
+    <div className="fixed inset-0 z-50 bg-pine-950/60 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto animate-in fade-in duration-150">
       <div 
-        className="bg-white w-full max-w-lg rounded-2xl border border-slate-200 shadow-2xl overflow-hidden my-8 animate-in zoom-in-95 duration-200"
+        className="bg-white w-full max-w-lg rounded-2xl border border-sand-200 shadow-2xl overflow-hidden my-8 animate-in zoom-in-95 duration-200"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Modal Header */}
-        <div className="p-5 sm:p-6 border-b border-slate-200 flex items-center justify-between bg-slate-50/50">
+        <div className="p-5 sm:p-6 border-b border-sand-200 flex items-center justify-between bg-sand-50/50">
           <div className="flex items-center gap-3">
-            <div className="p-2.5 bg-indigo-50 border border-indigo-100 rounded-xl text-indigo-600">
+            <div className="p-2.5 bg-terracotta-50 border border-terracotta-100 rounded-xl text-terracotta-600">
               <MessageSquareQuote className="h-5 w-5" />
             </div>
             <div>
-              <h3 className="text-lg font-extrabold text-slate-800 tracking-tight flex items-center gap-2">
+              <h3 className="text-lg font-extrabold text-ink-900 tracking-tight flex items-center gap-2">
                 <span>Share Feedback</span>
-                <span className="text-[10px] font-bold uppercase tracking-wider bg-indigo-50 text-indigo-700 border border-indigo-200 px-2 py-0.5 rounded-full">
+                <span className="text-[10px] font-bold uppercase tracking-wider bg-pine-50 text-pine-800 border border-pine-200 px-2 py-0.5 rounded-full">
                   Ascent Beta
                 </span>
               </h3>
-              <p className="text-xs text-slate-500 mt-0.5">
+              <p className="text-xs text-ink-500 mt-0.5">
                 Help us improve Ascent. Your feedback is sent directly to our team.
               </p>
             </div>
@@ -134,7 +134,7 @@ export default function FeedbackModal({ isOpen, onClose }: FeedbackModalProps) {
             type="button"
             onClick={onClose}
             disabled={loading}
-            className="p-2 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer disabled:opacity-50"
+            className="p-2 rounded-lg text-ink-400 hover:text-ink-700 hover:bg-sand-100 transition-colors cursor-pointer disabled:opacity-50"
           >
             <X className="h-5 w-5" />
           </button>
@@ -148,8 +148,8 @@ export default function FeedbackModal({ isOpen, onClose }: FeedbackModalProps) {
               <Check className="h-8 w-8 stroke-[2.5]" />
             </div>
             <div className="space-y-1.5">
-              <h4 className="text-xl font-bold text-slate-800">Thank You for Your Feedback!</h4>
-              <p className="text-xs text-slate-500 max-w-sm mx-auto leading-relaxed">
+              <h4 className="text-xl font-bold text-ink-900">Thank You for Your Feedback!</h4>
+              <p className="text-xs text-ink-500 max-w-sm mx-auto leading-relaxed">
                 Your message has been delivered directly to our inbox. We review every note to guide our next feature updates.
               </p>
             </div>
@@ -157,7 +157,7 @@ export default function FeedbackModal({ isOpen, onClose }: FeedbackModalProps) {
               <button
                 type="button"
                 onClick={onClose}
-                className="px-5 py-2.5 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-bold transition-all shadow-xs cursor-pointer"
+                className="px-5 py-2.5 bg-pine-900 hover:bg-pine-800 text-white rounded-xl text-xs font-bold transition-all shadow-xs cursor-pointer"
               >
                 Close
               </button>
@@ -178,7 +178,7 @@ export default function FeedbackModal({ isOpen, onClose }: FeedbackModalProps) {
 
             {/* Category Selector */}
             <div className="space-y-1.5">
-              <label className="text-xs font-bold text-slate-700 uppercase tracking-wider block">
+              <label className="text-xs font-bold text-ink-700 uppercase tracking-wider block">
                 Feedback Type
               </label>
               <div className="grid grid-cols-3 gap-2">
@@ -187,8 +187,8 @@ export default function FeedbackModal({ isOpen, onClose }: FeedbackModalProps) {
                   onClick={() => setFeedbackType('general')}
                   className={`py-2 px-3 rounded-xl border text-xs font-semibold flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
                     feedbackType === 'general'
-                      ? 'bg-emerald-50 border-emerald-300 text-emerald-800 shadow-2xs font-bold ring-2 ring-emerald-500/20'
-                      : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50 hover:border-slate-300'
+                      ? 'bg-pine-50 border-pine-300 text-pine-900 shadow-2xs font-bold ring-2 ring-pine-500/20'
+                      : 'bg-white border-sand-200 text-ink-600 hover:bg-sand-50 hover:border-sand-300'
                   }`}
                 >
                   <MessageSquareQuote className="h-3.5 w-3.5" />
@@ -200,8 +200,8 @@ export default function FeedbackModal({ isOpen, onClose }: FeedbackModalProps) {
                   onClick={() => setFeedbackType('feature')}
                   className={`py-2 px-3 rounded-xl border text-xs font-semibold flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
                     feedbackType === 'feature'
-                      ? 'bg-indigo-50 border-indigo-300 text-indigo-800 shadow-2xs font-bold ring-2 ring-indigo-500/20'
-                      : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50 hover:border-slate-300'
+                      ? 'bg-terracotta-50 border-terracotta-300 text-terracotta-800 shadow-2xs font-bold ring-2 ring-terracotta-500/20'
+                      : 'bg-white border-sand-200 text-ink-600 hover:bg-sand-50 hover:border-sand-300'
                   }`}
                 >
                   <Lightbulb className="h-3.5 w-3.5" />
@@ -214,7 +214,7 @@ export default function FeedbackModal({ isOpen, onClose }: FeedbackModalProps) {
                   className={`py-2 px-3 rounded-xl border text-xs font-semibold flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
                     feedbackType === 'bug'
                       ? 'bg-rose-50 border-rose-300 text-rose-800 shadow-2xs font-bold ring-2 ring-rose-500/20'
-                      : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50 hover:border-slate-300'
+                      : 'bg-white border-sand-200 text-ink-600 hover:bg-sand-50 hover:border-sand-300'
                   }`}
                 >
                   <Bug className="h-3.5 w-3.5" />
@@ -226,10 +226,10 @@ export default function FeedbackModal({ isOpen, onClose }: FeedbackModalProps) {
             {/* Message Area */}
             <div className="space-y-1.5">
               <div className="flex items-center justify-between">
-                <label className="text-xs font-bold text-slate-700 uppercase tracking-wider block">
+                <label className="text-xs font-bold text-ink-700 uppercase tracking-wider block">
                   Your Message <span className="text-rose-500">*</span>
                 </label>
-                <span className="text-[11px] text-slate-400 font-mono">
+                <span className="text-[11px] text-ink-400 font-mono">
                   {message.length} / 2000
                 </span>
               </div>
@@ -240,18 +240,18 @@ export default function FeedbackModal({ isOpen, onClose }: FeedbackModalProps) {
                 rows={5}
                 placeholder={getPlaceholder()}
                 required
-                className="w-full px-3.5 py-2.5 border border-slate-200 rounded-xl text-xs sm:text-sm text-slate-800 placeholder-slate-400 bg-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all resize-y leading-relaxed"
+                className="w-full px-3.5 py-2.5 border border-sand-200 rounded-xl text-xs sm:text-sm text-ink-900 placeholder-ink-400 bg-white focus:ring-2 focus:ring-terracotta-500 focus:border-terracotta-500 outline-none transition-all resize-y leading-relaxed"
               />
             </div>
 
             {/* Optional Email Input */}
             <div className="space-y-1.5">
-              <label className="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center justify-between">
+              <label className="text-xs font-bold text-ink-700 uppercase tracking-wider flex items-center justify-between">
                 <span>Your Email Address</span>
-                <span className="text-[11px] font-normal text-slate-400 lowercase">Optional (if you want a response)</span>
+                <span className="text-[11px] font-normal text-ink-400 lowercase">Optional (if you want a response)</span>
               </label>
               <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-ink-400">
                   <Mail className="h-3.5 w-3.5" />
                 </div>
                 <input
@@ -259,22 +259,22 @@ export default function FeedbackModal({ isOpen, onClose }: FeedbackModalProps) {
                   value={userEmail}
                   onChange={(e) => setUserEmail(e.target.value)}
                   placeholder="you@example.com"
-                  className="w-full pl-9 pr-3.5 py-2 border border-slate-200 rounded-xl text-xs sm:text-sm text-slate-800 placeholder-slate-400 bg-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all"
+                  className="w-full pl-9 pr-3.5 py-2 border border-sand-200 rounded-xl text-xs sm:text-sm text-ink-900 placeholder-ink-400 bg-white focus:ring-2 focus:ring-terracotta-500 focus:border-terracotta-500 outline-none transition-all"
                 />
               </div>
             </div>
 
             {/* Privacy Note */}
-            <div className="p-3 bg-slate-50 rounded-xl border border-slate-200 flex items-center gap-2 text-[11px] text-slate-500">
-              <ShieldCheck className="h-4 w-4 text-indigo-600 flex-shrink-0" />
+            <div className="p-3 bg-sand-50 rounded-xl border border-sand-200 flex items-center gap-2 text-[11px] text-ink-500">
+              <ShieldCheck className="h-4 w-4 text-pine-600 flex-shrink-0" />
               <span>
                 Your feedback is private. No CV files or personal passwords are sent.
               </span>
             </div>
 
             {/* Footer Buttons */}
-            <div className="pt-2 flex items-center justify-between gap-2.5 border-t border-slate-100">
-              <span className="text-[11px] font-mono text-slate-400">
+            <div className="pt-2 flex items-center justify-between gap-2.5 border-t border-sand-100">
+              <span className="text-[11px] font-mono text-ink-400">
                 Ascent {APP_STAGE} v{APP_VERSION}
               </span>
 
@@ -283,7 +283,7 @@ export default function FeedbackModal({ isOpen, onClose }: FeedbackModalProps) {
                   type="button"
                   onClick={onClose}
                   disabled={loading}
-                  className="px-4 py-2 text-xs font-semibold text-slate-600 hover:text-slate-800 bg-white hover:bg-slate-100 border border-slate-200 rounded-xl transition-colors cursor-pointer"
+                  className="px-4 py-2 text-xs font-semibold text-ink-600 hover:text-ink-800 bg-white hover:bg-sand-100 border border-sand-200 rounded-xl transition-colors cursor-pointer"
                 >
                   Cancel
                 </button>
@@ -291,7 +291,7 @@ export default function FeedbackModal({ isOpen, onClose }: FeedbackModalProps) {
                 <button
                   type="submit"
                   disabled={loading || !message.trim()}
-                  className="px-5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold transition-all shadow-xs flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                  className="px-5 py-2 bg-terracotta-600 hover:bg-terracotta-700 text-white rounded-xl text-xs font-bold transition-all shadow-xs flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
                 >
                   {loading ? (
                     <>

@@ -430,20 +430,20 @@ export default function InterviewPage() {
   return (
     <div className="max-w-5xl w-full mx-auto space-y-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200 pb-5">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-sand-200 pb-5">
         <div className="space-y-1">
           <div className="flex items-center gap-2.5">
-            <div className="p-2 bg-indigo-50 border border-indigo-100 rounded-lg text-indigo-600">
+            <div className="p-2 bg-pine-50 border border-pine-200 rounded-xl text-pine-700">
               <BrainCircuit className="h-6 w-6" />
             </div>
-            <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-800 tracking-tight">
+            <h2 className="text-2xl sm:text-3xl font-extrabold text-ink-900 tracking-tight">
               Mock Interview Room
             </h2>
-            <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-indigo-50 text-indigo-700 border border-indigo-200">
+            <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-sand-100 text-ink-700 border border-sand-200">
               STAR Evaluation & AI Coach
             </span>
           </div>
-          <p className="text-slate-500 text-sm max-w-2xl leading-relaxed">
+          <p className="text-ink-500 text-sm max-w-2xl leading-relaxed">
             Practice role-specific interview answers tailored to your target application. Automatically saved to your session so you can pause and revisit anytime.
           </p>
         </div>
@@ -451,20 +451,20 @@ export default function InterviewPage() {
         {started && (
           <div className="flex items-center gap-2.5 flex-shrink-0">
             {sessionSavedNotice ? (
-              <span className="text-xs font-bold text-blue-800 bg-blue-50 px-3 py-1.5 rounded-lg border border-blue-200 inline-flex items-center gap-1.5 shadow-2xs animate-in fade-in">
+              <span className="text-xs font-bold text-blue-800 bg-blue-50 px-3 py-1.5 rounded-xl border border-blue-200 inline-flex items-center gap-1.5 shadow-2xs animate-in fade-in">
                 <Check className="h-3.5 w-3.5 text-blue-700" />
                 <span>Progress Saved</span>
               </span>
             ) : (
-              <span className="text-xs font-medium text-slate-500 bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-200 inline-flex items-center gap-1.5">
-                <Clock className="h-3.5 w-3.5 text-slate-400" />
+              <span className="text-xs font-medium text-ink-500 bg-sand-100 px-3 py-1.5 rounded-xl border border-sand-200 inline-flex items-center gap-1.5">
+                <Clock className="h-3.5 w-3.5 text-ink-400" />
                 <span>Auto-saved</span>
               </span>
             )}
             <button
               type="button"
               onClick={handlePauseAndExit}
-              className="text-xs font-semibold text-slate-700 hover:text-indigo-700 bg-white hover:bg-slate-50 border border-slate-200 px-3 py-1.5 rounded-lg transition-colors cursor-pointer shadow-2xs"
+              className="text-xs font-semibold text-ink-700 hover:text-terracotta-700 bg-white hover:bg-sand-100 border border-sand-200 px-3 py-1.5 rounded-xl transition-colors cursor-pointer shadow-2xs"
             >
               Save & Exit
             </button>
@@ -477,27 +477,27 @@ export default function InterviewPage() {
         <div className="space-y-6 max-w-2xl mx-auto">
           {/* Resume Ongoing Session Banner (if saved session exists) */}
           {savedSession && savedSession.questions && savedSession.questions.length > 0 && (
-            <div className="bg-gradient-to-br from-indigo-50/90 via-white to-purple-50/60 p-5 rounded-2xl border border-indigo-200/80 shadow-xs space-y-4">
+            <div className="bg-sand-100/70 p-5 rounded-2xl border border-sand-200 shadow-2xs space-y-4">
               <div className="flex items-start justify-between gap-3">
                 <div className="space-y-1">
                   <div className="flex items-center gap-2 flex-wrap">
-                    <span className="px-2.5 py-0.5 rounded-full bg-indigo-600 text-white text-[10px] font-extrabold uppercase tracking-wider">
+                    <span className="px-2.5 py-0.5 rounded-full bg-terracotta-600 text-white text-[10px] font-extrabold uppercase tracking-wider">
                       {savedSession.isDone ? 'Completed Prep Session' : 'Session in Progress'}
                     </span>
-                    <span className="text-xs text-slate-500 flex items-center gap-1">
-                      <Clock className="h-3 w-3 text-slate-400" />
+                    <span className="text-xs text-ink-500 flex items-center gap-1">
+                      <Clock className="h-3 w-3 text-ink-400" />
                       Saved {new Date(savedSession.updatedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                     </span>
                   </div>
-                  <h4 className="font-extrabold text-slate-900 text-base sm:text-lg">
+                  <h4 className="font-extrabold text-ink-900 text-base sm:text-lg">
                     {savedSession.jobTitle} {savedSession.company ? `at ${savedSession.company}` : ''}
                   </h4>
-                  <p className="text-xs text-slate-600 flex items-center gap-2">
+                  <p className="text-xs text-ink-600 flex items-center gap-2">
                     <span>
                       <strong>{Object.keys(savedSession.feedbacks || {}).length}</strong> of <strong>{savedSession.questions.length}</strong> questions answered
                     </span>
                     {Object.keys(savedSession.feedbacks || {}).length > 0 && (
-                      <span className="font-bold text-indigo-700 bg-indigo-100/70 px-2 py-0.5 rounded">
+                      <span className="font-bold text-pine-800 bg-pine-100/70 border border-pine-200 px-2 py-0.5 rounded">
                         Avg Score: {Math.round(Object.values(savedSession.feedbacks).map(f => f.score).reduce((a, b) => a + b, 0) / Object.keys(savedSession.feedbacks).length)}%
                       </span>
                     )}
@@ -507,7 +507,7 @@ export default function InterviewPage() {
                   type="button"
                   onClick={handleClearSavedSession}
                   title="Discard saved session"
-                  className="text-slate-400 hover:text-rose-600 p-1.5 rounded-lg hover:bg-white transition-colors cursor-pointer"
+                  className="text-ink-400 hover:text-rose-600 p-1.5 rounded-xl hover:bg-white transition-colors cursor-pointer"
                 >
                   <Trash2 className="h-4 w-4" />
                 </button>
@@ -517,7 +517,7 @@ export default function InterviewPage() {
                 <button
                   type="button"
                   onClick={() => handleResumeSession()}
-                  className="px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-lg shadow-sm flex items-center gap-2 transition-all cursor-pointer"
+                  className="px-4 py-2.5 bg-terracotta-600 hover:bg-terracotta-700 text-white text-xs font-bold rounded-xl shadow-xs flex items-center gap-2 transition-all cursor-pointer"
                 >
                   <RotateCcw className="h-3.5 w-3.5" />
                   <span>{savedSession.isDone ? 'Review Session Answers' : 'Resume Interview Room'}</span>
@@ -525,7 +525,7 @@ export default function InterviewPage() {
                 <button
                   type="button"
                   onClick={handleClearSavedSession}
-                  className="px-3.5 py-2.5 text-slate-600 hover:text-slate-900 text-xs font-semibold hover:bg-white/80 rounded-lg transition-colors cursor-pointer"
+                  className="px-3.5 py-2.5 text-ink-600 hover:text-ink-900 text-xs font-semibold hover:bg-white/80 rounded-xl transition-colors cursor-pointer"
                 >
                   Start Fresh
                 </button>
@@ -534,9 +534,9 @@ export default function InterviewPage() {
           )}
 
           {/* New Session Configuration Card */}
-          <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-6">
-            <h3 className="font-bold text-slate-800 text-sm uppercase tracking-wider flex items-center gap-2">
-              <Sparkles className="h-4 w-4 text-indigo-600" />
+          <div className="bg-white p-6 rounded-2xl border border-sand-200 shadow-xs space-y-6">
+            <h3 className="font-bold text-ink-900 text-sm uppercase tracking-wider flex items-center gap-2">
+              <Sparkles className="h-4 w-4 text-pine-700" />
               <span>Configure New Mock Interview</span>
             </h3>
 
@@ -552,11 +552,11 @@ export default function InterviewPage() {
             ) : (
               <div className="space-y-4">
                 <div className="space-y-1">
-                  <label className="text-xs font-bold text-slate-600 uppercase tracking-wider">Select Target Profile</label>
+                  <label className="text-xs font-bold text-ink-700 uppercase tracking-wider">Select Target Profile</label>
                   <select
                     value={selectedResumeId}
                     onChange={(e) => setSelectedResumeId(e.target.value)}
-                    className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm bg-white focus:ring-2 focus:ring-indigo-500 outline-none cursor-pointer"
+                    className="w-full px-3 py-2.5 border border-sand-200 rounded-lg text-sm bg-white focus:ring-2 focus:ring-terracotta-500 outline-none cursor-pointer"
                   >
                     {tailoredList.map((item) => {
                       const d = new Date(item.createdAt);
@@ -570,9 +570,9 @@ export default function InterviewPage() {
                   </select>
                 </div>
 
-                <div className="space-y-1 bg-slate-50 p-4 rounded-xl border border-slate-200">
-                  <span className="text-xs font-bold text-slate-500 uppercase tracking-wider block">Associated Job Description</span>
-                  <p className="text-xs text-slate-600 font-mono line-clamp-3 leading-relaxed mt-1 whitespace-pre-wrap">
+                <div className="space-y-1 bg-sand-50/70 p-4 rounded-xl border border-sand-200">
+                  <span className="text-xs font-bold text-ink-500 uppercase tracking-wider block">Associated Job Description</span>
+                  <p className="text-xs text-ink-700 font-mono line-clamp-3 leading-relaxed mt-1 whitespace-pre-wrap">
                     {jobDescription || 'No job description text was saved with this tailored version.'}
                   </p>
                 </div>
@@ -588,7 +588,7 @@ export default function InterviewPage() {
                   type="button"
                   onClick={handleStartInterview}
                   disabled={loading}
-                  className="w-full py-3 px-4 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-sm font-semibold transition-colors disabled:opacity-50 flex items-center justify-center gap-2 cursor-pointer shadow-sm"
+                  className="w-full py-3 px-4 bg-terracotta-600 hover:bg-terracotta-700 text-white rounded-xl text-sm font-semibold transition-colors disabled:opacity-50 flex items-center justify-center gap-2 cursor-pointer shadow-xs"
                 >
                   {loading ? (
                     <>
@@ -608,10 +608,10 @@ export default function InterviewPage() {
 
           {/* Past Completed Sessions Drawer */}
           {pastSessions.length > 0 && (
-            <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-3">
+            <div className="bg-white p-5 rounded-2xl border border-sand-200 shadow-xs space-y-3">
               <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2 text-xs font-bold text-slate-700 uppercase tracking-wider">
-                  <History className="h-4 w-4 text-indigo-600" />
+                <div className="flex items-center gap-2 text-xs font-bold text-ink-800 uppercase tracking-wider">
+                  <History className="h-4 w-4 text-pine-700" />
                   <span>Previous Practice Sessions ({pastSessions.length})</span>
                 </div>
                 <button
@@ -622,24 +622,24 @@ export default function InterviewPage() {
                       setPastSessions([]);
                     }
                   }}
-                  className="text-[11px] font-semibold text-slate-400 hover:text-rose-600 flex items-center gap-1 transition-colors cursor-pointer"
+                  className="text-[11px] font-semibold text-ink-400 hover:text-rose-600 flex items-center gap-1 transition-colors cursor-pointer"
                   title="Clear past practice history"
                 >
                   <Trash2 className="h-3 w-3" />
                   <span>Clear All History</span>
                 </button>
               </div>
-              <div className="divide-y divide-slate-100">
+              <div className="divide-y divide-sand-100">
                 {pastSessions.map((session) => (
                   <div key={session.id} className="py-3 flex items-center justify-between gap-3 first:pt-1 last:pb-1">
                     <div className="space-y-0.5">
-                      <div className="text-sm font-bold text-slate-800">
+                      <div className="text-sm font-bold text-ink-900">
                         {session.jobTitle} {session.company ? `at ${session.company}` : ''}
                       </div>
-                      <div className="text-xs text-slate-500 flex items-center gap-2">
+                      <div className="text-xs text-ink-500 flex items-center gap-2">
                         <span>{new Date(session.completedAt).toLocaleDateString()}</span>
                         <span>•</span>
-                        <span className="font-semibold text-indigo-600">Average: {session.averageScore}%</span>
+                        <span className="font-semibold text-pine-700">Average: {session.averageScore}%</span>
                         <span>•</span>
                         <span>{session.totalQuestions} questions</span>
                       </div>
@@ -661,7 +661,7 @@ export default function InterviewPage() {
                           isDone: true,
                           updatedAt: session.completedAt
                         })}
-                        className="px-3 py-1.5 bg-slate-50 hover:bg-indigo-50 text-slate-700 hover:text-indigo-700 border border-slate-200 hover:border-indigo-200 text-xs font-bold rounded-lg transition-colors flex items-center gap-1.5 cursor-pointer"
+                        className="px-3 py-1.5 bg-sand-50 hover:bg-pine-50 text-ink-700 hover:text-pine-800 border border-sand-200 hover:border-pine-200 text-xs font-bold rounded-lg transition-colors flex items-center gap-1.5 cursor-pointer"
                       >
                         <Eye className="h-3.5 w-3.5" />
                         <span>Review</span>
@@ -720,21 +720,21 @@ export default function InterviewPage() {
         </div>
       ) : isDone ? (
         /* Final Scorecard Screen */
-        <div className="bg-white p-8 rounded-2xl border border-slate-200 shadow-sm max-w-2xl mx-auto text-center space-y-6">
-          <div className="mx-auto h-20 w-20 rounded-full bg-indigo-50 flex items-center justify-center text-indigo-600">
+        <div className="bg-white p-8 rounded-2xl border border-sand-200 shadow-xs max-w-2xl mx-auto text-center space-y-6">
+          <div className="mx-auto h-20 w-20 rounded-full bg-pine-50 flex items-center justify-center text-pine-700">
             <Award className="h-12 w-12 stroke-[1.5]" />
           </div>
 
           <div className="space-y-2">
-            <h3 className="text-3xl font-black text-slate-800">Prep Session Complete!</h3>
-            <p className="text-slate-500 text-sm">
+            <h3 className="text-3xl font-black text-ink-900">Prep Session Complete!</h3>
+            <p className="text-ink-500 text-sm">
               Great job practicing. Consistent preparation builds muscle memory and interview confidence. All questions and exemplar responses are saved in your session history.
             </p>
           </div>
 
-          <div className="p-6 rounded-2xl bg-slate-50 border border-slate-100 flex flex-col items-center justify-center max-w-xs mx-auto">
-            <span className="text-5xl font-black text-slate-800">{getAverageScore()}</span>
-            <span className="text-xs font-bold text-indigo-600 uppercase tracking-widest mt-1">Average Score</span>
+          <div className="p-6 rounded-2xl bg-sand-50/70 border border-sand-200 flex flex-col items-center justify-center max-w-xs mx-auto">
+            <span className="text-5xl font-black text-ink-900">{getAverageScore()}</span>
+            <span className="text-xs font-bold text-pine-700 uppercase tracking-widest mt-1">Average Score</span>
           </div>
 
           <div className="flex items-center justify-center gap-3 flex-wrap">
@@ -746,7 +746,7 @@ export default function InterviewPage() {
                 const q0 = questions[0];
                 setUserAnswer(userAnswers[q0?.id] || '');
               }}
-              className="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl text-sm transition-colors cursor-pointer shadow-sm flex items-center gap-2"
+              className="px-5 py-2.5 bg-terracotta-600 hover:bg-terracotta-700 text-white font-bold rounded-xl text-sm transition-colors cursor-pointer shadow-xs flex items-center gap-2"
             >
               <Eye className="h-4 w-4" />
               <span>Review All Questions & Feedback</span>
@@ -754,7 +754,7 @@ export default function InterviewPage() {
             <button
               type="button"
               onClick={handleRestart}
-              className="px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-800 font-semibold rounded-xl text-sm transition-colors cursor-pointer"
+              className="px-5 py-2.5 bg-sand-100 hover:bg-sand-200 text-ink-800 font-semibold rounded-xl text-sm transition-colors cursor-pointer"
             >
               Start New Session
             </button>
@@ -764,10 +764,10 @@ export default function InterviewPage() {
         /* Active Interview Screen */
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
           {/* Progress / Sidebar */}
-          <div className="lg:col-span-1 bg-white p-4 rounded-xl border border-slate-200 shadow-sm space-y-4 h-fit">
+          <div className="lg:col-span-1 bg-white p-4 rounded-xl border border-sand-200 shadow-xs space-y-4 h-fit">
             <div className="flex items-center justify-between">
-              <h4 className="font-bold text-slate-800 text-xs uppercase tracking-wider">Question List</h4>
-              <span className="text-[11px] font-bold text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded">
+              <h4 className="font-bold text-ink-900 text-xs uppercase tracking-wider">Question List</h4>
+              <span className="text-[11px] font-bold text-pine-800 bg-pine-50 px-2 py-0.5 rounded">
                 {Object.keys(feedbacks).length}/{questions.length} done
               </span>
             </div>
@@ -783,20 +783,20 @@ export default function InterviewPage() {
                     onClick={() => handleSelectQuestion(idx)}
                     className={`w-full p-2.5 rounded-lg border text-xs flex items-center justify-between gap-2.5 text-left transition-all cursor-pointer ${
                       isCurrent
-                        ? 'border-indigo-600 bg-indigo-50/50 text-indigo-950 font-bold ring-1 ring-indigo-500/20 shadow-xs'
+                        ? 'border-terracotta-600 bg-terracotta-50/50 text-terracotta-950 font-bold ring-1 ring-terracotta-500/20 shadow-xs'
                         : isAnswered
-                        ? 'border-slate-200 bg-slate-50 text-slate-700 hover:bg-slate-100/80'
-                        : 'border-slate-100 bg-white text-slate-400 hover:border-slate-200 hover:text-slate-600'
+                        ? 'border-sand-200 bg-sand-50/70 text-ink-800 hover:bg-sand-100'
+                        : 'border-sand-100 bg-white text-ink-400 hover:border-sand-200 hover:text-ink-600'
                     }`}
                   >
                     <div className="flex items-center gap-2 truncate">
                       <span className={`h-2 w-2 rounded-full flex-shrink-0 ${
-                        isAnswered ? 'bg-blue-600' : isCurrent ? 'bg-indigo-600 animate-pulse' : 'bg-slate-300'
+                        isAnswered ? 'bg-pine-600' : isCurrent ? 'bg-terracotta-600 animate-pulse' : 'bg-sand-300'
                       }`} />
                       <span className="truncate">Q{idx + 1}: {q.category === 'behavioral' ? 'Behavioral' : 'Technical'}</span>
                     </div>
                     {isAnswered && (
-                      <span className="font-black text-indigo-600 bg-indigo-50 px-1.5 py-0.5 rounded text-[11px] border border-indigo-100 flex-shrink-0">
+                      <span className="font-black text-pine-800 bg-pine-50 px-1.5 py-0.5 rounded text-[11px] border border-pine-200 flex-shrink-0">
                         {feedbacks[q.id].score}%
                       </span>
                     )}
@@ -805,19 +805,19 @@ export default function InterviewPage() {
               })}
             </div>
             
-            <div className="pt-2 border-t border-slate-100 space-y-2">
+            <div className="pt-2 border-t border-sand-100 space-y-2">
               <button
                 type="button"
                 onClick={handlePauseAndExit}
-                className="w-full text-xs font-semibold text-slate-700 hover:text-indigo-700 bg-slate-50 hover:bg-slate-100 p-2 rounded-lg border border-slate-200 transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
+                className="w-full text-xs font-semibold text-ink-700 hover:text-terracotta-700 bg-sand-50 hover:bg-sand-100 p-2 rounded-lg border border-sand-200 transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
               >
-                <Clock className="h-3.5 w-3.5 text-slate-400" />
+                <Clock className="h-3.5 w-3.5 text-ink-400" />
                 <span>Save & Pause Session</span>
               </button>
               <button
                 type="button"
                 onClick={handleRestart}
-                className="w-full text-xs font-semibold text-slate-700 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 p-2 rounded-lg border border-slate-300 transition-colors cursor-pointer"
+                className="w-full text-xs font-semibold text-ink-700 hover:text-ink-900 bg-sand-100 hover:bg-sand-200 p-2 rounded-lg border border-sand-300 transition-colors cursor-pointer"
               >
                 Quit / Discard Session
               </button>
@@ -827,32 +827,32 @@ export default function InterviewPage() {
           {/* Active Question Simulator */}
           <div className="lg:col-span-3 space-y-6">
             {/* Question Card */}
-            <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-4">
+            <div className="bg-white p-6 rounded-xl border border-sand-200 shadow-xs space-y-4">
               <div className="flex items-center justify-between">
-                <span className="px-2.5 py-1 text-xs font-bold uppercase tracking-wider rounded-md bg-indigo-100 text-indigo-800">
+                <span className="px-2.5 py-1 text-xs font-bold uppercase tracking-wider rounded-md bg-pine-100 text-pine-800">
                   {questions[currentIndex].category} Question
                 </span>
-                <span className="text-xs text-slate-400 font-semibold">
+                <span className="text-xs text-ink-400 font-semibold">
                   Question {currentIndex + 1} of {questions.length}
                 </span>
               </div>
 
-              <h3 className="text-lg font-extrabold text-slate-800 leading-snug">
+              <h3 className="text-lg font-extrabold text-ink-900 leading-snug">
                 {questions[currentIndex].text}
               </h3>
 
               {/* Hint accordion */}
-              <div className="border-t border-slate-100 pt-3">
+              <div className="border-t border-sand-100 pt-3">
                 <button
                   type="button"
                   onClick={() => setShowHint(!showHint)}
-                  className="flex items-center gap-1.5 text-xs text-indigo-600 hover:text-indigo-700 font-semibold cursor-pointer"
+                  className="flex items-center gap-1.5 text-xs text-terracotta-600 hover:text-terracotta-700 font-semibold cursor-pointer"
                 >
                   <Lightbulb className="h-4 w-4" />
                   <span>{showHint ? 'Hide Recruiter Tip' : 'Show Recruiter Tip'}</span>
                 </button>
                 {showHint && (
-                  <p className="text-xs text-slate-600 bg-slate-50 p-3 rounded-lg border border-slate-100 mt-2 leading-relaxed italic">
+                  <p className="text-xs text-ink-600 bg-sand-50/70 p-3 rounded-lg border border-sand-200 mt-2 leading-relaxed italic">
                     {questions[currentIndex].hint}
                   </p>
                 )}
@@ -862,16 +862,16 @@ export default function InterviewPage() {
             {/* Answer Input or Feedback display */}
             {feedbacks[questions[currentIndex].id] ? (
               /* Answer Feedback Card */
-              <div className="bg-white rounded-xl border border-slate-200 shadow-sm divide-y divide-slate-100">
+              <div className="bg-white rounded-xl border border-sand-200 shadow-xs divide-y divide-sand-100">
                 <div className="p-6 space-y-5">
                   <div className="flex items-center justify-between flex-wrap gap-2">
-                    <h4 className="font-bold text-slate-800 text-sm flex items-center gap-2">
-                      <CheckCircle className="h-5 w-5 text-indigo-500" />
+                    <h4 className="font-bold text-ink-900 text-sm flex items-center gap-2">
+                      <CheckCircle className="h-5 w-5 text-pine-600" />
                       <span>AI Feedback Report</span>
                     </h4>
                     <div className="flex items-center gap-2">
-                      <span className="text-xs text-slate-400 font-medium">Evaluation Score:</span>
-                      <div className="px-3 py-1 rounded-md bg-indigo-600 text-white font-black text-sm shadow-xs">
+                      <span className="text-xs text-ink-400 font-medium">Evaluation Score:</span>
+                      <div className="px-3 py-1 rounded-md bg-pine-900 text-white font-black text-sm shadow-xs">
                         {feedbacks[questions[currentIndex].id].score} / 100
                       </div>
                     </div>
@@ -879,9 +879,9 @@ export default function InterviewPage() {
 
                   {/* Candidate's submitted answer review */}
                   {userAnswers[questions[currentIndex].id] && (
-                    <div className="p-3.5 bg-slate-50/80 rounded-lg border border-slate-200 space-y-1">
-                      <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider block">Your Response</span>
-                      <p className="text-xs text-slate-700 leading-relaxed italic whitespace-pre-wrap">
+                    <div className="p-3.5 bg-sand-50/80 rounded-lg border border-sand-200 space-y-1">
+                      <span className="text-[11px] font-bold text-ink-500 uppercase tracking-wider block">Your Response</span>
+                      <p className="text-xs text-ink-800 leading-relaxed italic whitespace-pre-wrap">
                         "{userAnswers[questions[currentIndex].id]}"
                       </p>
                     </div>
@@ -889,14 +889,14 @@ export default function InterviewPage() {
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-1">
                     <div className="space-y-2">
-                      <span className="text-xs font-bold text-blue-900 uppercase tracking-widest flex items-center gap-1.5">
-                        <Check className="h-4 w-4 text-blue-700" />
+                      <span className="text-xs font-bold text-pine-900 uppercase tracking-widest flex items-center gap-1.5">
+                        <Check className="h-4 w-4 text-pine-700" />
                         <span>Strengths</span>
                       </span>
                       <ul className="space-y-2">
                         {feedbacks[questions[currentIndex].id].strengths.map((s, idx) => (
-                          <li key={idx} className="text-xs text-slate-800 flex items-start gap-2 leading-relaxed bg-blue-50/50 p-2.5 rounded-lg border border-blue-200">
-                            <span className="text-blue-700 font-black text-xs mt-0.5">✓</span>
+                          <li key={idx} className="text-xs text-ink-900 flex items-start gap-2 leading-relaxed bg-pine-50/60 p-2.5 rounded-lg border border-pine-200">
+                            <span className="text-pine-700 font-black text-xs mt-0.5">✓</span>
                             <span>{s}</span>
                           </li>
                         ))}
@@ -910,7 +910,7 @@ export default function InterviewPage() {
                       </span>
                       <ul className="space-y-2">
                         {feedbacks[questions[currentIndex].id].improvements.map((imp, idx) => (
-                          <li key={idx} className="text-xs text-slate-800 flex items-start gap-2 leading-relaxed bg-amber-50/50 p-2.5 rounded-lg border border-amber-200">
+                          <li key={idx} className="text-xs text-ink-900 flex items-start gap-2 leading-relaxed bg-amber-50/50 p-2.5 rounded-lg border border-amber-200">
                             <span className="text-amber-700 font-black text-xs mt-0.5">▲</span>
                             <span>{imp}</span>
                           </li>
@@ -921,14 +921,14 @@ export default function InterviewPage() {
                 </div>
 
                 {/* Polished Answer Sample with Rich Markdown Formatting */}
-                <div className="p-6 bg-slate-50/40 space-y-3">
+                <div className="p-6 bg-sand-50/50 space-y-3">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                      <span className="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
-                        <BookOpen className="h-4 w-4 text-indigo-600" />
+                      <span className="text-xs font-bold text-ink-800 uppercase tracking-wider flex items-center gap-1.5">
+                        <BookOpen className="h-4 w-4 text-pine-700" />
                         <span>Polished Answer Sample</span>
                       </span>
-                      <span className="text-[10px] font-bold text-indigo-700 bg-indigo-50 border border-indigo-200 px-2 py-0.5 rounded-full">
+                      <span className="text-[10px] font-bold text-pine-800 bg-pine-50 border border-pine-200 px-2 py-0.5 rounded-full">
                         STAR Framework
                       </span>
                     </div>
@@ -936,16 +936,16 @@ export default function InterviewPage() {
                     <button
                       type="button"
                       onClick={() => handleCopyAnswer(feedbacks[questions[currentIndex].id].suggestedAnswer)}
-                      className="text-xs font-semibold text-slate-600 hover:text-indigo-600 bg-white hover:bg-indigo-50/60 border border-slate-200 rounded-md px-2.5 py-1 flex items-center gap-1.5 transition-colors cursor-pointer shadow-2xs"
+                      className="text-xs font-semibold text-ink-700 hover:text-terracotta-700 bg-white hover:bg-sand-50 border border-sand-200 rounded-md px-2.5 py-1 flex items-center gap-1.5 transition-colors cursor-pointer shadow-2xs"
                     >
                       {copiedAnswer ? (
                         <>
-                          <Check className="h-3.5 w-3.5 text-blue-700" />
-                          <span className="text-blue-800 font-bold">Copied!</span>
+                          <Check className="h-3.5 w-3.5 text-pine-700" />
+                          <span className="text-pine-800 font-bold">Copied!</span>
                         </>
                       ) : (
                         <>
-                          <Copy className="h-3.5 w-3.5 text-slate-500" />
+                          <Copy className="h-3.5 w-3.5 text-ink-500" />
                           <span>Copy Answer</span>
                         </>
                       )}
@@ -1001,7 +1001,7 @@ export default function InterviewPage() {
                     }}
                     placeholder="Type your answer to this question. Outline your situation, specific actions taken, and measurable business outcomes..."
                     rows={9}
-                    className="w-full p-4 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none resize-none leading-relaxed"
+                    className="w-full p-4 border border-sand-300 rounded-xl text-sm text-ink-900 focus:ring-2 focus:ring-terracotta-500 focus:border-terracotta-500 outline-none resize-none leading-relaxed"
                   />
                 </div>
 
@@ -1017,7 +1017,7 @@ export default function InterviewPage() {
                     <button
                       type="button"
                       onClick={() => handleSelectQuestion(currentIndex - 1)}
-                      className="text-xs font-semibold text-slate-600 hover:text-slate-900 px-3 py-2 rounded-lg transition-colors cursor-pointer"
+                      className="text-xs font-semibold text-ink-600 hover:text-ink-900 px-3 py-2 rounded-lg transition-colors cursor-pointer"
                     >
                       ← Previous Question
                     </button>
@@ -1027,7 +1027,7 @@ export default function InterviewPage() {
                     type="button"
                     onClick={handleSubmitAnswer}
                     disabled={!userAnswer.trim() || submittingAnswer}
-                    className="flex items-center gap-1.5 bg-slate-900 hover:bg-slate-800 disabled:opacity-50 text-white text-xs font-bold px-4 py-2.5 rounded-lg transition-colors cursor-pointer shadow-xs"
+                    className="flex items-center gap-1.5 bg-terracotta-600 hover:bg-terracotta-700 disabled:opacity-50 text-white text-xs font-bold px-4 py-2.5 rounded-lg transition-colors cursor-pointer shadow-xs"
                   >
                     {submittingAnswer ? (
                       <>
@@ -1059,7 +1059,7 @@ function MarkdownAnswerView({ content }: { content: string }) {
   const rawSections = content.split(/\n{2,}|\n(?=###?\s)/);
 
   return (
-    <div className="space-y-4 text-xs sm:text-sm leading-relaxed text-slate-700">
+    <div className="space-y-4 text-xs sm:text-sm leading-relaxed text-ink-800">
       {rawSections.map((section, sIdx) => {
         const trimmed = section.trim();
         if (!trimmed) return null;
@@ -1073,13 +1073,13 @@ function MarkdownAnswerView({ content }: { content: string }) {
           return (
             <div key={sIdx} className="space-y-2 pt-1.5 first:pt-0">
               <div className="flex items-center gap-2">
-                <span className="px-2.5 py-1 rounded-md text-[11px] font-extrabold tracking-wide uppercase bg-indigo-50 text-indigo-800 border border-indigo-200/80 inline-flex items-center gap-1.5 shadow-2xs">
-                  <Sparkles className="h-3 w-3 text-indigo-600" />
+                <span className="px-2.5 py-1 rounded-md text-[11px] font-extrabold tracking-wide uppercase bg-sand-100 text-pine-900 border border-sand-300 inline-flex items-center gap-1.5 shadow-2xs">
+                  <Sparkles className="h-3 w-3 text-pine-700" />
                   {headerText}
                 </span>
               </div>
               {bodyText && (
-                <div className="space-y-2 pl-0.5 text-slate-700 leading-relaxed">
+                <div className="space-y-2 pl-0.5 text-ink-800 leading-relaxed">
                   {renderParagraphsAndLists(bodyText)}
                 </div>
               )}
@@ -1096,13 +1096,13 @@ function MarkdownAnswerView({ content }: { content: string }) {
           return (
             <div key={sIdx} className="space-y-2 pt-1.5 first:pt-0">
               <div className="flex items-center gap-2">
-                <span className="px-2.5 py-1 rounded-md text-[11px] font-extrabold tracking-wide uppercase bg-indigo-50 text-indigo-800 border border-indigo-200/80 inline-flex items-center gap-1.5 shadow-2xs">
-                  <Sparkles className="h-3 w-3 text-indigo-600" />
+                <span className="px-2.5 py-1 rounded-md text-[11px] font-extrabold tracking-wide uppercase bg-sand-100 text-pine-900 border border-sand-300 inline-flex items-center gap-1.5 shadow-2xs">
+                  <Sparkles className="h-3 w-3 text-pine-700" />
                   {boldTitle}
                 </span>
               </div>
               {restOfText && (
-                <div className="space-y-2 pl-0.5 text-slate-700 leading-relaxed">
+                <div className="space-y-2 pl-0.5 text-ink-800 leading-relaxed">
                   {renderParagraphsAndLists(restOfText)}
                 </div>
               )}
@@ -1112,7 +1112,7 @@ function MarkdownAnswerView({ content }: { content: string }) {
 
         // Regular paragraph or list block
         return (
-          <div key={sIdx} className="space-y-2 text-slate-700 leading-relaxed">
+          <div key={sIdx} className="space-y-2 text-ink-800 leading-relaxed">
             {renderParagraphsAndLists(trimmed)}
           </div>
         );

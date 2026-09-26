@@ -562,13 +562,13 @@ export default function TailorPage() {
         <div className="flex items-center gap-2 flex-wrap animate-in fade-in duration-200">
           <Link 
             href="/radar"
-            className="inline-flex items-center gap-1.5 text-xs font-bold text-indigo-700 hover:text-indigo-900 bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 px-3 py-1.5 rounded-lg transition-colors shadow-2xs"
+            className="inline-flex items-center gap-1.5 text-xs font-bold text-pine-800 hover:text-pine-950 bg-pine-50 hover:bg-pine-100 border border-pine-200 px-3 py-1.5 rounded-lg transition-colors shadow-2xs"
           >
             <ArrowLeft className="h-3.5 w-3.5" />
             <span>Return to Smart Job Radar</span>
           </Link>
-          <span className="text-xs text-slate-500 font-medium">
-            Imported role: <strong className="text-slate-800">{jobTitle || 'Job Posting'}</strong> {company ? `at ${company}` : ''}
+          <span className="text-xs text-ink-500 font-medium">
+            Imported role: <strong className="text-ink-900">{jobTitle || 'Job Posting'}</strong> {company ? `at ${company}` : ''}
           </span>
         </div>
       )}
@@ -619,7 +619,7 @@ export default function TailorPage() {
 
               <form onSubmit={handleTailor} className="space-y-4">
                 <div className="space-y-1">
-                  <label className="text-sm font-bold text-slate-600">Target Job Title</label>
+                  <label className="text-sm font-bold text-ink-700">Target Job Title</label>
                   <input
                     type="text"
                     required
@@ -627,31 +627,31 @@ export default function TailorPage() {
                     value={jobTitle}
                     onChange={(e) => setJobTitle(e.target.value)}
                     placeholder="e.g. Senior Project Manager, Staff Engineer"
-                    className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-base focus:ring-2 focus:ring-indigo-500 outline-none"
+                    className="w-full px-3.5 py-2.5 bg-white border border-sand-300 rounded-xl text-base text-ink-900 placeholder:text-ink-400 focus:ring-2 focus:ring-terracotta-500 focus:border-terracotta-500 outline-none shadow-2xs"
                   />
                 </div>
 
                 <div className="space-y-1">
-                  <label className="text-sm font-bold text-slate-600">Company Name (Optional)</label>
+                  <label className="text-sm font-bold text-ink-700">Company Name (Optional)</label>
                   <input
                     type="text"
                     disabled={!resumeText || loading}
                     value={company}
                     onChange={(e) => setCompany(e.target.value)}
                     placeholder="e.g. Google, Stripe, Acme Corp"
-                    className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-base focus:ring-2 focus:ring-indigo-500 outline-none"
+                    className="w-full px-3.5 py-2.5 bg-white border border-sand-300 rounded-xl text-base text-ink-900 placeholder:text-ink-400 focus:ring-2 focus:ring-terracotta-500 focus:border-terracotta-500 outline-none shadow-2xs"
                   />
                 </div>
 
                 <div className="space-y-1">
                   <div className="flex items-center justify-between">
-                    <label className="text-sm font-bold text-slate-600">Application Link / URL (Optional)</label>
+                    <label className="text-sm font-bold text-ink-700">Application Link / URL (Optional)</label>
                     {applyUrl && (
                       <a 
                         href={getApplyLink()} 
                         target="_blank" 
                         rel="noopener noreferrer" 
-                        className="text-xs text-indigo-600 hover:text-indigo-800 flex items-center gap-1 font-semibold"
+                        className="text-xs text-terracotta-600 hover:text-terracotta-700 flex items-center gap-1 font-semibold"
                         title="Test application link"
                       >
                         <span>Test link</span>
@@ -665,12 +665,12 @@ export default function TailorPage() {
                     value={applyUrl}
                     onChange={(e) => setApplyUrl(e.target.value)}
                     placeholder="e.g. https://careers.company.com/job/123 or job portal link"
-                    className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none"
+                    className="w-full px-3.5 py-2.5 bg-white border border-sand-300 rounded-xl text-sm text-ink-900 placeholder:text-ink-400 focus:ring-2 focus:ring-terracotta-500 focus:border-terracotta-500 outline-none shadow-2xs"
                   />
                 </div>
 
                 <div className="space-y-1">
-                  <label className="text-sm font-bold text-slate-600">Job Description</label>
+                  <label className="text-sm font-bold text-ink-700">Job Description</label>
                   <textarea
                     required
                     disabled={!resumeText || loading}
@@ -678,7 +678,7 @@ export default function TailorPage() {
                     onChange={(e) => setJobDescription(e.target.value)}
                     placeholder="Paste the target job description here..."
                     rows={22}
-                    className="w-full p-4 border border-slate-200 rounded-lg text-sm font-mono focus:ring-2 focus:ring-indigo-500 outline-none resize-none leading-relaxed"
+                    className="w-full p-4 bg-white border border-sand-300 rounded-xl text-sm font-mono text-ink-900 placeholder:text-ink-400 focus:ring-2 focus:ring-terracotta-500 focus:border-terracotta-500 outline-none resize-none leading-relaxed shadow-2xs"
                   />
                 </div>
               </form>
@@ -686,7 +686,7 @@ export default function TailorPage() {
 
             <div className="space-y-4">
               {error && (
-                <div className="p-3 bg-amber-50 text-amber-950 text-sm rounded-lg border border-amber-300 flex items-start gap-2 font-medium">
+                <div className="p-3 bg-amber-50 text-amber-950 text-sm rounded-xl border border-amber-300 flex items-start gap-2 font-medium">
                   <AlertTriangle className="h-4 w-4 text-amber-700 flex-shrink-0 mt-0.5" />
                   <span>{error}</span>
                 </div>
@@ -695,7 +695,7 @@ export default function TailorPage() {
               <button
                 onClick={handleTailor}
                 disabled={!resumeText || loading || !jobTitle || !jobDescription}
-                className="w-full py-3 px-4 bg-slate-900 hover:bg-slate-800 text-white rounded-lg text-base font-semibold transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+                className="w-full py-3.5 px-4 bg-terracotta-600 hover:bg-terracotta-700 text-white rounded-xl text-base font-bold transition-all shadow-xs disabled:opacity-50 flex items-center justify-center gap-2 cursor-pointer"
               >
                 {loading ? (
                   <>
@@ -714,10 +714,10 @@ export default function TailorPage() {
                 <button
                   type="button"
                   onClick={handleStartFresh}
-                  className="w-full py-2.5 px-4 bg-white hover:bg-slate-100 text-slate-700 border border-slate-300 rounded-lg text-sm font-bold transition-colors flex items-center justify-center gap-2 shadow-2xs"
+                  className="w-full py-2.5 px-4 bg-white hover:bg-sand-100 text-ink-700 border border-sand-300 rounded-xl text-sm font-bold transition-colors flex items-center justify-center gap-2 shadow-2xs cursor-pointer"
                   title="Clear all fields and start fresh"
                 >
-                  <RotateCcw className="h-4 w-4 text-slate-500" />
+                  <RotateCcw className="h-4 w-4 text-ink-500" />
                   <span>Start Fresh (Clear Form & Results)</span>
                 </button>
               )}
@@ -754,40 +754,40 @@ export default function TailorPage() {
                   </button>
                   <button
                     onClick={() => setActiveTab('coach')}
-                    className={`px-4 py-2 rounded-lg text-sm font-bold transition-colors ${
+                    className={`px-4 py-2 rounded-xl text-sm font-bold transition-colors cursor-pointer ${
                       activeTab === 'coach'
-                        ? 'bg-slate-900 text-white shadow-sm'
-                        : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-100'
+                        ? 'bg-pine-900 text-white shadow-xs'
+                        : 'bg-white text-ink-700 border border-sand-200 hover:bg-sand-100'
                     }`}
                   >
                     Coach Evaluation
                   </button>
                   <button
                     onClick={() => setActiveTab('resume')}
-                    className={`px-4 py-2 rounded-lg text-sm font-bold transition-colors ${
+                    className={`px-4 py-2 rounded-xl text-sm font-bold transition-colors cursor-pointer ${
                       activeTab === 'resume'
-                        ? 'bg-slate-900 text-white shadow-sm'
-                        : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-100'
+                        ? 'bg-pine-900 text-white shadow-xs'
+                        : 'bg-white text-ink-700 border border-sand-200 hover:bg-sand-100'
                     }`}
                   >
                     Tailored CV
                   </button>
                   <button
                     onClick={() => setActiveTab('scorecard')}
-                    className={`px-4 py-2 rounded-lg text-sm font-bold transition-colors ${
+                    className={`px-4 py-2 rounded-xl text-sm font-bold transition-colors cursor-pointer ${
                       activeTab === 'scorecard'
-                        ? 'bg-slate-900 text-white shadow-sm'
-                        : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-100'
+                        ? 'bg-pine-900 text-white shadow-xs'
+                        : 'bg-white text-ink-700 border border-sand-200 hover:bg-sand-100'
                     }`}
                   >
                     ATS Scorecard
                   </button>
                   <button
                     onClick={() => setActiveTab('skills')}
-                    className={`px-4 py-2 rounded-lg text-sm font-bold transition-colors ${
+                    className={`px-4 py-2 rounded-xl text-sm font-bold transition-colors cursor-pointer ${
                       activeTab === 'skills'
-                        ? 'bg-slate-900 text-white shadow-sm'
-                        : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-100'
+                        ? 'bg-pine-900 text-white shadow-xs'
+                        : 'bg-white text-ink-700 border border-sand-200 hover:bg-sand-100'
                     }`}
                   >
                     Pivot Translations
@@ -799,7 +799,7 @@ export default function TailorPage() {
                     href={getApplyLink()}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center justify-center gap-1.5 text-sm font-bold bg-amber-500 hover:bg-amber-400 text-slate-950 px-3 py-1.5 rounded-md shadow-xs transition-colors"
+                    className="flex items-center justify-center gap-1.5 text-sm font-bold bg-amber-500 hover:bg-amber-400 text-slate-950 px-3.5 py-1.5 rounded-xl shadow-xs transition-colors cursor-pointer"
                     title={applyUrl ? "Open the official job application link" : "Search Google Jobs to apply for this role"}
                   >
                     <ExternalLink className="h-4 w-4 text-slate-950 flex-shrink-0" />
@@ -808,7 +808,7 @@ export default function TailorPage() {
 
                   <button
                     onClick={handleCopy}
-                    className="flex items-center justify-center gap-1.5 text-sm font-semibold bg-white text-slate-700 hover:bg-slate-50 px-3 py-1.5 rounded-md border border-slate-200 transition-colors w-36"
+                    className="flex items-center justify-center gap-1.5 text-sm font-semibold bg-white text-ink-700 hover:bg-sand-100 px-3 py-1.5 rounded-xl border border-sand-200 transition-colors w-36 cursor-pointer"
                   >
                     <Copy className="h-4 w-4 flex-shrink-0" />
                     <span>{copied ? 'Copied!' : 'Copy markdown'}</span>
@@ -816,7 +816,7 @@ export default function TailorPage() {
 
                   <button
                     onClick={handleSaveAsPdf}
-                    className="flex items-center justify-center gap-1.5 text-sm font-semibold bg-white text-slate-700 hover:bg-slate-50 px-3 py-1.5 rounded-md border border-slate-200 transition-colors"
+                    className="flex items-center justify-center gap-1.5 text-sm font-semibold bg-white text-ink-700 hover:bg-sand-100 px-3 py-1.5 rounded-xl border border-sand-200 transition-colors cursor-pointer"
                   >
                     <FileText className="h-4 w-4 flex-shrink-0 text-red-500" />
                     <span>Save as PDF</span>
@@ -825,7 +825,7 @@ export default function TailorPage() {
                   <button
                     onClick={handleSave}
                     disabled={saved}
-                    className="flex items-center gap-1.5 text-sm font-semibold bg-indigo-600 hover:bg-indigo-700 disabled:bg-blue-600 disabled:opacity-95 text-white px-3 py-1.5 rounded-md transition-colors"
+                    className="flex items-center gap-1.5 text-sm font-semibold bg-terracotta-600 hover:bg-terracotta-700 disabled:bg-sand-300 disabled:opacity-95 text-white px-3.5 py-1.5 rounded-xl transition-colors cursor-pointer"
                   >
                     {saved ? (
                       <>
@@ -842,25 +842,25 @@ export default function TailorPage() {
 
                   <button
                     onClick={handleStartFresh}
-                    className="flex items-center justify-center gap-1.5 text-sm font-semibold bg-white text-slate-700 hover:bg-slate-50 px-3 py-1.5 rounded-md border border-slate-200 transition-colors"
+                    className="flex items-center justify-center gap-1.5 text-sm font-semibold bg-white text-ink-700 hover:bg-sand-100 px-3 py-1.5 rounded-xl border border-sand-200 transition-colors cursor-pointer"
                     title="Clear inputs and start fresh"
                   >
-                    <RotateCcw className="h-4 w-4 text-slate-500" />
+                    <RotateCcw className="h-4 w-4 text-ink-500" />
                     <span>Start fresh</span>
                   </button>
                 </div>
               </div>
 
               {/* Application Launchpad Banner */}
-              <div className="bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white p-4 sm:p-5 border-b border-indigo-900/50 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 animate-in fade-in duration-200">
+              <div className="bg-gradient-to-r from-pine-950 via-pine-900 to-pine-950 text-white p-4 sm:p-5 border-b border-pine-850/80 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 animate-in fade-in duration-200">
                 <div className="space-y-1">
                   <div className="flex items-center gap-2">
-                    <span className="px-2 py-0.5 rounded text-[10px] font-extrabold uppercase tracking-wider bg-amber-400 text-slate-950">Next Step</span>
+                    <span className="px-2 py-0.5 rounded text-[10px] font-extrabold uppercase tracking-wider bg-terracotta-500 text-white">Next Step</span>
                     <h4 className="text-base font-bold text-white flex items-center gap-2">
-                      Ready to Apply for {jobTitle ? <span className="text-amber-300 font-extrabold">{jobTitle}</span> : 'this role'}?
+                      Ready to Apply for {jobTitle ? <span className="text-terracotta-300 font-extrabold">{jobTitle}</span> : 'this role'}?
                     </h4>
                   </div>
-                  <p className="text-xs text-slate-300">
+                  <p className="text-xs text-sand-200">
                     Your tailored CV and dealbreaker analysis are ready. Launch your application or track pipeline progress.
                   </p>
                 </div>
@@ -893,7 +893,7 @@ export default function TailorPage() {
                       </>
                     ) : (
                       <>
-                        <Send className="h-3.5 w-3.5 text-indigo-300" />
+                        <Send className="h-3.5 w-3.5 text-terracotta-300" />
                         <span>Mark as &apos;Applied&apos;</span>
                       </>
                     )}
@@ -972,118 +972,118 @@ export default function TailorPage() {
                         {/* 2-Metric Comparison Cards */}
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                           {/* Must Haves Card */}
-                          <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm space-y-1.5">
+                          <div className="bg-white p-4 rounded-xl border border-sand-200 shadow-xs space-y-1.5">
                             <div className="flex items-center justify-between">
-                              <span className="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
-                                <ShieldAlert className="h-4 w-4 text-indigo-700 flex-shrink-0" />
+                              <span className="text-xs font-bold text-ink-700 uppercase tracking-wider flex items-center gap-1.5">
+                                <ShieldAlert className="h-4 w-4 text-terracotta-600 flex-shrink-0" />
                                 <span>Core Must-Haves (Dealbreakers)</span>
                               </span>
                               <span className={`text-xl font-black ${
-                                result.jdDeflator.mustHavesMatchRate >= 80 ? 'text-blue-700' : 'text-slate-800'
+                                result.jdDeflator.mustHavesMatchRate >= 80 ? 'text-pine-700' : 'text-ink-900'
                               }`}>
                                 {result.jdDeflator.mustHavesMatchRate}%
                               </span>
                             </div>
-                            <div className="w-full bg-slate-100 h-2.5 rounded-full overflow-hidden border border-slate-200">
+                            <div className="w-full bg-sand-100 h-2.5 rounded-full overflow-hidden border border-sand-200">
                               <div 
                                 className={`h-full rounded-full transition-all duration-500 ${
-                                  result.jdDeflator.mustHavesMatchRate >= 80 ? 'bg-blue-600' : 'bg-amber-500'
+                                  result.jdDeflator.mustHavesMatchRate >= 80 ? 'bg-pine-600' : 'bg-amber-500'
                                 }`}
                                 style={{ width: `${result.jdDeflator.mustHavesMatchRate}%` }}
                               />
                             </div>
-                            <p className="text-[11px] text-slate-600 font-medium">
+                            <p className="text-[11px] text-ink-600 font-medium">
                               {result.jdDeflator.mustHaves.filter(m => m.matched).length} of {result.jdDeflator.mustHaves.length} non-negotiable requirements satisfied
                             </p>
                           </div>
 
                           {/* Good To Haves Card */}
-                          <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm space-y-1.5">
+                          <div className="bg-white p-4 rounded-xl border border-sand-200 shadow-xs space-y-1.5">
                             <div className="flex items-center justify-between">
-                              <span className="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
+                              <span className="text-xs font-bold text-ink-700 uppercase tracking-wider flex items-center gap-1.5">
                                 <Sparkles className="h-4 w-4 text-amber-600 flex-shrink-0" />
                                 <span>Recruiter Wishlist (Learnable)</span>
                               </span>
-                              <span className="text-xl font-black text-slate-700">
+                              <span className="text-xl font-black text-ink-700">
                                 {result.jdDeflator.goodToHavesMatchRate}%
                               </span>
                             </div>
-                            <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
+                            <div className="w-full bg-sand-100 h-2 rounded-full overflow-hidden">
                               <div 
                                 className="h-full bg-amber-400 rounded-full transition-all duration-500"
                                 style={{ width: `${result.jdDeflator.goodToHavesMatchRate}%` }}
                               />
                             </div>
-                            <p className="text-[11px] text-slate-400">
+                            <p className="text-[11px] text-ink-400">
                               {result.jdDeflator.goodToHaves.filter(g => g.matched).length} of {result.jdDeflator.goodToHaves.length} wishlist preferences matched
                             </p>
                           </div>
                         </div>
 
                         {/* 4-Layer Recruiter Model Explainer */}
-                        <div className="bg-slate-50/80 border border-slate-200/90 rounded-xl overflow-hidden text-xs">
+                        <div className="bg-sand-50/80 border border-sand-200/90 rounded-xl overflow-hidden text-xs">
                           <button
                             type="button"
                             onClick={() => setShowExplainer(!showExplainer)}
-                            className="w-full px-4 py-3 flex items-center justify-between text-left font-bold text-slate-700 hover:bg-slate-100/70 transition-colors"
+                            className="w-full px-4 py-3 flex items-center justify-between text-left font-bold text-ink-800 hover:bg-sand-100/70 transition-colors cursor-pointer"
                           >
                             <div className="flex items-center gap-2">
-                              <HelpCircle className="h-4 w-4 text-indigo-600 flex-shrink-0" />
+                              <HelpCircle className="h-4 w-4 text-pine-700 flex-shrink-0" />
                               <span>How does the JD Deflator classify requirements? (The 4-Layer Recruiter Model)</span>
                             </div>
-                            <span className="text-slate-500 text-[11px] font-semibold flex items-center gap-1">
+                            <span className="text-ink-500 text-[11px] font-semibold flex items-center gap-1">
                               <span>{showExplainer ? 'Hide Model' : 'View 4-Layer Model'}</span>
                               <ChevronDown className={`h-3.5 w-3.5 transition-transform duration-200 ${showExplainer ? 'rotate-180' : ''}`} />
                             </span>
                           </button>
 
                           {showExplainer && (
-                            <div className="p-4 pt-0 border-t border-slate-200/60 bg-white space-y-3.5 animate-in fade-in duration-150">
-                              <p className="text-slate-500 leading-relaxed text-xs pt-3">
+                            <div className="p-4 pt-0 border-t border-sand-200/60 bg-white space-y-3.5 animate-in fade-in duration-150">
+                              <p className="text-ink-500 leading-relaxed text-xs pt-3">
                                 Recruiters frequently write inflated job descriptions listing dozens of &quot;requirements&quot;. Ascent applies a 4-layer heuristic model to separate true screening dealbreakers from flexible wishlist preferences:
                               </p>
 
                               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                                 {/* Layer 1 */}
-                                <div className="p-3 bg-slate-50/80 rounded-lg border border-slate-200/80 space-y-1.5">
-                                  <div className="flex items-center gap-1.5 font-bold text-slate-800 text-xs">
-                                    <span className="h-5 w-5 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center text-[10px] font-black">1</span>
+                                <div className="p-3 bg-sand-50/80 rounded-lg border border-sand-200/80 space-y-1.5">
+                                  <div className="flex items-center gap-1.5 font-bold text-ink-900 text-xs">
+                                    <span className="h-5 w-5 rounded-full bg-pine-100 text-pine-800 flex items-center justify-center text-[10px] font-black">1</span>
                                     <span>Structural Section Cues</span>
                                   </div>
-                                  <p className="text-slate-600 text-[11px] leading-relaxed">
+                                  <p className="text-ink-600 text-[11px] leading-relaxed">
                                     Parses explicit structural boundaries like <em>&quot;Basic / Minimum Qualifications&quot;</em> (Must-Haves) versus <em>&quot;Preferred / Bonus Pluses&quot;</em> (Wishlist).
                                   </p>
                                 </div>
 
                                 {/* Layer 2 */}
-                                <div className="p-3 bg-slate-50/80 rounded-lg border border-slate-200/80 space-y-1.5">
-                                  <div className="flex items-center gap-1.5 font-bold text-slate-800 text-xs">
-                                    <span className="h-5 w-5 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center text-[10px] font-black">2</span>
+                                <div className="p-3 bg-sand-50/80 rounded-lg border border-sand-200/80 space-y-1.5">
+                                  <div className="flex items-center gap-1.5 font-bold text-ink-900 text-xs">
+                                    <span className="h-5 w-5 rounded-full bg-pine-100 text-pine-800 flex items-center justify-center text-[10px] font-black">2</span>
                                     <span>Linguistic Modality &amp; Verbs</span>
                                   </div>
-                                  <p className="text-slate-600 text-[11px] leading-relaxed">
+                                  <p className="text-ink-600 text-[11px] leading-relaxed">
                                     Evaluates urgency: <em>&quot;5+ years required&quot;</em> and <em>&quot;proven track record&quot;</em> signal hard filters; <em>&quot;familiarity with&quot;</em> or <em>&quot;working knowledge&quot;</em> are flexible.
                                   </p>
                                 </div>
 
                                 {/* Layer 3 */}
-                                <div className="p-3 bg-slate-50/80 rounded-lg border border-slate-200/80 space-y-1.5">
-                                  <div className="flex items-center gap-1.5 font-bold text-slate-800 text-xs">
-                                    <span className="h-5 w-5 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center text-[10px] font-black">3</span>
+                                <div className="p-3 bg-sand-50/80 rounded-lg border border-sand-200/80 space-y-1.5">
+                                  <div className="flex items-center gap-1.5 font-bold text-ink-900 text-xs">
+                                    <span className="h-5 w-5 rounded-full bg-pine-100 text-pine-800 flex items-center justify-center text-[10px] font-black">3</span>
                                     <span>Learnability Horizon</span>
                                   </div>
-                                  <p className="text-slate-600 text-[11px] leading-relaxed">
+                                  <p className="text-ink-600 text-[11px] leading-relaxed">
                                     Core foundations (systems architecture, stakeholder alignment) take 6+ months to master &rarr; <strong>Must-Have</strong>. Interchangeable tools (Snowflake, React, Jira) ramp up in 1–2 weeks &rarr; <strong>Good-to-Have</strong>.
                                   </p>
                                 </div>
 
                                 {/* Layer 4 */}
-                                <div className="p-3 bg-slate-50/80 rounded-lg border border-slate-200/80 space-y-1.5">
-                                  <div className="flex items-center gap-1.5 font-bold text-slate-800 text-xs">
-                                    <span className="h-5 w-5 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center text-[10px] font-black">4</span>
+                                <div className="p-3 bg-sand-50/80 rounded-lg border border-sand-200/80 space-y-1.5">
+                                  <div className="flex items-center gap-1.5 font-bold text-ink-900 text-xs">
+                                    <span className="h-5 w-5 rounded-full bg-pine-100 text-pine-800 flex items-center justify-center text-[10px] font-black">4</span>
                                     <span>Centrality to Deliverables</span>
                                   </div>
-                                  <p className="text-slate-600 text-[11px] leading-relaxed">
+                                  <p className="text-ink-600 text-[11px] leading-relaxed">
                                     Maps requirements directly against the daily responsibilities listed in the role. Core deliverables take precedence over auxiliary stack wishlists.
                                   </p>
                                 </div>
@@ -1096,14 +1096,14 @@ export default function TailorPage() {
                         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
                           {/* Column 1: Must-Haves */}
                           <div className="space-y-3">
-                            <div className="flex items-center justify-between pb-1 border-b border-slate-200">
-                              <h4 className="text-sm font-bold text-slate-800 flex items-center gap-1.5">
-                                <span className="px-1.5 py-0.5 rounded text-[10px] font-black bg-indigo-100 text-indigo-900 border border-indigo-200 uppercase">
+                            <div className="flex items-center justify-between pb-1 border-b border-sand-200">
+                              <h4 className="text-sm font-bold text-ink-900 flex items-center gap-1.5">
+                                <span className="px-1.5 py-0.5 rounded text-[10px] font-black bg-terracotta-100 text-terracotta-900 border border-terracotta-200 uppercase">
                                   Dealbreakers
                                 </span>
                                 <span>Day-1 Non-Negotiables</span>
                               </h4>
-                              <span className="text-xs font-bold text-slate-600">
+                              <span className="text-xs font-bold text-ink-600">
                                 {result.jdDeflator.mustHaves.length} items
                               </span>
                             </div>
@@ -1258,16 +1258,16 @@ export default function TailorPage() {
                     )}
 
                     {/* Coach Score & Evaluation Card */}
-                    <div className="bg-indigo-50/30 border border-indigo-100 rounded-2xl p-6 space-y-6">
-                      <div className="flex flex-col sm:flex-row items-center gap-6 pb-4 border-b border-indigo-100/50">
+                    <div className="bg-sand-100/70 border border-sand-200 rounded-2xl p-6 space-y-6">
+                      <div className="flex flex-col sm:flex-row items-center gap-6 pb-4 border-b border-sand-200">
                         {/* Score Circle */}
-                        <div className="h-24 w-24 rounded-full border-4 border-indigo-600 bg-white flex flex-col items-center justify-center shadow-md flex-shrink-0">
-                          <span className="text-3xl font-black text-slate-800">{result.coachFeedback?.alignmentScore || 0}</span>
-                          <span className="text-[9px] text-indigo-600 font-bold uppercase tracking-widest mt-0.5">Fit Score</span>
+                        <div className="h-24 w-24 rounded-full border-4 border-terracotta-600 bg-white flex flex-col items-center justify-center shadow-xs flex-shrink-0">
+                          <span className="text-3xl font-black text-ink-900">{result.coachFeedback?.alignmentScore || 0}</span>
+                          <span className="text-[9px] text-terracotta-600 font-bold uppercase tracking-widest mt-0.5">Fit Score</span>
                         </div>
                         <div className="space-y-1 text-center sm:text-left">
-                          <h4 className="font-bold text-slate-855 text-base">Career Coach Alignment Score</h4>
-                          <p className="text-sm text-slate-600 leading-relaxed">
+                          <h4 className="font-bold text-ink-900 text-base">Career Coach Alignment Score</h4>
+                          <p className="text-sm text-ink-600 leading-relaxed">
                             This score measures the overall compatibility between your background achievements and the target role description, highlighting baseline feasibility before optimization.
                           </p>
                         </div>
@@ -1282,7 +1282,7 @@ export default function TailorPage() {
                               <CheckCircle className="h-4 w-4 text-blue-700" />
                               <span>Top Transferable Strengths</span>
                             </div>
-                            <div className="bg-white p-4.5 rounded-xl border border-slate-200/60 shadow-sm leading-relaxed">
+                            <div className="bg-white p-4.5 rounded-xl border border-sand-200 shadow-2xs leading-relaxed">
                               {renderBulletPoints(result.coachFeedback.strengths, 'No strengths analysis available.')}
                             </div>
                           </div>
@@ -1293,29 +1293,29 @@ export default function TailorPage() {
                               <AlertTriangle className="h-4 w-4 text-amber-700" />
                               <span>Key Alignment Gaps</span>
                             </div>
-                            <div className="bg-white p-4.5 rounded-xl border border-slate-200/60 shadow-sm leading-relaxed">
+                            <div className="bg-white p-4.5 rounded-xl border border-sand-200 shadow-2xs leading-relaxed">
                               {renderBulletPoints(result.coachFeedback.gaps, 'No gap analysis available.')}
                             </div>
                           </div>
 
                           {/* Suggestions */}
                           <div className="space-y-2">
-                            <div className="flex items-center gap-2 text-indigo-800 font-bold text-sm">
-                              <MessageSquare className="h-4 w-4 text-indigo-600" />
+                            <div className="flex items-center gap-2 text-pine-900 font-bold text-sm">
+                              <MessageSquare className="h-4 w-4 text-pine-700" />
                               <span>Coaching Suggestions</span>
                             </div>
-                            <div className="bg-white p-4.5 rounded-xl border border-slate-200/60 shadow-sm leading-relaxed">
+                            <div className="bg-white p-4.5 rounded-xl border border-sand-200 shadow-2xs leading-relaxed">
                               {renderBulletPoints(result.coachFeedback.suggestions, 'No suggestions available.')}
                             </div>
                           </div>
                         </div>
                       ) : (
                         <div className="space-y-3 leading-relaxed">
-                          <div className="flex items-center gap-2 text-indigo-800 font-bold text-sm">
-                            <MessageSquare className="h-5 w-5 text-indigo-600" />
+                          <div className="flex items-center gap-2 text-pine-900 font-bold text-sm">
+                            <MessageSquare className="h-5 w-5 text-pine-700" />
                             <span>Strategic Coach Insights</span>
                           </div>
-                          <p className="text-sm text-slate-755 bg-white p-5 rounded-xl border border-indigo-100/50 shadow-sm whitespace-pre-wrap leading-relaxed italic">
+                          <p className="text-sm text-ink-800 bg-white p-5 rounded-xl border border-sand-200 shadow-2xs whitespace-pre-wrap leading-relaxed italic">
                             "{result.coachFeedback?.feedbackText || 'No coach evaluation text available.'}"
                           </p>
                         </div>
@@ -1385,15 +1385,15 @@ export default function TailorPage() {
                     </div>
 
                     {/* Upskilling Actions */}
-                    <div className="space-y-3 pt-4 border-t border-slate-100">
-                      <h5 className="font-bold text-sm uppercase tracking-wider text-slate-700 flex items-center gap-2">
-                        <BookOpen className="h-5 w-5 text-indigo-500" />
+                    <div className="space-y-3 pt-4 border-t border-sand-100">
+                      <h5 className="font-bold text-sm uppercase tracking-wider text-ink-800 flex items-center gap-2">
+                        <BookOpen className="h-5 w-5 text-pine-700" />
                         <span>Recommended Upskilling Actions</span>
                       </h5>
                       <ul className="space-y-2">
                         {result.atsAnalysis.learningActions.map((action, i) => (
-                          <li key={i} className="flex gap-2.5 items-start text-sm text-slate-600 bg-slate-50 p-2.5 rounded-lg border border-slate-100 leading-relaxed">
-                            <span className="h-5 w-5 rounded-full bg-indigo-50 text-indigo-600 flex items-center justify-center text-xs font-bold mt-0.5 flex-shrink-0">
+                          <li key={i} className="flex gap-2.5 items-start text-sm text-ink-700 bg-sand-50 p-2.5 rounded-lg border border-sand-100 leading-relaxed">
+                            <span className="h-5 w-5 rounded-full bg-pine-50 text-pine-800 flex items-center justify-center text-xs font-bold mt-0.5 flex-shrink-0">
                               {i + 1}
                             </span>
                             <span>{action}</span>
@@ -1406,28 +1406,28 @@ export default function TailorPage() {
 
                 {activeTab === 'skills' && (
                   <div className="space-y-4 overflow-y-auto max-h-[800px] pr-2">
-                    <p className="text-sm text-slate-500 italic mb-2 leading-relaxed">
+                    <p className="text-sm text-ink-500 italic mb-2 leading-relaxed">
                       Below are the strategic translations applied during tailoring. Jargon and original phrasing have been mapped to target competencies to show maximum alignment.
                     </p>
                     <div className="space-y-4">
                       {result.atsAnalysis.transferableSkills.map((item, i) => (
-                        <div key={i} className="p-4 rounded-xl border border-slate-200 space-y-3 bg-white hover:border-slate-300 transition-colors">
+                        <div key={i} className="p-4 rounded-xl border border-sand-200 space-y-3 bg-white hover:border-sand-300 transition-colors">
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div className="space-y-1">
-                              <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Original Experience</span>
-                              <p className="text-sm text-slate-600 bg-slate-50 p-2.5 rounded border border-slate-100 leading-relaxed">
+                              <span className="text-xs font-bold text-ink-400 uppercase tracking-wider">Original Experience</span>
+                              <p className="text-sm text-ink-700 bg-sand-50 p-2.5 rounded border border-sand-100 leading-relaxed">
                                 {item.original}
                               </p>
                             </div>
                             <div className="space-y-1">
                               <span className="text-xs font-bold text-amber-600 uppercase tracking-wider">Tailored Experience</span>
-                              <p className="text-sm text-slate-800 bg-amber-50/50 p-2.5 rounded border border-amber-100 font-semibold leading-relaxed">
+                              <p className="text-sm text-ink-900 bg-amber-50/50 p-2.5 rounded border border-amber-100 font-semibold leading-relaxed">
                                 {item.tailored}
                               </p>
                             </div>
                           </div>
-                          <div className="bg-slate-50 p-2.5 rounded-lg border border-slate-100 text-sm text-slate-500 leading-relaxed">
-                            <span className="font-bold text-slate-700">Rationale: </span>
+                          <div className="bg-sand-50 p-2.5 rounded-lg border border-sand-100 text-sm text-ink-600 leading-relaxed">
+                            <span className="font-bold text-ink-800">Rationale: </span>
                             {item.explanation}
                           </div>
                         </div>
@@ -1438,10 +1438,10 @@ export default function TailorPage() {
               </div>
             </div>
           ) : (
-            <div className="bg-white rounded-xl border border-slate-200 shadow-sm flex flex-col items-center justify-center h-[880px] text-slate-400 p-8 gap-3 animate-in fade-in duration-200">
-              <Sparkles className="h-16 w-16 stroke-[1.5] animate-pulse text-slate-300" />
-              <h4 className="font-bold text-slate-800 text-base">Awaiting Target Parameters</h4>
-              <p className="text-sm text-slate-500 text-center max-w-sm leading-relaxed">
+            <div className="bg-white rounded-xl border border-sand-200 shadow-xs flex flex-col items-center justify-center h-[880px] text-ink-400 p-8 gap-3 animate-in fade-in duration-200">
+              <Sparkles className="h-16 w-16 stroke-[1.5] animate-pulse text-sand-300" />
+              <h4 className="font-bold text-ink-900 text-base">Awaiting Target Parameters</h4>
+              <p className="text-sm text-ink-500 text-center max-w-sm leading-relaxed">
                 Enter your target Job Title and paste the Job Description on the left, then click Tailor CV to run the AI engine.
               </p>
             </div>
@@ -1450,28 +1450,28 @@ export default function TailorPage() {
       </div>
 
       {/* Full-Width Tailoring History Panel */}
-      <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-4 animate-in fade-in duration-300">
-        <div className="flex items-center justify-between border-b border-slate-100 pb-3 flex-wrap gap-3">
+      <div className="bg-white p-6 rounded-xl border border-sand-200 shadow-xs space-y-4 animate-in fade-in duration-300">
+        <div className="flex items-center justify-between border-b border-sand-100 pb-3 flex-wrap gap-3">
           <div className="flex items-center gap-2.5">
-            <h3 className="font-bold text-slate-800 text-sm uppercase tracking-wider">
+            <h3 className="font-bold text-ink-900 text-sm uppercase tracking-wider">
               Tailoring History
             </h3>
-            <span className="px-2.5 py-0.5 rounded-full text-xs bg-indigo-50 text-indigo-700 font-bold border border-indigo-100">
+            <span className="px-2.5 py-0.5 rounded-full text-xs bg-pine-50 text-pine-800 font-bold border border-pine-200">
               {historyList.length}
             </span>
           </div>
 
           {historyList.length > 0 && (
             <div className="flex items-center gap-2">
-              <label htmlFor="history-sort" className="text-xs text-slate-500 font-medium flex items-center gap-1.5">
-                <ArrowUpDown className="h-3.5 w-3.5 text-indigo-600" />
+              <label htmlFor="history-sort" className="text-xs text-ink-500 font-medium flex items-center gap-1.5">
+                <ArrowUpDown className="h-3.5 w-3.5 text-pine-700" />
                 <span className="hidden sm:inline">Sort by:</span>
               </label>
               <select
                 id="history-sort"
                 value={historySortBy}
                 onChange={(e) => setHistorySortBy(e.target.value as HistorySortOption)}
-                className="text-xs font-semibold text-slate-700 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-lg px-2.5 py-1.5 focus:ring-2 focus:ring-indigo-500 outline-none cursor-pointer transition-colors shadow-2xs"
+                className="text-xs font-semibold text-ink-700 bg-sand-50 hover:bg-sand-100 border border-sand-200 rounded-lg px-2.5 py-1.5 focus:ring-2 focus:ring-terracotta-500 outline-none cursor-pointer transition-colors shadow-2xs"
               >
                 <option value="date-desc">Date: Newest first</option>
                 <option value="date-asc">Date: Oldest first</option>
@@ -1492,32 +1492,32 @@ export default function TailorPage() {
                 <div
                   key={item.id}
                   onClick={() => handleLoadHistory(item)}
-                  className={`p-3 rounded-lg border transition-all flex items-center justify-between gap-4 group relative cursor-pointer ${
+                  className={`p-3 rounded-xl border transition-all flex items-center justify-between gap-4 group relative cursor-pointer ${
                     isCurrent 
-                      ? 'border-indigo-600 bg-indigo-50/20 shadow-sm shadow-indigo-100/50 font-medium' 
-                      : 'border-slate-200 bg-slate-50/30 hover:bg-slate-50 hover:border-slate-350'
+                      ? 'border-terracotta-600 bg-terracotta-50/25 shadow-xs font-medium' 
+                      : 'border-sand-200 bg-sand-50/40 hover:bg-sand-100/60 hover:border-sand-300'
                   }`}
                 >
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between flex-1 gap-2 min-w-0">
                     <div className="flex items-center gap-2 min-w-0 flex-wrap">
                       <h4 className={`font-bold text-sm truncate ${
-                        isCurrent ? 'text-indigo-900 font-extrabold' : 'text-slate-800'
+                        isCurrent ? 'text-terracotta-900 font-extrabold' : 'text-ink-900'
                       }`}>
                         {item.jobTitle}
                       </h4>
                       {item.company && item.company.trim() !== '' && item.company !== 'Target Company' && (
-                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-semibold bg-slate-100 text-slate-700 border border-slate-200 truncate max-w-[180px]">
-                          <Building2 className="h-3 w-3 text-slate-400 flex-shrink-0" />
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-semibold bg-sand-100 text-ink-700 border border-sand-200 truncate max-w-[180px]">
+                          <Building2 className="h-3 w-3 text-ink-400 flex-shrink-0" />
                           <span className="truncate">{item.company}</span>
                         </span>
                       )}
                     </div>
                     <div className="flex items-center gap-4 text-xs flex-shrink-0">
-                      <span className="text-slate-500 font-medium">
-                        Fit Score: <span className="font-extrabold text-indigo-600">{item.coachFeedback?.alignmentScore ?? item.atsAnalysis?.afterScore ?? 0}%</span>
+                      <span className="text-ink-500 font-medium">
+                        Fit Score: <span className="font-extrabold text-terracotta-600">{item.coachFeedback?.alignmentScore ?? item.atsAnalysis?.afterScore ?? 0}%</span>
                       </span>
-                      <span className="text-slate-350 hidden sm:inline">•</span>
-                      <span className="text-slate-400">
+                      <span className="text-sand-300 hidden sm:inline">•</span>
+                      <span className="text-ink-400">
                         {(() => {
                           const d = new Date(item.createdAt);
                           return !isNaN(d.getTime()) ? d.toLocaleDateString() : 'Recent';

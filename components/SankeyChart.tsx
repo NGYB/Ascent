@@ -100,11 +100,11 @@ export default function SankeyChart({ apps }: SankeyChartProps) {
   };
 
   return (
-    <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-4">
+    <div className="bg-white p-6 rounded-xl border border-sand-200 shadow-xs space-y-4">
       <div className="flex items-center justify-between flex-wrap gap-2">
         <div>
-          <h3 className="font-bold text-slate-800 text-base">Application Funnel (Sankey Flow)</h3>
-          <p className="text-xs text-slate-500 leading-relaxed">
+          <h3 className="font-bold text-ink-900 text-base">Application Funnel (Sankey Flow)</h3>
+          <p className="text-xs text-ink-500 leading-relaxed">
             Visualizing status progression from initial application to interviews, offers, and rejections.
           </p>
         </div>
@@ -113,7 +113,7 @@ export default function SankeyChart({ apps }: SankeyChartProps) {
           <button
             type="button"
             onClick={() => setShowSample(!showSample)}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 hover:bg-slate-200 text-slate-700 transition-colors"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-sand-100 hover:bg-sand-200 text-ink-700 transition-colors"
           >
             {showSample ? (
               <>
@@ -128,19 +128,19 @@ export default function SankeyChart({ apps }: SankeyChartProps) {
             )}
           </button>
         ) : (
-          <span className="px-2 py-0.5 rounded text-[10px] bg-blue-50 text-blue-800 border border-blue-200 font-bold uppercase tracking-wider">
+          <span className="px-2 py-0.5 rounded text-[10px] bg-pine-50 text-pine-800 border border-pine-200 font-bold uppercase tracking-wider">
             Live Conversion Pipeline
           </span>
         )}
       </div>
 
       {!hasRealData && !showSample ? (
-        <div className="p-8 text-center bg-slate-50/50 rounded-xl border border-dashed border-slate-200 space-y-2">
-          <div className="h-10 w-10 rounded-full bg-indigo-50 text-indigo-600 flex items-center justify-center mx-auto">
+        <div className="p-8 text-center bg-sand-50/50 rounded-xl border border-dashed border-sand-300 space-y-2">
+          <div className="h-10 w-10 rounded-full bg-pine-50 text-pine-700 flex items-center justify-center mx-auto">
             <TrendingUp className="h-5 w-5" />
           </div>
-          <h4 className="text-sm font-bold text-slate-700">Funnel Awaiting Active Applications</h4>
-          <p className="text-xs text-slate-500 max-w-md mx-auto leading-relaxed">
+          <h4 className="text-sm font-bold text-ink-800">Funnel Awaiting Active Applications</h4>
+          <p className="text-xs text-ink-500 max-w-md mx-auto leading-relaxed">
             Move opportunities from <strong>Draft / Tailored</strong> to <strong>Applied</strong> to track your conversion rate from application to interview, offers, and archive.
           </p>
         </div>
@@ -161,24 +161,24 @@ export default function SankeyChart({ apps }: SankeyChartProps) {
             <defs>
               {/* Gradients for links */}
               <linearGradient id="applied-to-interviewing" x1="0" y1="0" x2="1" y2="0">
-                <stop offset="0%" stopColor="#3b82f6" stopOpacity="0.3" />
-                <stop offset="100%" stopColor="#6366f1" stopOpacity="0.3" />
+                <stop offset="0%" stopColor="#C85A32" stopOpacity="0.35" />
+                <stop offset="100%" stopColor="#D97706" stopOpacity="0.35" />
               </linearGradient>
               <linearGradient id="applied-to-rejected" x1="0" y1="0" x2="1" y2="0">
-                <stop offset="0%" stopColor="#3b82f6" stopOpacity="0.25" />
-                <stop offset="100%" stopColor="#d97706" stopOpacity="0.25" />
+                <stop offset="0%" stopColor="#C85A32" stopOpacity="0.25" />
+                <stop offset="100%" stopColor="#A8A29E" stopOpacity="0.25" />
               </linearGradient>
               <linearGradient id="interviewing-to-offers" x1="0" y1="0" x2="1" y2="0">
-                <stop offset="0%" stopColor="#6366f1" stopOpacity="0.35" />
-                <stop offset="100%" stopColor="#2563eb" stopOpacity="0.35" />
+                <stop offset="0%" stopColor="#D97706" stopOpacity="0.35" />
+                <stop offset="100%" stopColor="#059669" stopOpacity="0.35" />
               </linearGradient>
               <linearGradient id="interviewing-to-rejected" x1="0" y1="0" x2="1" y2="0">
-                <stop offset="0%" stopColor="#6366f1" stopOpacity="0.25" />
-                <stop offset="100%" stopColor="#ea580c" stopOpacity="0.25" />
+                <stop offset="0%" stopColor="#D97706" stopOpacity="0.25" />
+                <stop offset="100%" stopColor="#A8A29E" stopOpacity="0.25" />
               </linearGradient>
               <linearGradient id="offers-to-rejected" x1="0" y1="0" x2="1" y2="0">
-                <stop offset="0%" stopColor="#2563eb" stopOpacity="0.25" />
-                <stop offset="100%" stopColor="#ea580c" stopOpacity="0.25" />
+                <stop offset="0%" stopColor="#059669" stopOpacity="0.25" />
+                <stop offset="100%" stopColor="#A8A29E" stopOpacity="0.25" />
               </linearGradient>
             </defs>
 
@@ -195,7 +195,7 @@ export default function SankeyChart({ apps }: SankeyChartProps) {
                 fill="none"
                 stroke="url(#applied-to-interviewing)"
                 strokeWidth={Math.max(2, interviewTotal * scale)}
-                className="hover:stroke-indigo-500/50 transition-colors cursor-pointer"
+                className="hover:stroke-terracotta-500/50 transition-colors cursor-pointer"
               >
                 <title>{`Advanced to Interviews: ${interviewTotal}`}</title>
               </path>
@@ -282,12 +282,12 @@ export default function SankeyChart({ apps }: SankeyChartProps) {
                 width={nodeWidth}
                 height={hApplied}
                 rx={3}
-                className="fill-blue-500 shadow-sm"
+                className="fill-terracotta-600 shadow-xs"
               />
-              <text x={xApplied - 12} y={yApplied + Math.min(16, hApplied / 2) + 2} className="text-xs font-bold text-slate-800" textAnchor="end">
+              <text x={xApplied - 12} y={yApplied + Math.min(16, hApplied / 2) + 2} className="text-xs font-bold text-ink-900" textAnchor="end">
                 Total applied ({effectiveTotal})
               </text>
-              <text x={xApplied - 12} y={yApplied + Math.min(16, hApplied / 2) + 16} className="text-[10px] font-semibold text-slate-500" textAnchor="end">
+              <text x={xApplied - 12} y={yApplied + Math.min(16, hApplied / 2) + 16} className="text-[10px] font-semibold text-ink-500" textAnchor="end">
                 {appliedActive} pending reply
               </text>
             </g>
@@ -300,12 +300,12 @@ export default function SankeyChart({ apps }: SankeyChartProps) {
                 width={nodeWidth}
                 height={hInterviewing}
                 rx={3}
-                className={interviewTotal > 0 ? 'fill-indigo-500 shadow-sm' : 'fill-slate-200'}
+                className={interviewTotal > 0 ? 'fill-amber-600 shadow-xs' : 'fill-sand-200'}
               />
-              <text x={xInterviewing - 12} y={yInterviewing + Math.min(16, hInterviewing / 2) + 2} className={`text-xs font-bold ${interviewTotal > 0 ? 'text-slate-800' : 'text-slate-400'}`} textAnchor="end">
+              <text x={xInterviewing - 12} y={yInterviewing + Math.min(16, hInterviewing / 2) + 2} className={`text-xs font-bold ${interviewTotal > 0 ? 'text-ink-900' : 'text-ink-400'}`} textAnchor="end">
                 Interviewed ({interviewTotal})
               </text>
-              <text x={xInterviewing - 12} y={yInterviewing + Math.min(16, hInterviewing / 2) + 16} className={`text-[10px] font-semibold ${interviewActive > 0 ? 'text-slate-500' : 'text-slate-400'}`} textAnchor="end">
+              <text x={xInterviewing - 12} y={yInterviewing + Math.min(16, hInterviewing / 2) + 16} className={`text-[10px] font-semibold ${interviewActive > 0 ? 'text-ink-500' : 'text-ink-400'}`} textAnchor="end">
                 {interviewActive} pending reply
               </text>
             </g>
@@ -318,12 +318,12 @@ export default function SankeyChart({ apps }: SankeyChartProps) {
                 width={nodeWidth}
                 height={hOffers}
                 rx={3}
-                className={offerTotal > 0 ? 'fill-blue-600 shadow-sm' : 'fill-slate-200'}
+                className={offerTotal > 0 ? 'fill-emerald-600 shadow-xs' : 'fill-sand-200'}
               />
-              <text x={xOffers + nodeWidth + 12} y={yOffers + Math.min(16, hOffers / 2) + 2} className={`text-xs font-bold ${offerActive > 0 ? 'text-slate-800' : 'text-slate-400'}`} textAnchor="start">
+              <text x={xOffers + nodeWidth + 12} y={yOffers + Math.min(16, hOffers / 2) + 2} className={`text-xs font-bold ${offerActive > 0 ? 'text-ink-900' : 'text-ink-400'}`} textAnchor="start">
                 Offers ({offerActive})
               </text>
-              <text x={xOffers + nodeWidth + 12} y={yOffers + Math.min(16, hOffers / 2) + 16} className={`text-[10px] font-semibold ${offerTotal > 0 ? 'text-blue-700' : 'text-slate-400'}`} textAnchor="start">
+              <text x={xOffers + nodeWidth + 12} y={yOffers + Math.min(16, hOffers / 2) + 16} className={`text-[10px] font-semibold ${offerTotal > 0 ? 'text-emerald-700' : 'text-ink-400'}`} textAnchor="start">
                 {rejOffer > 0 ? `${rejOffer} declined` : offerTotal > 0 ? `${offerTotal} received` : '0 offers'}
               </text>
             </g>
@@ -336,12 +336,12 @@ export default function SankeyChart({ apps }: SankeyChartProps) {
                 width={nodeWidth}
                 height={hRejInterview}
                 rx={3}
-                className={rejInterviewTotal > 0 ? 'fill-amber-600 shadow-sm' : 'fill-slate-200'}
+                className={rejInterviewTotal > 0 ? 'fill-sand-500 shadow-xs' : 'fill-sand-200'}
               />
-              <text x={xRejected + nodeWidth + 12} y={yRejInterview + Math.min(16, hRejInterview / 2) + 2} className={`text-xs font-bold ${rejInterviewTotal > 0 ? 'text-slate-800' : 'text-slate-400'}`} textAnchor="start">
+              <text x={xRejected + nodeWidth + 12} y={yRejInterview + Math.min(16, hRejInterview / 2) + 2} className={`text-xs font-bold ${rejInterviewTotal > 0 ? 'text-ink-900' : 'text-ink-400'}`} textAnchor="start">
                 Rejected after interviewing ({rejInterviewTotal})
               </text>
-              <text x={xRejected + nodeWidth + 12} y={yRejInterview + Math.min(16, hRejInterview / 2) + 16} className={`text-[10px] font-semibold ${rejInterviewTotal > 0 ? 'text-amber-800' : 'text-slate-400'}`} textAnchor="start">
+              <text x={xRejected + nodeWidth + 12} y={yRejInterview + Math.min(16, hRejInterview / 2) + 16} className={`text-[10px] font-semibold ${rejInterviewTotal > 0 ? 'text-ink-600' : 'text-ink-400'}`} textAnchor="start">
                 {rejInterviewTotal > 0 ? `${rejInterviewTotal} after interview` : '0 after interview'}
               </text>
             </g>
@@ -354,12 +354,12 @@ export default function SankeyChart({ apps }: SankeyChartProps) {
                 width={nodeWidth}
                 height={hRejApplied}
                 rx={3}
-                className={rejApplied > 0 ? 'fill-amber-500 shadow-sm' : 'fill-slate-200'}
+                className={rejApplied > 0 ? 'fill-sand-400 shadow-xs' : 'fill-sand-200'}
               />
-              <text x={xRejected + nodeWidth + 12} y={yRejApplied + Math.min(16, hRejApplied / 2) + 2} className={`text-xs font-bold ${rejApplied > 0 ? 'text-slate-800' : 'text-slate-400'}`} textAnchor="start">
+              <text x={xRejected + nodeWidth + 12} y={yRejApplied + Math.min(16, hRejApplied / 2) + 2} className={`text-xs font-bold ${rejApplied > 0 ? 'text-ink-900' : 'text-ink-400'}`} textAnchor="start">
                 Rejected after applied ({rejApplied})
               </text>
-              <text x={xRejected + nodeWidth + 12} y={yRejApplied + Math.min(16, hRejApplied / 2) + 16} className={`text-[10px] font-semibold ${rejApplied > 0 ? 'text-amber-800' : 'text-slate-400'}`} textAnchor="start">
+              <text x={xRejected + nodeWidth + 12} y={yRejApplied + Math.min(16, hRejApplied / 2) + 16} className={`text-[10px] font-semibold ${rejApplied > 0 ? 'text-ink-600' : 'text-ink-400'}`} textAnchor="start">
                 {rejApplied > 0 ? `${rejApplied} after applied` : '0 after applied'}
               </text>
             </g>
