@@ -62,9 +62,15 @@ export default function SankeyChart({ apps }: SankeyChartProps) {
   const rejOffer = isSample ? 0 : cRejectedOffer;
   const rejInterviewTotal = isSample ? 1 : totalRejectedInterview;
 
+  // Percentage Calculations for Funnel Progression
+  const pctInterviewed = effectiveTotal > 0 ? Math.round((interviewTotal / effectiveTotal) * 100) : 0;
+  const pctOffers = interviewTotal > 0 ? Math.round((offerTotal / interviewTotal) * 100) : 0;
+  const pctRejectedInterview = interviewTotal > 0 ? Math.round((rejInterviewTotal / interviewTotal) * 100) : 0;
+  const pctRejectedApplied = effectiveTotal > 0 ? Math.round((rejApplied / effectiveTotal) * 100) : 0;
+
   // Flow Math setup
   const height = 300;
-  const width = 980;
+  const width = 1000;
   const topPadding = 28;
   const bottomPadding = 32;
   const nodeWidth = 14;
@@ -82,8 +88,8 @@ export default function SankeyChart({ apps }: SankeyChartProps) {
   // Node positions
   const xApplied = 140;
   const xInterviewing = 385;
-  const xOffers = 610;
-  const xRejected = 750;
+  const xOffers = 600;
+  const xRejected = 760;
 
   const yApplied = topPadding;
   const yInterviewing = topPadding + (appliedActive * scale * 0.3);
@@ -145,225 +151,262 @@ export default function SankeyChart({ apps }: SankeyChartProps) {
           </p>
         </div>
       ) : (
-        <div className="relative overflow-x-auto select-none pt-2 pb-2 px-2">
+        <div className="relative select-none pt-1 pb-2 px-1 space-y-4">
+          {/* Conversion Rates KPI Summary */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            <div className="bg-indigo-50/70 border border-indigo-100 rounded-lg p-3">
+              <div className="text-[11px] font-bold uppercase tracking-wider text-indigo-700">Interview Rate</div>
+              <div className="text-xl font-bold text-slate-800 mt-1">{pctInterviewed}%</div>
+              <div className="text-[11px] text-slate-500 mt-0.5">
+                {interviewTotal} of {effectiveTotal} applied
+              </div>
+            </div>
+
+            <div className="bg-blue-50/70 border border-blue-100 rounded-lg p-3">
+              <div className="text-[11px] font-bold uppercase tracking-wider text-blue-700">Offer Rate</div>
+              <div className="text-xl font-bold text-slate-800 mt-1">{interviewTotal > 0 ? `${pctOffers}%` : '—'}</div>
+              <div className="text-[11px] text-slate-500 mt-0.5">
+                {interviewTotal > 0 ? `${offerTotal} of ${interviewTotal} interviewed` : 'Awaiting interviews'}
+              </div>
+            </div>
+
+            <div className="bg-amber-50/70 border border-amber-100 rounded-lg p-3">
+              <div className="text-[11px] font-bold uppercase tracking-wider text-amber-700">Initial Screen Drop-off</div>
+              <div className="text-xl font-bold text-slate-800 mt-1">{pctRejectedApplied}%</div>
+              <div className="text-[11px] text-slate-500 mt-0.5">
+                {rejApplied} of {effectiveTotal} rejected after applied
+              </div>
+            </div>
+
+            <div className="bg-orange-50/70 border border-orange-100 rounded-lg p-3">
+              <div className="text-[11px] font-bold uppercase tracking-wider text-orange-700">Post-Interview Drop-off</div>
+              <div className="text-xl font-bold text-slate-800 mt-1">{interviewTotal > 0 ? `${pctRejectedInterview}%` : '—'}</div>
+              <div className="text-[11px] text-slate-500 mt-0.5">
+                {interviewTotal > 0 ? `${rejInterviewTotal} of ${interviewTotal} rejected after interview` : 'Awaiting interviews'}
+              </div>
+            </div>
+          </div>
+
           {isSample && (
-            <div className="mb-2 px-3 py-1.5 rounded-lg bg-amber-50 border border-amber-200 text-amber-800 text-xs flex items-center justify-between">
+            <div className="px-3 py-1.5 rounded-lg bg-amber-50 border border-amber-200 text-amber-800 text-xs flex items-center justify-between">
               <span><strong>Sample Preview Mode:</strong> Showing simulated pipeline progression until you apply to jobs.</span>
               <button onClick={() => setShowSample(false)} className="underline font-bold text-amber-900 ml-2">Hide</button>
             </div>
           )}
 
-          <svg 
-            viewBox={`0 0 ${width} ${height}`} 
-            className="w-full min-w-[760px] h-fit"
-            style={{ overflow: 'visible' }}
-          >
-            <defs>
-              {/* Gradients for links */}
-              <linearGradient id="applied-to-interviewing" x1="0" y1="0" x2="1" y2="0">
-                <stop offset="0%" stopColor="#3b82f6" stopOpacity="0.3" />
-                <stop offset="100%" stopColor="#6366f1" stopOpacity="0.3" />
-              </linearGradient>
-              <linearGradient id="applied-to-rejected" x1="0" y1="0" x2="1" y2="0">
-                <stop offset="0%" stopColor="#3b82f6" stopOpacity="0.25" />
-                <stop offset="100%" stopColor="#d97706" stopOpacity="0.25" />
-              </linearGradient>
-              <linearGradient id="interviewing-to-offers" x1="0" y1="0" x2="1" y2="0">
-                <stop offset="0%" stopColor="#6366f1" stopOpacity="0.35" />
-                <stop offset="100%" stopColor="#2563eb" stopOpacity="0.35" />
-              </linearGradient>
-              <linearGradient id="interviewing-to-rejected" x1="0" y1="0" x2="1" y2="0">
-                <stop offset="0%" stopColor="#6366f1" stopOpacity="0.25" />
-                <stop offset="100%" stopColor="#ea580c" stopOpacity="0.25" />
-              </linearGradient>
-              <linearGradient id="offers-to-rejected" x1="0" y1="0" x2="1" y2="0">
-                <stop offset="0%" stopColor="#2563eb" stopOpacity="0.25" />
-                <stop offset="100%" stopColor="#ea580c" stopOpacity="0.25" />
-              </linearGradient>
-            </defs>
+          <div className="overflow-x-auto">
+            <svg 
+              viewBox={`0 0 ${width} ${height}`} 
+              className="w-full min-w-[760px] h-fit"
+              style={{ overflow: 'visible' }}
+            >
+              <defs>
+                {/* Gradients for links */}
+                <linearGradient id="applied-to-interviewing" x1="0" y1="0" x2="1" y2="0">
+                  <stop offset="0%" stopColor="#3b82f6" stopOpacity="0.3" />
+                  <stop offset="100%" stopColor="#6366f1" stopOpacity="0.3" />
+                </linearGradient>
+                <linearGradient id="applied-to-rejected" x1="0" y1="0" x2="1" y2="0">
+                  <stop offset="0%" stopColor="#3b82f6" stopOpacity="0.25" />
+                  <stop offset="100%" stopColor="#d97706" stopOpacity="0.25" />
+                </linearGradient>
+                <linearGradient id="interviewing-to-offers" x1="0" y1="0" x2="1" y2="0">
+                  <stop offset="0%" stopColor="#6366f1" stopOpacity="0.35" />
+                  <stop offset="100%" stopColor="#2563eb" stopOpacity="0.35" />
+                </linearGradient>
+                <linearGradient id="interviewing-to-rejected" x1="0" y1="0" x2="1" y2="0">
+                  <stop offset="0%" stopColor="#6366f1" stopOpacity="0.25" />
+                  <stop offset="100%" stopColor="#ea580c" stopOpacity="0.25" />
+                </linearGradient>
+                <linearGradient id="offers-to-rejected" x1="0" y1="0" x2="1" y2="0">
+                  <stop offset="0%" stopColor="#2563eb" stopOpacity="0.25" />
+                  <stop offset="100%" stopColor="#ea580c" stopOpacity="0.25" />
+                </linearGradient>
+              </defs>
 
-            {/* --- LINKS / PATHS --- */}
-            {/* Link 1: Applied -> Interviewing */}
-            {interviewTotal > 0 && (
-              <path
-                d={getSankeyPath(
-                  xApplied + nodeWidth,
-                  yApplied + (appliedActive * scale) + (interviewTotal * scale / 2),
-                  xInterviewing,
-                  yInterviewing + (interviewTotal * scale / 2)
-                )}
-                fill="none"
-                stroke="url(#applied-to-interviewing)"
-                strokeWidth={Math.max(2, interviewTotal * scale)}
-                className="hover:stroke-indigo-500/50 transition-colors cursor-pointer"
-              >
-                <title>{`Advanced to Interviews: ${interviewTotal}`}</title>
-              </path>
-            )}
+              {/* --- LINKS / PATHS --- */}
+              {/* Link 1: Applied -> Interviewing */}
+              {interviewTotal > 0 && (
+                <path
+                  d={getSankeyPath(
+                    xApplied + nodeWidth,
+                    yApplied + (appliedActive * scale) + (interviewTotal * scale / 2),
+                    xInterviewing,
+                    yInterviewing + (interviewTotal * scale / 2)
+                  )}
+                  fill="none"
+                  stroke="url(#applied-to-interviewing)"
+                  strokeWidth={Math.max(2, interviewTotal * scale)}
+                  className="hover:stroke-indigo-500/50 transition-colors cursor-pointer"
+                >
+                  <title>{`Advanced to Interviews: ${interviewTotal} (${pctInterviewed}% of applied)`}</title>
+                </path>
+              )}
 
-            {/* Link 2: Interviewing -> Offers */}
-            {offerTotal > 0 && (
-              <path
-                d={getSankeyPath(
-                  xInterviewing + nodeWidth,
-                  yInterviewing + (interviewActive * scale) + (offerTotal * scale / 2),
-                  xOffers,
-                  yOffers + (offerTotal * scale / 2)
-                )}
-                fill="none"
-                stroke="url(#interviewing-to-offers)"
-                strokeWidth={Math.max(2, offerTotal * scale)}
-                className="hover:stroke-blue-500/60 transition-colors cursor-pointer"
-              >
-                <title>{`Received Offers: ${offerTotal}`}</title>
-              </path>
-            )}
+              {/* Link 2: Interviewing -> Offers */}
+              {offerTotal > 0 && (
+                <path
+                  d={getSankeyPath(
+                    xInterviewing + nodeWidth,
+                    yInterviewing + (interviewActive * scale) + (offerTotal * scale / 2),
+                    xOffers,
+                    yOffers + (offerTotal * scale / 2)
+                  )}
+                  fill="none"
+                  stroke="url(#interviewing-to-offers)"
+                  strokeWidth={Math.max(2, offerTotal * scale)}
+                  className="hover:stroke-blue-500/60 transition-colors cursor-pointer"
+                >
+                  <title>{`Received Offers: ${offerTotal} (${pctOffers}% of interviewed)`}</title>
+                </path>
+              )}
 
-            {/* Link 3: Interviewing -> Rejected after interviewing */}
-            {rejInterviewOnly > 0 && (
-              <path
-                d={getSankeyPath(
-                  xInterviewing + nodeWidth,
-                  yInterviewing + (interviewActive + offerTotal) * scale + (rejInterviewOnly * scale / 2),
-                  xRejected,
-                  yRejInterview + (rejInterviewOnly * scale / 2)
-                )}
-                fill="none"
-                stroke="url(#interviewing-to-rejected)"
-                strokeWidth={Math.max(2, rejInterviewOnly * scale)}
-                className="hover:stroke-orange-500/50 transition-colors cursor-pointer"
-              >
-                <title>{`Rejected after Interview: ${rejInterviewOnly}`}</title>
-              </path>
-            )}
+              {/* Link 3: Interviewing -> Rejected after interviewing */}
+              {rejInterviewOnly > 0 && (
+                <path
+                  d={getSankeyPath(
+                    xInterviewing + nodeWidth,
+                    yInterviewing + (interviewActive + offerTotal) * scale + (rejInterviewOnly * scale / 2),
+                    xRejected,
+                    yRejInterview + (rejInterviewOnly * scale / 2)
+                  )}
+                  fill="none"
+                  stroke="url(#interviewing-to-rejected)"
+                  strokeWidth={Math.max(2, rejInterviewOnly * scale)}
+                  className="hover:stroke-orange-500/50 transition-colors cursor-pointer"
+                >
+                  <title>{`Rejected after Interview: ${rejInterviewOnly} (${pctRejectedInterview}% of interviewed)`}</title>
+                </path>
+              )}
 
-            {/* Link 4: Offers -> Rejected after interviewing (if any offer declined/rejected) */}
-            {rejOffer > 0 && (
-              <path
-                d={getSankeyPath(
-                  xOffers + nodeWidth,
-                  yOffers + (offerActive * scale) + (rejOffer * scale / 2),
-                  xRejected,
-                  yRejInterview + (rejInterviewOnly * scale) + (rejOffer * scale / 2)
-                )}
-                fill="none"
-                stroke="url(#offers-to-rejected)"
-                strokeWidth={Math.max(2, rejOffer * scale)}
-                className="hover:stroke-orange-500/50 transition-colors cursor-pointer"
-              >
-                <title>{`Declined / Rejected at Offer: ${rejOffer}`}</title>
-              </path>
-            )}
+              {/* Link 4: Offers -> Rejected after interviewing (if any offer declined/rejected) */}
+              {rejOffer > 0 && (
+                <path
+                  d={getSankeyPath(
+                    xOffers + nodeWidth,
+                    yOffers + (offerActive * scale) + (rejOffer * scale / 2),
+                    xRejected,
+                    yRejInterview + (rejInterviewOnly * scale) + (rejOffer * scale / 2)
+                  )}
+                  fill="none"
+                  stroke="url(#offers-to-rejected)"
+                  strokeWidth={Math.max(2, rejOffer * scale)}
+                  className="hover:stroke-orange-500/50 transition-colors cursor-pointer"
+                >
+                  <title>{`Declined / Rejected at Offer: ${rejOffer}`}</title>
+                </path>
+              )}
 
-            {/* Link 5: Applied -> Rejected after applied */}
-            {rejApplied > 0 && (
-              <path
-                d={getSankeyPath(
-                  xApplied + nodeWidth,
-                  yApplied + (appliedActive + interviewTotal) * scale + (rejApplied * scale / 2),
-                  xRejected,
-                  yRejApplied + (rejApplied * scale / 2)
-                )}
-                fill="none"
-                stroke="url(#applied-to-rejected)"
-                strokeWidth={Math.max(2, rejApplied * scale)}
-                className="hover:stroke-amber-500/40 transition-colors cursor-pointer"
-              >
-                <title>{`Rejected after Applied: ${rejApplied}`}</title>
-              </path>
-            )}
+              {/* Link 5: Applied -> Rejected after applied */}
+              {rejApplied > 0 && (
+                <path
+                  d={getSankeyPath(
+                    xApplied + nodeWidth,
+                    yApplied + (appliedActive + interviewTotal) * scale + (rejApplied * scale / 2),
+                    xRejected,
+                    yRejApplied + (rejApplied * scale / 2)
+                  )}
+                  fill="none"
+                  stroke="url(#applied-to-rejected)"
+                  strokeWidth={Math.max(2, rejApplied * scale)}
+                  className="hover:stroke-amber-500/40 transition-colors cursor-pointer"
+                >
+                  <title>{`Rejected after Applied: ${rejApplied} (${pctRejectedApplied}% of applied)`}</title>
+                </path>
+              )}
 
-            {/* --- NODES (Rectangles & Exact Labels) --- */}
-            {/* Node 1: Total applied */}
-            <g>
-              <rect
-                x={xApplied}
-                y={yApplied}
-                width={nodeWidth}
-                height={hApplied}
-                rx={3}
-                className="fill-blue-500 shadow-sm"
-              />
-              <text x={xApplied - 12} y={yApplied + Math.min(16, hApplied / 2) + 2} className="text-xs font-bold text-slate-800" textAnchor="end">
-                Total applied ({effectiveTotal})
-              </text>
-              <text x={xApplied - 12} y={yApplied + Math.min(16, hApplied / 2) + 16} className="text-[10px] font-semibold text-slate-500" textAnchor="end">
-                {appliedActive} pending reply
-              </text>
-            </g>
+              {/* --- NODES (Rectangles & Exact Labels) --- */}
+              {/* Node 1: Total applied */}
+              <g>
+                <rect
+                  x={xApplied}
+                  y={yApplied}
+                  width={nodeWidth}
+                  height={hApplied}
+                  rx={3}
+                  className="fill-blue-500 shadow-sm"
+                />
+                <text x={xApplied - 12} y={yApplied + Math.min(16, hApplied / 2) + 2} className="text-xs font-bold text-slate-800" textAnchor="end">
+                  Total applied ({effectiveTotal})
+                </text>
+                <text x={xApplied - 12} y={yApplied + Math.min(16, hApplied / 2) + 16} className="text-[10px] font-semibold text-slate-500" textAnchor="end">
+                  {appliedActive} pending reply
+                </text>
+              </g>
 
-            {/* Node 2: Interviewed */}
-            <g>
-              <rect
-                x={xInterviewing}
-                y={yInterviewing}
-                width={nodeWidth}
-                height={hInterviewing}
-                rx={3}
-                className={interviewTotal > 0 ? 'fill-indigo-500 shadow-sm' : 'fill-slate-200'}
-              />
-              <text x={xInterviewing - 12} y={yInterviewing + Math.min(16, hInterviewing / 2) + 2} className={`text-xs font-bold ${interviewTotal > 0 ? 'text-slate-800' : 'text-slate-400'}`} textAnchor="end">
-                Interviewed ({interviewTotal})
-              </text>
-              <text x={xInterviewing - 12} y={yInterviewing + Math.min(16, hInterviewing / 2) + 16} className={`text-[10px] font-semibold ${interviewActive > 0 ? 'text-slate-500' : 'text-slate-400'}`} textAnchor="end">
-                {interviewActive} pending reply
-              </text>
-            </g>
+              {/* Node 2: Interviewed */}
+              <g>
+                <rect
+                  x={xInterviewing}
+                  y={yInterviewing}
+                  width={nodeWidth}
+                  height={hInterviewing}
+                  rx={3}
+                  className={interviewTotal > 0 ? 'fill-indigo-500 shadow-sm' : 'fill-slate-200'}
+                />
+                <text x={xInterviewing - 12} y={yInterviewing + Math.min(16, hInterviewing / 2) + 2} className={`text-xs font-bold ${interviewTotal > 0 ? 'text-slate-800' : 'text-slate-400'}`} textAnchor="end">
+                  Interviewed ({interviewTotal})
+                </text>
+                <text x={xInterviewing - 12} y={yInterviewing + Math.min(16, hInterviewing / 2) + 16} className={`text-[10px] font-semibold ${interviewTotal > 0 ? 'text-indigo-600' : 'text-slate-400'}`} textAnchor="end">
+                  {effectiveTotal > 0 ? `${pctInterviewed}% of applied` : '0%'}{interviewActive > 0 ? ` · ${interviewActive} active` : ''}
+                </text>
+              </g>
 
-            {/* Node 3: Offers */}
-            <g>
-              <rect
-                x={xOffers}
-                y={yOffers}
-                width={nodeWidth}
-                height={hOffers}
-                rx={3}
-                className={offerTotal > 0 ? 'fill-blue-600 shadow-sm' : 'fill-slate-200'}
-              />
-              <text x={xOffers + nodeWidth + 12} y={yOffers + Math.min(16, hOffers / 2) + 2} className={`text-xs font-bold ${offerActive > 0 ? 'text-slate-800' : 'text-slate-400'}`} textAnchor="start">
-                Offers ({offerActive})
-              </text>
-              <text x={xOffers + nodeWidth + 12} y={yOffers + Math.min(16, hOffers / 2) + 16} className={`text-[10px] font-semibold ${offerTotal > 0 ? 'text-blue-700' : 'text-slate-400'}`} textAnchor="start">
-                {rejOffer > 0 ? `${rejOffer} declined` : offerTotal > 0 ? `${offerTotal} received` : '0 offers'}
-              </text>
-            </g>
+              {/* Node 3: Offers */}
+              <g>
+                <rect
+                  x={xOffers}
+                  y={yOffers}
+                  width={nodeWidth}
+                  height={hOffers}
+                  rx={3}
+                  className={offerTotal > 0 ? 'fill-blue-600 shadow-sm' : 'fill-slate-200'}
+                />
+                <text x={xOffers + nodeWidth + 12} y={yOffers + Math.min(16, hOffers / 2) + 2} className={`text-xs font-bold ${offerActive > 0 ? 'text-slate-800' : 'text-slate-400'}`} textAnchor="start">
+                  Offers ({offerActive})
+                </text>
+                <text x={xOffers + nodeWidth + 12} y={yOffers + Math.min(16, hOffers / 2) + 16} className={`text-[10px] font-semibold ${offerTotal > 0 ? 'text-blue-700' : 'text-slate-400'}`} textAnchor="start">
+                  {interviewTotal > 0 ? `${pctOffers}% of interviewed` : '0%'}{rejOffer > 0 ? ` · ${rejOffer} declined` : ''}
+                </text>
+              </g>
 
-            {/* Node 4: Rejected after interviewing */}
-            <g>
-              <rect
-                x={xRejected}
-                y={yRejInterview}
-                width={nodeWidth}
-                height={hRejInterview}
-                rx={3}
-                className={rejInterviewTotal > 0 ? 'fill-amber-600 shadow-sm' : 'fill-slate-200'}
-              />
-              <text x={xRejected + nodeWidth + 12} y={yRejInterview + Math.min(16, hRejInterview / 2) + 2} className={`text-xs font-bold ${rejInterviewTotal > 0 ? 'text-slate-800' : 'text-slate-400'}`} textAnchor="start">
-                Rejected after interviewing ({rejInterviewTotal})
-              </text>
-              <text x={xRejected + nodeWidth + 12} y={yRejInterview + Math.min(16, hRejInterview / 2) + 16} className={`text-[10px] font-semibold ${rejInterviewTotal > 0 ? 'text-amber-800' : 'text-slate-400'}`} textAnchor="start">
-                {rejInterviewTotal > 0 ? `${rejInterviewTotal} after interview` : '0 after interview'}
-              </text>
-            </g>
+              {/* Node 4: Rejected after interviewing */}
+              <g>
+                <rect
+                  x={xRejected}
+                  y={yRejInterview}
+                  width={nodeWidth}
+                  height={hRejInterview}
+                  rx={3}
+                  className={rejInterviewTotal > 0 ? 'fill-amber-600 shadow-sm' : 'fill-slate-200'}
+                />
+                <text x={xRejected + nodeWidth + 12} y={yRejInterview + Math.min(16, hRejInterview / 2) + 2} className={`text-xs font-bold ${rejInterviewTotal > 0 ? 'text-slate-800' : 'text-slate-400'}`} textAnchor="start">
+                  Rejected after interviewing ({rejInterviewTotal})
+                </text>
+                <text x={xRejected + nodeWidth + 12} y={yRejInterview + Math.min(16, hRejInterview / 2) + 16} className={`text-[10px] font-semibold ${rejInterviewTotal > 0 ? 'text-amber-800' : 'text-slate-400'}`} textAnchor="start">
+                  {interviewTotal > 0 ? `${pctRejectedInterview}% of interviewed` : '0% of interviewed'}
+                </text>
+              </g>
 
-            {/* Node 5: Rejected after applied */}
-            <g>
-              <rect
-                x={xRejected}
-                y={yRejApplied}
-                width={nodeWidth}
-                height={hRejApplied}
-                rx={3}
-                className={rejApplied > 0 ? 'fill-amber-500 shadow-sm' : 'fill-slate-200'}
-              />
-              <text x={xRejected + nodeWidth + 12} y={yRejApplied + Math.min(16, hRejApplied / 2) + 2} className={`text-xs font-bold ${rejApplied > 0 ? 'text-slate-800' : 'text-slate-400'}`} textAnchor="start">
-                Rejected after applied ({rejApplied})
-              </text>
-              <text x={xRejected + nodeWidth + 12} y={yRejApplied + Math.min(16, hRejApplied / 2) + 16} className={`text-[10px] font-semibold ${rejApplied > 0 ? 'text-amber-800' : 'text-slate-400'}`} textAnchor="start">
-                {rejApplied > 0 ? `${rejApplied} after applied` : '0 after applied'}
-              </text>
-            </g>
-          </svg>
+              {/* Node 5: Rejected after applied */}
+              <g>
+                <rect
+                  x={xRejected}
+                  y={yRejApplied}
+                  width={nodeWidth}
+                  height={hRejApplied}
+                  rx={3}
+                  className={rejApplied > 0 ? 'fill-amber-500 shadow-sm' : 'fill-slate-200'}
+                />
+                <text x={xRejected + nodeWidth + 12} y={yRejApplied + Math.min(16, hRejApplied / 2) + 2} className={`text-xs font-bold ${rejApplied > 0 ? 'text-slate-800' : 'text-slate-400'}`} textAnchor="start">
+                  Rejected after applied ({rejApplied})
+                </text>
+                <text x={xRejected + nodeWidth + 12} y={yRejApplied + Math.min(16, hRejApplied / 2) + 16} className={`text-[10px] font-semibold ${rejApplied > 0 ? 'text-amber-800' : 'text-slate-400'}`} textAnchor="start">
+                  {effectiveTotal > 0 ? `${pctRejectedApplied}% of applied` : '0% of applied'}
+                </text>
+              </g>
+            </svg>
+          </div>
         </div>
       )}
     </div>
