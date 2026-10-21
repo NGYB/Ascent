@@ -157,7 +157,7 @@ export default function InterviewPage() {
         id: savedSession?.id || crypto.randomUUID(),
         selectedResumeId: updatedFields.selectedResumeId || selectedResumeId,
         jobTitle: updatedFields.jobTitle || selected?.jobTitle || savedSession?.jobTitle || 'Target Role',
-        company: updatedFields.company || selected?.company || savedSession?.company || 'Target Company',
+        company: updatedFields.company || selected?.company || savedSession?.company || 'Not Provided',
         jobDescription: updatedFields.jobDescription !== undefined ? updatedFields.jobDescription : (jobDescription || savedSession?.jobDescription || ''),
         questions: updatedFields.questions || questions,
         currentIndex: updatedFields.currentIndex !== undefined ? updatedFields.currentIndex : currentIndex,
@@ -224,7 +224,7 @@ export default function InterviewPage() {
         id: crypto.randomUUID(),
         selectedResumeId,
         jobTitle: selected?.jobTitle || 'Target Role',
-        company: selected?.company || 'Target Company',
+        company: selected?.company || 'Not Provided',
         jobDescription: targetJobDesc,
         questions: newQuestions,
         currentIndex: 0,
@@ -383,7 +383,7 @@ export default function InterviewPage() {
         const newHistoryItem: CompletedInterviewSession = {
           id: savedSession?.id || crypto.randomUUID(),
           jobTitle: selected?.jobTitle || savedSession?.jobTitle || 'Target Role',
-          company: selected?.company || savedSession?.company || 'Target Company',
+          company: selected?.company || savedSession?.company || 'Not Provided',
           completedAt: new Date().toISOString(),
           totalQuestions: questions.length,
           averageScore: avg,
@@ -490,7 +490,7 @@ export default function InterviewPage() {
                     </span>
                   </div>
                   <h4 className="font-extrabold text-slate-900 text-base sm:text-lg">
-                    {savedSession.jobTitle} {savedSession.company ? `at ${savedSession.company}` : ''}
+                    {savedSession.jobTitle} {savedSession.company && savedSession.company !== 'Target Company' && savedSession.company !== 'Not Provided' ? `at ${savedSession.company}` : ''}
                   </h4>
                   <p className="text-xs text-slate-600 flex items-center gap-2">
                     <span>
@@ -563,7 +563,7 @@ export default function InterviewPage() {
                       const dateStr = !isNaN(d.getTime()) ? ` (${d.toLocaleDateString()})` : '';
                       return (
                         <option key={item.id} value={item.id}>
-                          {item.jobTitle} - {item.company}{dateStr}
+                          {item.jobTitle} - {(!item.company || item.company === 'Target Company' || item.company.trim() === '') ? 'Not Provided' : item.company}{dateStr}
                         </option>
                       );
                     })}
@@ -634,7 +634,7 @@ export default function InterviewPage() {
                   <div key={session.id} className="py-3 flex items-center justify-between gap-3 first:pt-1 last:pb-1">
                     <div className="space-y-0.5">
                       <div className="text-sm font-bold text-slate-800">
-                        {session.jobTitle} {session.company ? `at ${session.company}` : ''}
+                        {session.jobTitle} {session.company && session.company !== 'Target Company' && session.company !== 'Not Provided' ? `at ${session.company}` : ''}
                       </div>
                       <div className="text-xs text-slate-500 flex items-center gap-2">
                         <span>{new Date(session.completedAt).toLocaleDateString()}</span>

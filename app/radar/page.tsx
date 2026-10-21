@@ -731,7 +731,7 @@ export default function RadarPage() {
                     <div className="flex items-center gap-2 sm:gap-3 text-xs text-slate-600 font-medium flex-wrap">
                       <span className="flex items-center gap-1">
                         <Building2 className="h-3.5 w-3.5 text-slate-500" />
-                        <strong>{job.company}</strong>
+                        <strong>{(!job.company || job.company === 'Target Company' || job.company.trim() === '') ? 'Not Provided' : job.company}</strong>
                       </span>
                       <span className="text-slate-300">•</span>
                       <span className="flex items-center gap-1 text-slate-500">

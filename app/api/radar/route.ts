@@ -107,7 +107,7 @@ export async function POST(req: NextRequest) {
               return {
                 id: j.job_id || `serp-${idx}-${Date.now()}`,
                 title: j.title || 'Untitled Role',
-                company: j.company_name || 'Target Company',
+                company: j.company_name || 'Not Provided',
                 location: j.location || searchLocation || 'Remote / Flexible',
                 via: j.via || 'via Job Board',
                 description: j.description || 'No description provided.',

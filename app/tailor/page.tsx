@@ -257,9 +257,10 @@ export default function TailorPage() {
   const handleMarkAsApplied = () => {
     try {
       const apps = JSON.parse(localStorage.getItem('ascent_applications') || '[]');
+      const targetCompany = company.trim() || 'Not Provided';
       const existingIdx = apps.findIndex((a: any) => 
         (result?.id && a.tailoredResumeId === result.id) || 
-        (a.jobTitle === jobTitle && a.company === (company.trim() || 'Target Company'))
+        (a.jobTitle === jobTitle && (a.company === targetCompany || a.company === 'Target Company' || (!company.trim() && a.company === 'Not Provided')))
       );
 
       if (existingIdx !== -1) {
@@ -267,12 +268,15 @@ export default function TailorPage() {
         if (applyUrl.trim() && !apps[existingIdx].applyUrl) {
           apps[existingIdx].applyUrl = applyUrl.trim();
         }
+        if (apps[existingIdx].company === 'Target Company') {
+          apps[existingIdx].company = targetCompany;
+        }
         apps[existingIdx].updatedAt = new Date().toISOString();
       } else {
         const newApp = {
           id: crypto.randomUUID(),
           jobTitle,
-          company: company.trim() || 'Target Company',
+          company: targetCompany,
           status: 'APPLIED',
           applyUrl: applyUrl.trim() || undefined,
           tailoredResumeId: result?.id,
@@ -486,7 +490,7 @@ export default function TailorPage() {
       const newApp = {
         id: crypto.randomUUID(),
         jobTitle,
-        company: company.trim() || 'Target Company',
+        company: company.trim() || 'Not Provided',
         status: appliedState ? 'APPLIED' : 'DRAFT',
         applyUrl: applyUrl.trim() || undefined,
         tailoredResumeId: newTailoredVersion.id,
@@ -505,7 +509,7 @@ export default function TailorPage() {
 
   const handleLoadHistory = (item: any) => {
     setJobTitle(item.jobTitle);
-    setCompany(item.company && item.company !== 'Target Company' ? item.company : '');
+    setCompany(item.company && item.company !== 'Target Company' && item.company !== 'Not Provided' ? item.company : '');
     setJobDescription(item.jobDescription || '');
     setApplyUrl(item.applyUrl || '');
     setResult({
@@ -524,7 +528,10 @@ export default function TailorPage() {
     setSaved(true);
     try {
       const apps = JSON.parse(localStorage.getItem('ascent_applications') || '[]');
-      const match = apps.find((a: any) => a.tailoredResumeId === item.id || (a.jobTitle === item.jobTitle && a.company === (item.company || 'Target Company')));
+      const match = apps.find((a: any) => 
+        a.tailoredResumeId === item.id || 
+        (a.jobTitle === item.jobTitle && (a.company === (item.company || 'Not Provided') || a.company === 'Target Company'))
+      );
       if (match && match.status === 'APPLIED') {
         setAppliedState(true);
       } else {
@@ -1505,7 +1512,7 @@ export default function TailorPage() {
                       }`}>
                         {item.jobTitle}
                       </h4>
-                      {item.company && item.company.trim() !== '' && item.company !== 'Target Company' && (
+                      {item.company && item.company.trim() !== '' && item.company !== 'Target Company' && item.company !== 'Not Provided' && (
                         <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-semibold bg-slate-100 text-slate-700 border border-slate-200 truncate max-w-[180px]">
                           <Building2 className="h-3 w-3 text-slate-400 flex-shrink-0" />
                           <span className="truncate">{item.company}</span>

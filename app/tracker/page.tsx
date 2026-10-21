@@ -116,8 +116,15 @@ export default function TrackerPage() {
           hasHealed = true;
         }
 
+        let company = app.company;
+        if (!company || company.trim() === '' || company === 'Target Company') {
+          company = 'Not Provided';
+          hasHealed = true;
+        }
+
         return {
           ...app,
+          company,
           createdAt,
           updatedAt
         };
@@ -144,12 +151,12 @@ export default function TrackerPage() {
 
   const handleAddApp = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newTitle || !newCompany) return;
+    if (!newTitle.trim()) return;
 
     const newApp: Application = {
       id: crypto.randomUUID(),
-      jobTitle: newTitle,
-      company: newCompany,
+      jobTitle: newTitle.trim(),
+      company: newCompany.trim() || 'Not Provided',
       status: newStatus,
       rejectedFromStage: newStatus === 'REJECTED' ? newRejectedStage : undefined,
       tailoredResumeId: selectedResume || undefined,
@@ -297,7 +304,9 @@ export default function TrackerPage() {
                           <h4 className="font-bold text-xs text-slate-800 leading-tight pr-6">
                             {app.jobTitle}
                           </h4>
-                          <p className="text-[10px] text-slate-500 font-medium">{app.company}</p>
+                          <p className="text-[10px] text-slate-500 font-medium">
+                            {(!app.company || app.company === 'Target Company' || app.company.trim() === '') ? 'Not Provided' : app.company}
+                          </p>
                         </div>
 
                         <div className="flex flex-wrap items-center gap-1.5">
@@ -464,13 +473,12 @@ export default function TrackerPage() {
               </div>
 
               <div className="space-y-1">
-                <label className="text-xs font-bold text-slate-600">Company Name</label>
+                <label className="text-xs font-bold text-slate-600">Company Name (Optional)</label>
                 <input
                   type="text"
-                  required
                   value={newCompany}
                   onChange={(e) => setNewCompany(e.target.value)}
-                  placeholder="e.g. Acme Corporation"
+                  placeholder="e.g. Acme Corporation (or leave blank for 'Not Provided')"
                   className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none"
                 />
               </div>
