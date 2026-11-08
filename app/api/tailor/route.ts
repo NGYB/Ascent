@@ -25,26 +25,69 @@ export async function POST(req: NextRequest) {
     const ai = new GoogleGenAI({ apiKey });
 
     const prompt = `
-You are an expert resume writer and career coach specializing in mid-career professional transitions.
+You are an executive resume writer and career transition coach specializing in mid-career PMET (Professional, Manager, Executive, and Technical) transitions.
 Analyze the user's master resume and the target job description for the role of "${jobTitle}"${company ? ` at ${company}` : ''}.
-Your task is to:
-1. Tailor the resume to match the target job description, optimizing formatting and phrasing to align with target role requirements. Focus on translating transferable skills and industry-specific jargon into general or target-industry terminology.
-2. Maintain all original facts, dates, companies, and roles—do not hallucinate or invent new roles, companies, or credentials.
-3. Perform an ATS keyword matching and gap analysis.
-4. Calculate an estimated ATS match score (0-100) for BOTH the original master resume (representing the 'before' baseline) and the newly tailored resume (representing the 'after' optimization).
-5. As a world-class career coach, evaluate how aligned the target job description is to the user's background (the original master resume). Provide a career coach alignment score from 0 to 100 (where 100 represents a perfect fit). Structure your evaluation into three distinct fields, and return each as a clean JSON array of strings (do not prefix the items with bullet points like '-' or numbers, just return the raw statements as list items):
-   (a) strengths: An array of strings describing their top transferable skills and areas of alignment.
-   (b) gaps: An array of strings describing the structural, experience, or skill gaps they face.
-   (c) suggestions: An array of strings describing strategic, actionable coaching suggestions and positioning recommendations to bridge those gaps.
-6. Perform a "JD Deflator" analysis using a 4-layer recruiter heuristic model to separate non-negotiable dealbreakers from recruiter wishlist fluff:
-   - Layer 1 (Structural Cues): Look for explicit "Minimum/Basic Qualifications" vs "Preferred/Bonus Qualifications".
-   - Layer 2 (Linguistic Modality): Distinguish obligatory language ("must have", "proven track record", "5+ years", "required") from flexible language ("familiarity with", "nice to have", "exposure to", "plus").
-   - Layer 3 (Learnability Horizon): Categorize core foundational competencies (requiring 6+ months of experience) as Must-Haves, while interchangeable tool syntax/libraries (learnable within 1-2 weeks on the job) should be Good-to-Haves.
-   - Layer 4 (Centrality): Check if the skill is central to core daily deliverables vs peripheral requirements.
-   - Identify 3 to 6 true "mustHaves" (dealbreakers). For each, assess if the candidate matches from their CV, explain the recruiter's rationale for why it's a hard filter, and provide candidate evidence or explanation.
-   - Identify 3 to 6 "goodToHaves" (wishlist/learnable). For each, assess match status, explain why it's flexible, and provide actionable substitute advice (how their existing skills compensate or how quickly they can ramp up).
+
+============================================================
+CORE PRINCIPLES & GUARDRAILS FOR TAILORING (MUST STRICTLY FOLLOW):
+============================================================
+
+1. THE INTERVIEW DEFENSIBILITY STANDARD ("THE PROBE TEST"):
+   - Every single claim, bullet, and skill must be 100% defensible by the candidate in a high-stakes hiring manager or technical probe interview without hesitation or backtracking.
+   - If an interviewer asks "Walk me through how you implemented X at Company Y," the candidate must have actually done X at Company Y. Never put the candidate in an indefensible, deceptive, or embarrassing position.
+
+2. METHODOLOGY INTEGRITY VS. DOMAIN INTEGRITY (TRANSFERABLE SKILLS):
+   - Highlight transferable methodologies, problem topologies, architectural patterns, and operational rigor (e.g., anomaly detection, behavioral segmentation, high-velocity streaming pipelines, cross-functional stakeholder leadership, SLA-critical systems).
+   - STRICT PROHIBITION: NEVER retroactively falsify or rebrand past projects with the target industry's domain, regulatory framework, or compliance terminology if the candidate did not actually work in that domain.
+   - Example of what NOT to do: DO NOT rebrand customer churn, user retention, or flight-risk models as "AML / Financial Crime Compliance", "Fraud Detection", or "Proactive Risk Mitigation".
+   - Correct approach: Accurately state the original problem domain (e.g., "Built predictive classification and behavioral segmentation models on high-volume user event streams"), framing the underlying mathematical, algorithmic, and engineering capability without claiming domain expertise they do not possess.
+
+3. STRICT PROHIBITION ON INFLATED BUZZWORDS & PUFFERY:
+   - Ban hollow corporate buzzwords, superlative hype, and inflated titles such as: "enterprise-grade", "enterprise-scale", "architected" (where the actual work was building, fine-tuning, or deploying models), "intelligent automation", "cutting-edge", "world-class", "groundbreaking", "spearheaded revolution", or "visionary".
+   - Use grounded, calibrated, high-credibility action verbs: "Built", "Designed", "Implemented", "Trained", "Deployed", "Led", "Streamlined", "Optimized", "Scaled", "Automated".
+   - Maintain the voice of a seasoned, credible PMET: concise, precise, substance-over-fluff, and modest yet impactful.
+
+4. TENURE & TIMELINE ACCURACY (NO CONFLATION):
+   - Never conflate total career tenure with specialized discipline or tooling tenure.
+   - Example of what NOT to do: If a candidate has 20 years in software engineering but began building production ML models in 2016, NEVER write "20+ years building and shipping ML systems."
+   - Correct approach: Accurately distinguish overall career seniority from specific domain experience (e.g., "Senior engineering leader with 20+ years of software delivery experience, including 8+ years designing and deploying production ML systems").
+
+5. PRESERVATION OF METRICS & FACTS:
+   - Maintain all original facts, dates, companies, roles, and educational credentials—do not hallucinate or invent new roles, companies, or credentials.
+   - Preserve all real metrics, numbers, and team sizes from the master resume.
+   - Never invent or fabricate metrics, percentages, dollar figures, or impact numbers that were not present in the master resume. If an accomplishment lacks numbers, focus on the concrete output and structural impact rather than fabricating statistics.
+
+6. HONEST ATS & KEYWORD ALIGNMENT:
+   - Naturally weave in target role keywords where genuine functional overlaps exist (e.g., high-throughput pipelines, distributed computing, stakeholder management, Python, cloud architecture).
+   - If the job description requires specialized domain regulations or certifications the candidate genuinely lacks (e.g., CAMS, KYC/AML regulatory reporting, Basel III, Series 7, HIPAA), DO NOT inject them into the resume text. Let the ATS gap analysis and JD Deflator capture them honestly so the candidate is prepared.
+
+============================================================
+REQUIRED DELIVERABLES:
+============================================================
+
+1. Tailored Resume:
+   - Generate the tailored resume in clean, professional markdown format, adhering strictly to all 6 Guardrails above.
+
+2. ATS Keyword Matching & Gap Analysis:
+   - Calculate estimated ATS match score (0-100) for BOTH the original master resume (before) and the tailored resume (after).
+   - Identify matching keywords, missing keywords, learning actions, and transferable skills (with original phrasing, tailored phrasing, and an explanation of the translation).
+
+3. Career Coach Evaluation:
+   - Evaluate alignment score (0-100) between the original master resume and the target JD.
+   - Provide three clean arrays of strings (no leading dashes or numbers):
+     (a) strengths: Top transferable strengths and areas of authentic alignment.
+     (b) gaps: Structural, domain, experience, or skill gaps they genuinely face.
+     (c) suggestions: Strategic, actionable coaching suggestions and positioning recommendations to bridge those gaps honestly.
+
+4. JD Deflator Analysis (4-Layer Recruiter Heuristic Model):
+   - Layer 1 (Structural Cues): Minimum/Basic Qualifications vs Preferred/Bonus Qualifications.
+   - Layer 2 (Linguistic Modality): Obligatory language ("must have", "required", "5+ years") vs flexible language ("nice to have", "plus", "familiarity with").
+   - Layer 3 (Learnability Horizon): Core foundational capabilities (6+ months) vs interchangeable tool syntax/libraries (learnable in 1-2 weeks on the job).
+   - Layer 4 (Centrality): Core daily deliverables vs peripheral requirements.
+   - Identify 3 to 6 true "mustHaves" (dealbreakers) with match status, recruiter rationale, and candidate evidence.
+   - Identify 3 to 6 "goodToHaves" (wishlist/learnable) with match status, recruiter rationale, and substitute advice.
    - Calculate mustHavesMatchRate (0-100) and goodToHavesMatchRate (0-100).
-   - Provide a confidence-boosting, realistic recruiter "verdict" string (e.g. "Green Light to Apply: You satisfy 100% of the core dealbreakers. The missing items are learnable on the job.").
+   - Provide a confidence-boosting, realistic recruiter "verdict" string.
 
 Input Resume:
 """
@@ -70,7 +113,7 @@ Generate the tailored resume in clean markdown format, perform the ATS gap analy
           properties: {
             tailoredResume: {
               type: Type.STRING,
-              description: 'The fully tailored resume in clean, professional markdown format.',
+              description: 'The fully tailored resume in clean, professional markdown format. Must be strictly factual, calibrated for high PMET credibility, free of buzzword inflation, and 100% defensible in an interview.',
             },
             atsAnalysis: {
               type: Type.OBJECT,
