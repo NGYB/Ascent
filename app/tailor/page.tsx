@@ -9,32 +9,34 @@ import {
   Check, 
   AlertTriangle, 
   BookOpen, 
-  CheckCircle,
+  CheckCircle, 
   TrendingUp, 
-  Copy,
-  ChevronRight,
-  RefreshCw,
-  FolderPlus,
-  Save,
-  MessageSquare,
-  Trash2,
-  Target,
-  ShieldCheck,
-  CheckCircle2,
-  XCircle,
-  Zap,
-  Lightbulb,
-  Info,
-  HelpCircle,
-  ChevronDown,
-  Building2,
-  ArrowUpDown,
-  ShieldAlert,
-  ExternalLink,
-  ArrowLeft,
-  Send,
-  RotateCcw
+  Copy, 
+  ChevronRight, 
+  RefreshCw, 
+  FolderPlus, 
+  Save, 
+  MessageSquare, 
+  Trash2, 
+  Target, 
+  ShieldCheck, 
+  CheckCircle2, 
+  XCircle, 
+  Zap, 
+  Lightbulb, 
+  Info, 
+  HelpCircle, 
+  ChevronDown, 
+  Building2, 
+  ArrowUpDown, 
+  ShieldAlert, 
+  ExternalLink, 
+  ArrowLeft, 
+  Send, 
+  RotateCcw,
+  Upload
 } from 'lucide-react';
+import QuickUploadModal from '@/components/QuickUploadModal';
 
 interface TransferableSkill {
   original: string;
@@ -190,6 +192,7 @@ export default function TailorPage() {
   const [historyList, setHistoryList] = useState<any[]>([]);
   type HistorySortOption = 'date-desc' | 'date-asc' | 'score-desc' | 'score-asc';
   const [historySortBy, setHistorySortBy] = useState<HistorySortOption>('date-desc');
+  const [isQuickUploadOpen, setIsQuickUploadOpen] = useState(false);
 
   const sortedHistoryList = [...historyList].sort((a, b) => {
     if (historySortBy === 'date-desc') {
@@ -313,12 +316,7 @@ export default function TailorPage() {
     } catch {}
   };
 
-  const handleTailor = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!resumeText) {
-      setError('Please upload a master CV in the CV Workspace first.');
-      return;
-    }
+  const executeTailor = async (activeResume: string) => {
     if (!jobTitle || !jobDescription) {
       setError('Please provide a target job title and description.');
       return;
@@ -334,7 +332,7 @@ export default function TailorPage() {
       const res = await fetch('/api/tailor', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ resumeText, jobTitle, company, jobDescription }),
+        body: JSON.stringify({ resumeText: activeResume, jobTitle, company, jobDescription }),
       });
 
       if (!res.ok) {
@@ -371,6 +369,22 @@ export default function TailorPage() {
       }
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleTailor = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    if (!resumeText) {
+      setIsQuickUploadOpen(true);
+      return;
+    }
+    executeTailor(resumeText);
+  };
+
+  const handleQuickUploadSuccess = (extractedText: string) => {
+    setResumeText(extractedText);
+    if (jobTitle.trim() && jobDescription.trim()) {
+      executeTailor(extractedText);
     }
   };
 
@@ -588,15 +602,28 @@ export default function TailorPage() {
       </div>
 
       {!resumeText && (
-        <div className="p-4 bg-amber-50 rounded-xl border border-amber-200 text-amber-800 flex items-center justify-between text-base">
-          <div className="flex items-center gap-3">
-            <AlertTriangle className="h-6 w-6 flex-shrink-0" />
-            <span>You need to upload your core CV before you can tailor it.</span>
+        <div className="p-4 bg-gradient-to-r from-indigo-50 via-violet-50 to-indigo-50 rounded-xl border border-indigo-200 text-indigo-950 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs">
+          <div className="flex items-start sm:items-center gap-3">
+            <div className="p-2 bg-indigo-600 text-white rounded-lg flex-shrink-0">
+              <Sparkles className="h-5 w-5" />
+            </div>
+            <div>
+              <p className="font-bold text-sm text-slate-900">
+                {jobTitle ? `Ready to tailor for "${jobTitle}"!` : 'Upload your Master CV to tailor'}
+              </p>
+              <p className="text-xs text-slate-600">
+                Add your resume to unlock ATS optimization, interview defensibility checks, and keyword gap analysis.
+              </p>
+            </div>
           </div>
-          <Link href="/cv" className="font-bold underline flex items-center gap-1">
-            <span>Upload CV</span>
-            <ChevronRight className="h-5 w-5" />
-          </Link>
+          <button
+            type="button"
+            onClick={() => setIsQuickUploadOpen(true)}
+            className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-lg shadow-sm transition-all whitespace-nowrap self-start sm:self-center flex items-center gap-1.5 cursor-pointer"
+          >
+            <Upload className="h-3.5 w-3.5" />
+            <span>Upload Master CV</span>
+          </button>
         </div>
       )}
 
@@ -630,7 +657,7 @@ export default function TailorPage() {
                   <input
                     type="text"
                     required
-                    disabled={!resumeText || loading}
+                    disabled={loading}
                     value={jobTitle}
                     onChange={(e) => setJobTitle(e.target.value)}
                     placeholder="e.g. Senior Project Manager, Staff Engineer"
@@ -642,7 +669,7 @@ export default function TailorPage() {
                   <label className="text-sm font-bold text-slate-600">Company Name (Optional)</label>
                   <input
                     type="text"
-                    disabled={!resumeText || loading}
+                    disabled={loading}
                     value={company}
                     onChange={(e) => setCompany(e.target.value)}
                     placeholder="e.g. Google, Stripe, Acme Corp"
@@ -668,7 +695,7 @@ export default function TailorPage() {
                   </div>
                   <input
                     type="url"
-                    disabled={!resumeText || loading}
+                    disabled={loading}
                     value={applyUrl}
                     onChange={(e) => setApplyUrl(e.target.value)}
                     placeholder="e.g. https://careers.company.com/job/123 or job portal link"
@@ -680,7 +707,7 @@ export default function TailorPage() {
                   <label className="text-sm font-bold text-slate-600">Job Description</label>
                   <textarea
                     required
-                    disabled={!resumeText || loading}
+                    disabled={loading}
                     value={jobDescription}
                     onChange={(e) => setJobDescription(e.target.value)}
                     placeholder="Paste the target job description here..."
@@ -701,13 +728,18 @@ export default function TailorPage() {
 
               <button
                 onClick={handleTailor}
-                disabled={!resumeText || loading || !jobTitle || !jobDescription}
-                className="w-full py-3 px-4 bg-slate-900 hover:bg-slate-800 text-white rounded-lg text-base font-semibold transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+                disabled={loading || !jobTitle || !jobDescription}
+                className="w-full py-3 px-4 bg-slate-900 hover:bg-slate-800 text-white rounded-lg text-base font-semibold transition-colors disabled:opacity-50 flex items-center justify-center gap-2 cursor-pointer shadow-sm"
               >
                 {loading ? (
                   <>
                     <RefreshCw className="h-5 w-5 animate-spin" />
                     <span>Tailoring CV...</span>
+                  </>
+                ) : !resumeText ? (
+                  <>
+                    <Sparkles className="h-5 w-5 text-amber-300" />
+                    <span>Upload CV & Tailor</span>
                   </>
                 ) : (
                   <>
@@ -1549,6 +1581,15 @@ export default function TailorPage() {
           </div>
         )}
       </div>
+
+      {/* Quick CV Upload Modal */}
+      <QuickUploadModal
+        isOpen={isQuickUploadOpen}
+        onClose={() => setIsQuickUploadOpen(false)}
+        onSuccess={handleQuickUploadSuccess}
+        title="Upload CV to Tailor"
+        subtitle="Upload your Master CV to unlock ATS scorecard analysis, bullet point rewriting, and keyword gap analysis."
+      />
     </div>
   );
 }

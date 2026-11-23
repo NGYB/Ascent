@@ -21,8 +21,8 @@ import { useSidebar } from '@/context/SidebarContext';
 import { APP_VERSION, APP_STAGE } from '@/lib/version';
 
 const navItems = [
-  { name: 'CV Workspace', href: '/cv', icon: FileText },
   { name: 'Smart Job Radar', href: '/radar', icon: Radar },
+  { name: 'CV Workspace', href: '/cv', icon: FileText },
   { name: 'Tailoring & ATS', href: '/tailor', icon: Sparkles },
   { name: 'Interview Prep', href: '/interview', icon: MessageSquare },
   { name: 'Job Tracker', href: '/tracker', icon: Kanban },

@@ -64,8 +64,25 @@ export default function Home() {
             Land your next transition with Ascent.
           </h2>
           <p className="text-slate-300 text-base sm:text-lg leading-relaxed">
-            Ascent uses AI to dynamically adapt your career experience to target roles. Tailor CVs for ATS validation, analyze skill gaps, and run mock interviews trained specifically on your profile.
+            Start by scanning active market opportunities on Radar, or upload your CV to score match alignment, tailor ATS-ready resumes, and run AI mock interviews.
           </p>
+          <div className="pt-2 flex flex-wrap items-center gap-3">
+            <Link
+              href="/radar"
+              className="px-5 py-2.5 bg-indigo-500 hover:bg-indigo-400 text-white rounded-xl font-bold text-sm shadow-md transition-all flex items-center gap-2 cursor-pointer"
+            >
+              <Radar className="h-4 w-4" />
+              <span>Scan Radar First</span>
+              <ArrowRight className="h-4 w-4" />
+            </Link>
+            <Link
+              href="/cv"
+              className="px-4 py-2.5 bg-slate-800/80 hover:bg-slate-800 text-slate-200 border border-slate-700 rounded-xl font-semibold text-sm transition-all flex items-center gap-2 cursor-pointer"
+            >
+              <FileText className="h-4 w-4" />
+              <span>Upload CV</span>
+            </Link>
+          </div>
         </div>
       </div>
 
@@ -124,29 +141,7 @@ export default function Home() {
       <div className="space-y-4">
         <h3 className="text-lg font-bold text-slate-800 px-1">Jump Right In</h3>
         <div className="flex flex-col gap-4">
-          {/* Card 1: CV Workspace */}
-          <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm hover:shadow-md transition-shadow flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 group">
-            <div className="flex items-start gap-4 flex-1">
-              <div className="h-12 w-12 rounded-lg bg-indigo-50 flex items-center justify-center text-indigo-600 flex-shrink-0 mt-1">
-                <FileText className="h-6 w-6" />
-              </div>
-              <div className="space-y-1">
-                <h4 className="text-lg font-bold text-slate-800">1. CV Workspace</h4>
-                <p className="text-sm text-slate-500 leading-relaxed max-w-2xl">
-                  Upload your master PDF/Word CV. We'll parse the content so it's ready for real-time tailoring. You can preview and edit the raw text at any time.
-                </p>
-              </div>
-            </div>
-            <Link 
-              href="/cv" 
-              className="flex items-center gap-2 text-sm font-bold text-indigo-600 hover:text-indigo-700 transition-colors group-hover:gap-3 flex-shrink-0 self-end sm:self-center"
-            >
-              <span>Go to Workspace</span>
-              <ArrowRight className="h-4 w-4" />
-            </Link>
-          </div>
-
-          {/* Card 2: Smart Job Radar */}
+          {/* Card 1: Smart Job Radar */}
           <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm hover:shadow-md transition-shadow flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 group">
             <div className="flex items-start gap-4 flex-1">
               <div className="h-12 w-12 rounded-lg bg-indigo-50 flex items-center justify-center text-indigo-600 flex-shrink-0 mt-1">
@@ -154,11 +149,11 @@ export default function Home() {
               </div>
               <div className="space-y-1">
                 <div className="flex items-center gap-2">
-                  <h4 className="text-lg font-bold text-slate-800">2. Smart Job Radar</h4>
-                  <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-indigo-50 text-indigo-700 border border-indigo-200 uppercase">New</span>
+                  <h4 className="text-lg font-bold text-slate-800">1. Smart Job Radar</h4>
+                  <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-indigo-50 text-indigo-700 border border-indigo-200 uppercase">Start Here</span>
                 </div>
                 <p className="text-sm text-slate-500 leading-relaxed max-w-2xl">
-                  Scan active job postings across LinkedIn, Indeed, Greenhouse, and Google Jobs with SerpAPI. Get instant AI fit scoring against your Master CV and 1-click tailoring.
+                  Scan active job postings across LinkedIn, Indeed, Greenhouse, and Google Jobs without needing a CV first. When ready, score your match in 1 click and tailor your resume.
                 </p>
               </div>
             </div>
@@ -167,6 +162,28 @@ export default function Home() {
               className="flex items-center gap-2 text-sm font-bold text-indigo-600 hover:text-indigo-700 transition-colors group-hover:gap-3 flex-shrink-0 self-end sm:self-center"
             >
               <span>Scan Radar</span>
+              <ArrowRight className="h-4 w-4" />
+            </Link>
+          </div>
+
+          {/* Card 2: CV Workspace */}
+          <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm hover:shadow-md transition-shadow flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 group">
+            <div className="flex items-start gap-4 flex-1">
+              <div className="h-12 w-12 rounded-lg bg-indigo-50 flex items-center justify-center text-indigo-600 flex-shrink-0 mt-1">
+                <FileText className="h-6 w-6" />
+              </div>
+              <div className="space-y-1">
+                <h4 className="text-lg font-bold text-slate-800">2. CV Workspace</h4>
+                <p className="text-sm text-slate-500 leading-relaxed max-w-2xl">
+                  Upload your master PDF/Word CV. We&apos;ll parse the content locally in your browser so it&apos;s ready for real-time tailoring. You can preview and edit the raw text at any time.
+                </p>
+              </div>
+            </div>
+            <Link 
+              href="/cv" 
+              className="flex items-center gap-2 text-sm font-bold text-indigo-600 hover:text-indigo-700 transition-colors group-hover:gap-3 flex-shrink-0 self-end sm:self-center"
+            >
+              <span>Go to Workspace</span>
               <ArrowRight className="h-4 w-4" />
             </Link>
           </div>

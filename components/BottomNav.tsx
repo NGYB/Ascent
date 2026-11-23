@@ -12,8 +12,8 @@ import {
 import { cn } from '@/lib/utils';
 
 const navItems = [
-  { name: 'CV', href: '/cv', icon: FileText },
   { name: 'Radar', href: '/radar', icon: Radar },
+  { name: 'CV', href: '/cv', icon: FileText },
   { name: 'Tailor', href: '/tailor', icon: Sparkles },
   { name: 'Prep', href: '/interview', icon: MessageSquare },
   { name: 'Tracker', href: '/tracker', icon: Kanban },

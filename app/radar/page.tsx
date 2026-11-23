@@ -19,9 +19,11 @@ import {
   Building2,
   Filter,
   ArrowDownWideNarrow,
-  X
+  X,
+  Upload
 } from 'lucide-react';
 import { isBlockedJob } from '@/lib/job-blocklist';
+import QuickUploadModal from '@/components/QuickUploadModal';
 
 interface RadarJob {
   id: string;
@@ -73,6 +75,7 @@ export default function RadarPage() {
   const [savedJobIds, setSavedJobIds] = useState<Set<string>>(new Set());
   const [hasMasterResume, setHasMasterResume] = useState(false);
   const [resumeText, setResumeText] = useState('');
+  const [isQuickUploadOpen, setIsQuickUploadOpen] = useState(false);
 
   // Initial load
   useEffect(() => {
@@ -304,18 +307,19 @@ export default function RadarPage() {
   const handleScanFromCV = async () => {
     const activeCv = resumeText || (typeof window !== 'undefined' ? localStorage.getItem('ascent_master_resume') || '' : '');
     if (!activeCv) {
-      if (confirm('No Master CV found yet. Would you like to go to the CV Workspace to upload your CV now?')) {
-        router.push('/cv');
-      }
+      setIsQuickUploadOpen(true);
       return;
     }
+    await handleScanFromCVWithText(activeCv);
+  };
 
+  const handleScanFromCVWithText = async (cvText: string) => {
     setIsExtractingRoles(true);
     try {
       const res = await fetch('/api/radar/extract-roles', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ resumeText: activeCv })
+        body: JSON.stringify({ resumeText: cvText })
       });
 
       if (res.ok) {
@@ -337,7 +341,7 @@ export default function RadarPage() {
           if (domain) localStorage.setItem('ascent_radar_domain', domain);
         } catch {}
 
-        fetchRadarJobs(primary, locationQuery, remoteOnly, activeCv);
+        fetchRadarJobs(primary, locationQuery, remoteOnly, cvText);
       } else {
         alert('Could not extract roles from CV. Please try searching manually.');
       }
@@ -346,6 +350,20 @@ export default function RadarPage() {
       alert('Network error while analyzing CV with AI.');
     } finally {
       setIsExtractingRoles(false);
+    }
+  };
+
+  const handleQuickUploadSuccess = (extractedText: string) => {
+    setResumeText(extractedText);
+    setHasMasterResume(true);
+
+    const targetRole = searchedRole || roleQuery;
+    if (targetRole) {
+      // Re-fetch and score the active search with the new CV in-place
+      fetchRadarJobs(targetRole, searchedLocation || locationQuery, remoteOnly, extractedText);
+    } else {
+      // If no query searched yet, automatically extract roles and scan
+      handleScanFromCVWithText(extractedText);
     }
   };
 
@@ -649,12 +667,43 @@ export default function RadarPage() {
             AI Fit Score matched against your Master CV
           </span>
         ) : (
-          <span className="text-slate-500 font-medium flex items-center gap-1">
-            <Sparkles className="h-3.5 w-3.5 text-slate-400" />
-            Search Relevance Score (Upload Master CV in CV Workspace for personalized AI fit scoring)
-          </span>
+          <button
+            type="button"
+            onClick={() => setIsQuickUploadOpen(true)}
+            className="text-indigo-600 hover:text-indigo-800 font-semibold flex items-center gap-1 cursor-pointer transition-colors"
+          >
+            <Sparkles className="h-3.5 w-3.5 text-indigo-500" />
+            <span>Upload CV to reveal AI fit scores →</span>
+          </button>
         )}
       </div>
+
+      {/* Prominent CTA Banner for users scanning without a CV yet */}
+      {!hasMasterResume && jobs.length > 0 && !loading && (
+        <div className="p-4 bg-gradient-to-r from-indigo-50 via-violet-50 to-indigo-50 rounded-xl border border-indigo-200 text-indigo-950 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs">
+          <div className="flex items-start sm:items-center gap-3">
+            <div className="p-2 bg-indigo-600 text-white rounded-lg flex-shrink-0">
+              <Sparkles className="h-5 w-5" />
+            </div>
+            <div>
+              <p className="font-bold text-sm text-slate-900">
+                Scanned {jobs.length} live opportunities!
+              </p>
+              <p className="text-xs text-slate-600">
+                Upload your CV to calculate instant AI match scores, transferable skills, and tailored recommendations across all scanned roles.
+              </p>
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={() => setIsQuickUploadOpen(true)}
+            className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-lg shadow-sm transition-all whitespace-nowrap self-start sm:self-center flex items-center gap-1.5 cursor-pointer"
+          >
+            <Sparkles className="h-3.5 w-3.5" />
+            <span>Upload CV & Score</span>
+          </button>
+        </div>
+      )}
 
       {/* Jobs Feed Grid */}
       <div className="space-y-4">
@@ -667,29 +716,46 @@ export default function RadarPage() {
             </p>
           </div>
         ) : jobs.length === 0 && !loading ? (
-          <div className="p-12 text-center bg-white rounded-xl border border-dashed border-slate-200 space-y-4">
-            <Radar className="h-10 w-10 text-slate-300 mx-auto animate-pulse" />
-            <div className="space-y-1">
-              <h4 className="text-base font-bold text-slate-700">
-                {searchedRole ? 'No Postings Detected' : 'No Active Opportunities'}
+          <div className="p-10 text-center bg-white rounded-2xl border border-slate-200 shadow-xs space-y-5">
+            <div className="h-14 w-14 mx-auto rounded-2xl bg-indigo-50 border border-indigo-100 flex items-center justify-center text-indigo-600">
+              <Radar className="h-7 w-7 animate-spin-slow" />
+            </div>
+            <div className="space-y-1.5 max-w-md mx-auto">
+              <h4 className="text-lg font-bold text-slate-800">
+                {searchedRole ? 'No Postings Detected' : 'Start Your Search on Radar'}
               </h4>
-              <p className="text-xs text-slate-500 max-w-sm mx-auto">
+              <p className="text-xs sm:text-sm text-slate-500 leading-relaxed">
                 {searchedRole 
                   ? 'Try adjusting your target role or location keywords to broaden the radar scan.' 
-                  : 'Select a quick role above, click "Auto-Scan for My CV", or enter a target role in the search box and click "Scan Radar".'}
+                  : 'Scan live job postings across LinkedIn, Indeed, and Google Jobs without needing a CV first. Choose a popular role below or enter your target job title.'}
               </p>
             </div>
             {!searchedRole && (
-              <div className="pt-2">
-                <button
-                  type="button"
-                  onClick={handleScanFromCV}
-                  disabled={isExtractingRoles || loading}
-                  className="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-indigo-600 via-indigo-700 to-violet-700 hover:from-indigo-700 hover:to-violet-800 text-white rounded-xl shadow-md hover:shadow-lg font-bold text-sm transition-all cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed border border-indigo-400/30 ring-2 ring-indigo-500/20"
-                >
-                  <Zap className="h-4.5 w-4.5 text-amber-300 fill-amber-300 animate-pulse" />
-                  <span>Auto-Scan for My CV</span>
-                </button>
+              <div className="space-y-4">
+                <div className="flex flex-wrap justify-center gap-2 max-w-lg mx-auto">
+                  {QUICK_ROLES.map((role) => (
+                    <button
+                      key={role}
+                      type="button"
+                      onClick={() => handleToggleQuickRole(role)}
+                      className="px-3.5 py-1.5 bg-slate-50 hover:bg-indigo-50 hover:text-indigo-700 hover:border-indigo-200 border border-slate-200 rounded-lg text-xs font-semibold text-slate-700 transition-all cursor-pointer flex items-center gap-1.5"
+                    >
+                      <Search className="h-3 w-3 text-slate-400" />
+                      <span>{role}</span>
+                    </button>
+                  ))}
+                </div>
+                <div className="pt-2 text-xs text-slate-400 flex items-center justify-center gap-2">
+                  <span>Have a CV ready?</span>
+                  <button
+                    type="button"
+                    onClick={handleScanFromCV}
+                    disabled={isExtractingRoles || loading}
+                    className="text-indigo-600 hover:text-indigo-800 font-bold underline cursor-pointer"
+                  >
+                    Auto-Scan with My CV →
+                  </button>
+                </div>
               </div>
             )}
           </div>
@@ -760,19 +826,31 @@ export default function RadarPage() {
 
                   {/* AI Fit Match Badge */}
                   <div className="flex items-center gap-2 self-start flex-shrink-0">
-                    <div className={`px-3 py-1.5 rounded-lg border flex items-center gap-1.5 ${scoreColor}`}>
-                      <Sparkles className="h-3.5 w-3.5 flex-shrink-0" />
-                      <div className="text-left">
-                        <span className="text-xs font-black tracking-tight block">
-                          {score}% Match • {matchTier}
-                        </span>
+                    {hasMasterResume ? (
+                      <div className={`px-3 py-1.5 rounded-lg border flex items-center gap-1.5 ${scoreColor}`}>
+                        <Sparkles className="h-3.5 w-3.5 flex-shrink-0" />
+                        <div className="text-left">
+                          <span className="text-xs font-black tracking-tight block">
+                            {score}% Match • {matchTier}
+                          </span>
+                        </div>
                       </div>
-                    </div>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={() => setIsQuickUploadOpen(true)}
+                        className="px-3 py-1.5 rounded-lg border border-indigo-200 bg-indigo-50/90 hover:bg-indigo-100 text-indigo-700 transition-all flex items-center gap-1.5 cursor-pointer text-xs font-bold shadow-2xs group/btn"
+                        title="Upload your CV to reveal AI fit score"
+                      >
+                        <Sparkles className="h-3.5 w-3.5 text-indigo-600 group-hover/btn:rotate-12 transition-transform" />
+                        <span>Score with My CV</span>
+                      </button>
+                    )}
                   </div>
                 </div>
 
                 {/* Match Rationale & Top Skills */}
-                {job.matchRationale && (
+                {hasMasterResume && job.matchRationale ? (
                   <div className="p-3 bg-slate-50 rounded-lg border border-slate-200/80 text-xs space-y-2">
                     <p className="text-slate-700 leading-relaxed italic">
                       "{job.matchRationale}"
@@ -793,7 +871,21 @@ export default function RadarPage() {
                       </div>
                     )}
                   </div>
-                )}
+                ) : !hasMasterResume ? (
+                  <div className="p-3 bg-indigo-50/40 rounded-lg border border-indigo-100 text-xs flex items-center justify-between gap-3 flex-wrap">
+                    <p className="text-slate-600 text-xs">
+                      Want to see your transferable skill match and personalized AI fit score?
+                    </p>
+                    <button
+                      type="button"
+                      onClick={() => setIsQuickUploadOpen(true)}
+                      className="text-xs font-bold text-indigo-600 hover:text-indigo-800 underline cursor-pointer flex items-center gap-1"
+                    >
+                      <span>Score against my CV</span>
+                      <span>→</span>
+                    </button>
+                  </div>
+                ) : null}
 
                 {/* Detected Salary (if available) */}
                 {job.salary && (
@@ -868,6 +960,14 @@ export default function RadarPage() {
           })
         )}
       </div>
+      {/* Quick CV Upload & In-Place Scoring Modal */}
+      <QuickUploadModal
+        isOpen={isQuickUploadOpen}
+        onClose={() => setIsQuickUploadOpen(false)}
+        onSuccess={handleQuickUploadSuccess}
+        title="Score Jobs with Your CV"
+        subtitle="Upload your CV to calculate instant AI match scores and uncover transferable skill alignments without leaving your search."
+      />
     </div>
   );
 }
