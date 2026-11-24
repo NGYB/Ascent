@@ -37,8 +37,14 @@ Context-aware resume optimizer rewriting experience bullets, evaluating keyword 
 * **Keyword Breakdown**: Click tab labeled **"ATS Analysis"** to see matching keywords, missing keywords, and recommended learning actions.
 * **Transferable Skills**: Click tab labeled **"Transferable Skills"** to view methodology mapping.
 
-### 5. Downstream Actions
+### 5. Saving & Session Persistence
+* **Active Session Draft**: Form inputs and generated tailor results are automatically persisted to `localStorage.getItem('ascent_tailor_active_draft')`, ensuring switching pages does not lose work.
+* **Saving Tailored CV**: Click **"Save Tailored CV"** (in top header, in action bar, or in Unsaved Warning banner) to permanently save to `localStorage.getItem('ascent_tailored_resumes')` and create/update an entry in `localStorage.getItem('ascent_applications')`.
+* **Unsaved Warning**: If a tailored CV is generated but not yet permanently saved, an amber **"Unsaved Tailored CV"** alert banner displays with a 1-click **"Save Tailored CV Now"** button, and closing/reloading the tab triggers a native browser unload warning.
+
+### 6. Downstream Actions
 * Click **"Copy Markdown"** to copy the tailored text to clipboard.
+* Click **"Save as PDF"** to open a print-optimized window for exporting as PDF.
 * Click **"Mark as Applied"** to push this application directly into the Kanban pipeline (`ascent_applications`).
 * Click **"Practice Interview for this Role"** to transfer the tailored resume and JD into `/interview`.
 

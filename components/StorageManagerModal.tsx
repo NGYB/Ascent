@@ -104,11 +104,11 @@ export default function StorageManagerModal({ isOpen, onClose, onStorageCleared 
         {
           id: 'tailored',
           name: 'Tailored CVs & ATS Reports',
-          description: 'Customized resumes, ATS match scores, and JD Deflator evaluations.',
+          description: 'Customized resumes, ATS match scores, active session drafts, and JD Deflator evaluations.',
           icon: Sparkles,
-          keys: ['ascent_tailored_resumes'],
-          sizeBytes: tailoredSize,
-          itemCount: tailoredCount
+          keys: ['ascent_tailored_resumes', 'ascent_tailor_active_draft'],
+          sizeBytes: tailoredSize + getBytes('ascent_tailor_active_draft'),
+          itemCount: tailoredCount + (localStorage.getItem('ascent_tailor_active_draft') ? 1 : 0)
         },
         {
           id: 'tracker',
@@ -191,6 +191,7 @@ export default function StorageManagerModal({ isOpen, onClose, onStorageCleared 
         'ascent_master_resume',
         'ascent_resume_name',
         'ascent_tailored_resumes',
+        'ascent_tailor_active_draft',
         'ascent_interview_session',
         'ascent_interview_history',
         'ascent_applications',

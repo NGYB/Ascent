@@ -193,6 +193,8 @@ export default function TailorPage() {
   type HistorySortOption = 'date-desc' | 'date-asc' | 'score-desc' | 'score-asc';
   const [historySortBy, setHistorySortBy] = useState<HistorySortOption>('date-desc');
   const [isQuickUploadOpen, setIsQuickUploadOpen] = useState(false);
+  const [isDraftLoaded, setIsDraftLoaded] = useState(false);
+  const [restoredFromDraft, setRestoredFromDraft] = useState(false);
 
   const sortedHistoryList = [...historyList].sort((a, b) => {
     if (historySortBy === 'date-desc') {
@@ -222,11 +224,11 @@ export default function TailorPage() {
     setHistoryList(list);
   };
 
-  // Load master resume text and history on mount
+  // Load master resume text, history, and active draft on mount
   useEffect(() => {
     loadStoredTailorData();
 
-    // Check if imported from Smart Job Radar
+    // Check if imported from Smart Job Radar first
     try {
       const imported = sessionStorage.getItem('ascent_import_job');
       if (imported) {
@@ -239,12 +241,71 @@ export default function TailorPage() {
         sessionStorage.removeItem('ascent_import_job');
       } else if (typeof window !== 'undefined' && window.location.search.includes('import=radar')) {
         setFromRadar(true);
+      } else {
+        // Restore in-progress active draft so user never loses work when switching pages
+        const draftStr = localStorage.getItem('ascent_tailor_active_draft');
+        if (draftStr) {
+          const draft = JSON.parse(draftStr);
+          if (draft.jobTitle) setJobTitle(draft.jobTitle);
+          if (draft.company) setCompany(draft.company);
+          if (draft.jobDescription) setJobDescription(draft.jobDescription);
+          if (draft.applyUrl) setApplyUrl(draft.applyUrl);
+          if (draft.result) setResult(draft.result);
+          if (typeof draft.saved === 'boolean') setSaved(draft.saved);
+          if (typeof draft.appliedState === 'boolean') setAppliedState(draft.appliedState);
+          if (draft.activeTab) setActiveTab(draft.activeTab);
+          if (draft.jobTitle || draft.jobDescription || draft.result) {
+            setRestoredFromDraft(true);
+          }
+        }
       }
-    } catch {}
+    } catch (e) {
+      console.warn('Failed to restore tailor draft:', e);
+    } finally {
+      setIsDraftLoaded(true);
+    }
 
     window.addEventListener('ascent-storage-cleared', loadStoredTailorData);
     return () => window.removeEventListener('ascent-storage-cleared', loadStoredTailorData);
   }, []);
+
+  // Auto-persist active tailor draft to localStorage so switching pages never discards work
+  useEffect(() => {
+    if (!isDraftLoaded) return;
+
+    try {
+      if (jobTitle.trim() || jobDescription.trim() || result) {
+        const draft = {
+          jobTitle,
+          company,
+          jobDescription,
+          applyUrl,
+          result,
+          saved,
+          appliedState,
+          activeTab,
+          updatedAt: new Date().toISOString()
+        };
+        localStorage.setItem('ascent_tailor_active_draft', JSON.stringify(draft));
+      } else {
+        localStorage.removeItem('ascent_tailor_active_draft');
+      }
+    } catch (e) {
+      console.warn('Failed to auto-save tailor draft:', e);
+    }
+  }, [isDraftLoaded, jobTitle, company, jobDescription, applyUrl, result, saved, appliedState, activeTab]);
+
+  // Warn user on page reload/close if there is an unsaved tailored CV
+  useEffect(() => {
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      if (result && !saved) {
+        e.preventDefault();
+        e.returnValue = '';
+      }
+    };
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+  }, [result, saved]);
 
   const getApplyLink = () => {
     if (applyUrl && applyUrl.trim()) {
@@ -298,6 +359,16 @@ export default function TailorPage() {
   };
 
   const handleStartFresh = () => {
+    if (result && !saved) {
+      const confirmDiscard = window.confirm(
+        'You have an unsaved tailored CV. Starting fresh will clear all fields and discard this tailored version. Are you sure you want to proceed?'
+      );
+      if (!confirmDiscard) return;
+    } else if (!result && (jobTitle.trim() || jobDescription.trim())) {
+      const confirmDiscard = window.confirm('Clear all target job details and start fresh?');
+      if (!confirmDiscard) return;
+    }
+
     setJobTitle('');
     setCompany('');
     setApplyUrl('');
@@ -308,8 +379,10 @@ export default function TailorPage() {
     setError('');
     setFromRadar(false);
     setActiveTab('deflator');
+    setRestoredFromDraft(false);
     try {
       sessionStorage.removeItem('ascent_import_job');
+      localStorage.removeItem('ascent_tailor_active_draft');
       if (typeof window !== 'undefined' && window.history.replaceState) {
         window.history.replaceState({}, '', '/tailor');
       }
@@ -327,6 +400,7 @@ export default function TailorPage() {
     setResult(null);
     setSaved(false);
     setAppliedState(false);
+    setRestoredFromDraft(false);
 
     try {
       const res = await fetch('/api/tailor', {
@@ -482,8 +556,11 @@ export default function TailorPage() {
     if (result) {
       const tailoredList = JSON.parse(localStorage.getItem('ascent_tailored_resumes') || '[]');
       
-      const newTailoredVersion = {
-        id: crypto.randomUUID(),
+      const newId = result.id || crypto.randomUUID();
+      const existingIdx = tailoredList.findIndex((item: any) => item.id === newId);
+
+      const savedItem = {
+        id: newId,
         jobTitle,
         company: company.trim(),
         jobDescription,
@@ -492,36 +569,59 @@ export default function TailorPage() {
         atsAnalysis: result.atsAnalysis,
         coachFeedback: result.coachFeedback,
         jdDeflator: result.jdDeflator,
-        createdAt: new Date().toISOString()
+        createdAt: existingIdx !== -1 ? (tailoredList[existingIdx].createdAt || new Date().toISOString()) : new Date().toISOString(),
+        updatedAt: new Date().toISOString()
       };
 
-      tailoredList.push(newTailoredVersion);
+      if (existingIdx !== -1) {
+        tailoredList[existingIdx] = savedItem;
+      } else {
+        tailoredList.push(savedItem);
+      }
+
       localStorage.setItem('ascent_tailored_resumes', JSON.stringify(tailoredList));
       setHistoryList(tailoredList);
       
       // Automatically create a draft or applied entry in the Job Tracker
       const apps = JSON.parse(localStorage.getItem('ascent_applications') || '[]');
-      const newApp = {
-        id: crypto.randomUUID(),
-        jobTitle,
-        company: company.trim() || 'Not Provided',
-        status: appliedState ? 'APPLIED' : 'DRAFT',
-        applyUrl: applyUrl.trim() || undefined,
-        tailoredResumeId: newTailoredVersion.id,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
-      };
-      apps.push(newApp);
+      const existingAppIdx = apps.findIndex((a: any) => a.tailoredResumeId === newId);
+
+      if (existingAppIdx !== -1) {
+        apps[existingAppIdx].jobTitle = jobTitle;
+        apps[existingAppIdx].company = company.trim() || 'Not Provided';
+        apps[existingAppIdx].applyUrl = applyUrl.trim() || undefined;
+        apps[existingAppIdx].updatedAt = new Date().toISOString();
+      } else {
+        const newApp = {
+          id: crypto.randomUUID(),
+          jobTitle,
+          company: company.trim() || 'Not Provided',
+          status: appliedState ? 'APPLIED' : 'DRAFT',
+          applyUrl: applyUrl.trim() || undefined,
+          tailoredResumeId: newId,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString()
+        };
+        apps.push(newApp);
+      }
+
       localStorage.setItem('ascent_applications', JSON.stringify(apps));
 
       setSaved(true);
       
       // Update result state to hold the newly saved ID
-      setResult(prev => prev ? { ...prev, id: newTailoredVersion.id, applyUrl: applyUrl.trim() || undefined } : null);
+      setResult(prev => prev ? { ...prev, id: newId, applyUrl: applyUrl.trim() || undefined } : null);
     }
   };
 
   const handleLoadHistory = (item: any) => {
+    if (result && !saved) {
+      const confirmSwitch = window.confirm(
+        'You have an unsaved tailored CV. Loading another saved version from history will replace your current unsaved work. Do you want to continue?'
+      );
+      if (!confirmSwitch) return;
+    }
+
     setJobTitle(item.jobTitle);
     setCompany(item.company && item.company !== 'Target Company' && item.company !== 'Not Provided' ? item.company : '');
     setJobDescription(item.jobDescription || '');
@@ -540,6 +640,7 @@ export default function TailorPage() {
       setActiveTab('coach');
     }
     setSaved(true);
+    setRestoredFromDraft(false);
     try {
       const apps = JSON.parse(localStorage.getItem('ascent_applications') || '[]');
       const match = apps.find((a: any) => 
@@ -594,12 +695,88 @@ export default function TailorPage() {
         </div>
       )}
 
-      <div className="space-y-2">
-        <h2 className="text-3xl font-extrabold text-slate-800 tracking-tight">Tailor & ATS Scorecard</h2>
-        <p className="text-slate-500 text-base">
-          Optimize your experience for target roles. Enter the target job specs below to generate an ATS-compatible CV and view transition analytics.
-        </p>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="space-y-1">
+          <div className="flex items-center gap-3 flex-wrap">
+            <h2 className="text-3xl font-extrabold text-slate-800 tracking-tight">Tailor & ATS Scorecard</h2>
+            {result && !saved && (
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-900 border border-amber-300 shadow-2xs">
+                <span className="h-2 w-2 rounded-full bg-amber-500 animate-ping" />
+                <span>Unsaved Tailored CV</span>
+              </span>
+            )}
+            {result && saved && (
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-300 shadow-2xs">
+                <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600" />
+                <span>Saved to History & Tracker</span>
+              </span>
+            )}
+            {!result && (jobTitle || jobDescription) && (
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium text-slate-600 bg-slate-100 border border-slate-200">
+                <Check className="h-3 w-3 text-emerald-600" />
+                <span>Draft auto-saved locally</span>
+              </span>
+            )}
+          </div>
+          <p className="text-slate-500 text-base">
+            Optimize your experience for target roles. Enter the target job specs below to generate an ATS-compatible CV and view transition analytics.
+          </p>
+        </div>
+
+        {result && (
+          <div className="flex items-center gap-2 self-start sm:self-center">
+            <button
+              type="button"
+              onClick={handleSave}
+              disabled={saved}
+              className={`flex items-center gap-2 text-sm font-bold px-4 py-2.5 rounded-xl transition-all shadow-sm ${
+                saved
+                  ? 'bg-emerald-50 text-emerald-700 border border-emerald-200 cursor-default'
+                  : 'bg-indigo-600 hover:bg-indigo-700 text-white shadow-md hover:shadow-indigo-500/25 ring-2 ring-indigo-500/30 cursor-pointer'
+              }`}
+            >
+              {saved ? (
+                <>
+                  <Check className="h-4 w-4 text-emerald-600" />
+                  <span>Saved to Tracker</span>
+                </>
+              ) : (
+                <>
+                  <Save className="h-4 w-4" />
+                  <span>Save Tailored CV</span>
+                </>
+              )}
+            </button>
+          </div>
+        )}
       </div>
+
+      {restoredFromDraft && (
+        <div className="p-3.5 bg-slate-100/90 border border-slate-200 rounded-xl text-slate-700 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 text-xs animate-in fade-in duration-200">
+          <div className="flex items-center gap-2">
+            <Info className="h-4 w-4 text-indigo-600 flex-shrink-0" />
+            <span>
+              Restored your in-progress draft for <strong>{jobTitle || 'Target Role'}</strong>. All fields and tailored analyses are preserved across page switches.
+            </span>
+          </div>
+          <div className="flex items-center gap-2 self-end sm:self-center">
+            <button
+              type="button"
+              onClick={() => setRestoredFromDraft(false)}
+              className="text-slate-500 hover:text-slate-800 font-semibold px-2 py-0.5 rounded hover:bg-slate-200/60 transition-colors"
+            >
+              Dismiss
+            </button>
+            <button
+              type="button"
+              onClick={handleStartFresh}
+              className="text-rose-600 hover:text-rose-800 font-semibold px-2 py-0.5 rounded hover:bg-rose-50 transition-colors"
+            >
+              Discard draft
+            </button>
+          </div>
+        </div>
+      )}
 
       {!resumeText && (
         <div className="p-4 bg-gradient-to-r from-indigo-50 via-violet-50 to-indigo-50 rounded-xl border border-indigo-200 text-indigo-950 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs">
@@ -638,17 +815,25 @@ export default function TailorPage() {
                   <Sparkles className="h-5 w-5 text-amber-500" />
                   <span>Target Job Details</span>
                 </h3>
-                {(result || jobTitle || jobDescription || applyUrl) && (
-                  <button
-                    type="button"
-                    onClick={handleStartFresh}
-                    className="text-xs font-bold text-slate-500 hover:text-slate-800 flex items-center gap-1.5 transition-colors px-2 py-1 rounded hover:bg-slate-100 border border-transparent hover:border-slate-200"
-                    title="Clear all fields and start fresh"
-                  >
-                    <RotateCcw className="h-3.5 w-3.5" />
-                    <span>Start fresh</span>
-                  </button>
-                )}
+                <div className="flex items-center gap-2">
+                  {(jobTitle || jobDescription) && (
+                    <span className="text-[10px] font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200/80 px-2 py-0.5 rounded flex items-center gap-1">
+                      <Check className="h-2.5 w-2.5 text-emerald-600" />
+                      <span>Draft auto-saved</span>
+                    </span>
+                  )}
+                  {(result || jobTitle || jobDescription || applyUrl) && (
+                    <button
+                      type="button"
+                      onClick={handleStartFresh}
+                      className="text-xs font-bold text-slate-500 hover:text-slate-800 flex items-center gap-1.5 transition-colors px-2 py-1 rounded hover:bg-slate-100 border border-transparent hover:border-slate-200"
+                      title="Clear all fields and start fresh"
+                    >
+                      <RotateCcw className="h-3.5 w-3.5" />
+                      <span>Start fresh</span>
+                    </button>
+                  )}
+                </div>
               </div>
 
               <form onSubmit={handleTailor} className="space-y-4">
@@ -765,130 +950,166 @@ export default function TailorPage() {
         </div>
 
         {/* Right Column: Results Column (3/5 columns = 60%) */}
-        <div className="lg:col-span-3 flex flex-col">
+        <div className="lg:col-span-3 flex flex-col space-y-4">
           {result ? (
-            <div className="bg-white rounded-xl border border-slate-200 shadow-sm flex flex-col min-h-[880px] overflow-hidden animate-in fade-in duration-200">
-              {/* Tab Navigation */}
-              <div className="px-6 py-4 border-b border-slate-200 bg-slate-50/50 flex flex-wrap items-center justify-between gap-4">
-                <div className="flex gap-2">
+            <>
+              {/* Unsaved Changes Alert Banner */}
+              {!saved && (
+                <div className="p-4 bg-gradient-to-r from-amber-50 via-orange-50 to-amber-50 border-2 border-amber-300 rounded-xl text-amber-950 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-xs animate-in fade-in duration-200">
+                  <div className="flex items-start sm:items-center gap-3">
+                    <div className="p-2 bg-amber-500 text-white rounded-lg flex-shrink-0 shadow-xs">
+                      <AlertTriangle className="h-5 w-5" />
+                    </div>
+                    <div>
+                      <p className="font-bold text-sm text-slate-900 flex items-center gap-2">
+                        <span>Unsaved Tailored CV for {jobTitle || 'Target Role'}</span>
+                        <span className="px-2 py-0.5 rounded text-[10px] font-extrabold uppercase tracking-wider bg-amber-400 text-slate-950">
+                          Action Needed
+                        </span>
+                      </p>
+                      <p className="text-xs text-slate-600">
+                        This tailored CV is saved in your active local draft, but is not yet saved to your permanent History or Job Tracker. Click <strong>Save Tailored CV</strong> to keep it permanently.
+                      </p>
+                    </div>
+                  </div>
                   <button
-                    onClick={() => setActiveTab('deflator')}
-                    className={`px-3.5 py-2 rounded-lg text-sm font-bold transition-colors flex items-center gap-1.5 ${
-                      activeTab === 'deflator'
-                        ? 'bg-slate-900 text-white shadow-sm'
-                        : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-100'
-                    }`}
-                  >
-                    <Target className="h-4 w-4 text-amber-500" />
-                    <span>JD Deflator</span>
-                    {result.jdDeflator && (
-                      <span className={`ml-1 px-1.5 py-0.5 rounded text-[10px] font-extrabold ${
-                        result.jdDeflator.mustHavesMatchRate >= 80 
-                          ? 'bg-blue-600 text-white' 
-                          : 'bg-amber-500 text-white'
-                      }`}>
-                        {result.jdDeflator.mustHavesMatchRate}%
-                      </span>
-                    )}
-                  </button>
-                  <button
-                    onClick={() => setActiveTab('coach')}
-                    className={`px-4 py-2 rounded-lg text-sm font-bold transition-colors ${
-                      activeTab === 'coach'
-                        ? 'bg-slate-900 text-white shadow-sm'
-                        : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-100'
-                    }`}
-                  >
-                    Coach Evaluation
-                  </button>
-                  <button
-                    onClick={() => setActiveTab('resume')}
-                    className={`px-4 py-2 rounded-lg text-sm font-bold transition-colors ${
-                      activeTab === 'resume'
-                        ? 'bg-slate-900 text-white shadow-sm'
-                        : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-100'
-                    }`}
-                  >
-                    Tailored CV
-                  </button>
-                  <button
-                    onClick={() => setActiveTab('scorecard')}
-                    className={`px-4 py-2 rounded-lg text-sm font-bold transition-colors ${
-                      activeTab === 'scorecard'
-                        ? 'bg-slate-900 text-white shadow-sm'
-                        : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-100'
-                    }`}
-                  >
-                    ATS Scorecard
-                  </button>
-                  <button
-                    onClick={() => setActiveTab('skills')}
-                    className={`px-4 py-2 rounded-lg text-sm font-bold transition-colors ${
-                      activeTab === 'skills'
-                        ? 'bg-slate-900 text-white shadow-sm'
-                        : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-100'
-                    }`}
-                  >
-                    Pivot Translations
-                  </button>
-                </div>
-
-                <div className="flex gap-2">
-                  <a
-                    href={getApplyLink()}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center justify-center gap-1.5 text-sm font-bold bg-amber-500 hover:bg-amber-400 text-slate-950 px-3 py-1.5 rounded-md shadow-xs transition-colors"
-                    title={applyUrl ? "Open the official job application link" : "Search Google Jobs to apply for this role"}
-                  >
-                    <ExternalLink className="h-4 w-4 text-slate-950 flex-shrink-0" />
-                    <span>Apply ↗</span>
-                  </a>
-
-                  <button
-                    onClick={handleCopy}
-                    className="flex items-center justify-center gap-1.5 text-sm font-semibold bg-white text-slate-700 hover:bg-slate-50 px-3 py-1.5 rounded-md border border-slate-200 transition-colors w-36"
-                  >
-                    <Copy className="h-4 w-4 flex-shrink-0" />
-                    <span>{copied ? 'Copied!' : 'Copy markdown'}</span>
-                  </button>
-
-                  <button
-                    onClick={handleSaveAsPdf}
-                    className="flex items-center justify-center gap-1.5 text-sm font-semibold bg-white text-slate-700 hover:bg-slate-50 px-3 py-1.5 rounded-md border border-slate-200 transition-colors"
-                  >
-                    <FileText className="h-4 w-4 flex-shrink-0 text-red-500" />
-                    <span>Save as PDF</span>
-                  </button>
-
-                  <button
+                    type="button"
                     onClick={handleSave}
-                    disabled={saved}
-                    className="flex items-center gap-1.5 text-sm font-semibold bg-indigo-600 hover:bg-indigo-700 disabled:bg-blue-600 disabled:opacity-95 text-white px-3 py-1.5 rounded-md transition-colors"
+                    className="px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs sm:text-sm font-bold rounded-lg shadow-sm hover:shadow-md transition-all flex items-center gap-2 whitespace-nowrap cursor-pointer flex-shrink-0 ring-2 ring-indigo-500/30"
                   >
-                    {saved ? (
-                      <>
-                        <Check className="h-4 w-4" />
-                        <span>Saved to Tracker!</span>
-                      </>
-                    ) : (
-                      <>
-                        <FolderPlus className="h-4 w-4" />
-                        <span>Save & Track Job</span>
-                      </>
-                    )}
-                  </button>
-
-                  <button
-                    onClick={handleStartFresh}
-                    className="flex items-center justify-center gap-1.5 text-sm font-semibold bg-white text-slate-700 hover:bg-slate-50 px-3 py-1.5 rounded-md border border-slate-200 transition-colors"
-                    title="Clear inputs and start fresh"
-                  >
-                    <RotateCcw className="h-4 w-4 text-slate-500" />
-                    <span>Start fresh</span>
+                    <Save className="h-4 w-4" />
+                    <span>Save Tailored CV Now</span>
                   </button>
                 </div>
-              </div>
+              )}
+
+              <div className="bg-white rounded-xl border border-slate-200 shadow-sm flex flex-col min-h-[880px] overflow-hidden animate-in fade-in duration-200">
+                {/* Tab Navigation */}
+                <div className="px-6 py-4 border-b border-slate-200 bg-slate-50/50 flex flex-wrap items-center justify-between gap-4">
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => setActiveTab('deflator')}
+                      className={`px-3.5 py-2 rounded-lg text-sm font-bold transition-colors flex items-center gap-1.5 ${
+                        activeTab === 'deflator'
+                          ? 'bg-slate-900 text-white shadow-sm'
+                          : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-100'
+                      }`}
+                    >
+                      <Target className="h-4 w-4 text-amber-500" />
+                      <span>JD Deflator</span>
+                      {result.jdDeflator && (
+                        <span className={`ml-1 px-1.5 py-0.5 rounded text-[10px] font-extrabold ${
+                          result.jdDeflator.mustHavesMatchRate >= 80 
+                            ? 'bg-blue-600 text-white' 
+                            : 'bg-amber-500 text-white'
+                        }`}>
+                          {result.jdDeflator.mustHavesMatchRate}%
+                        </span>
+                      )}
+                    </button>
+                    <button
+                      onClick={() => setActiveTab('coach')}
+                      className={`px-4 py-2 rounded-lg text-sm font-bold transition-colors ${
+                        activeTab === 'coach'
+                          ? 'bg-slate-900 text-white shadow-sm'
+                          : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-100'
+                      }`}
+                    >
+                      Coach Evaluation
+                    </button>
+                    <button
+                      onClick={() => setActiveTab('resume')}
+                      className={`px-4 py-2 rounded-lg text-sm font-bold transition-colors ${
+                        activeTab === 'resume'
+                          ? 'bg-slate-900 text-white shadow-sm'
+                          : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-100'
+                      }`}
+                    >
+                      Tailored CV
+                    </button>
+                    <button
+                      onClick={() => setActiveTab('scorecard')}
+                      className={`px-4 py-2 rounded-lg text-sm font-bold transition-colors ${
+                        activeTab === 'scorecard'
+                          ? 'bg-slate-900 text-white shadow-sm'
+                          : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-100'
+                      }`}
+                    >
+                      ATS Scorecard
+                    </button>
+                    <button
+                      onClick={() => setActiveTab('skills')}
+                      className={`px-4 py-2 rounded-lg text-sm font-bold transition-colors ${
+                        activeTab === 'skills'
+                          ? 'bg-slate-900 text-white shadow-sm'
+                          : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-100'
+                      }`}
+                    >
+                      Pivot Translations
+                    </button>
+                  </div>
+
+                  <div className="flex gap-2">
+                    <a
+                      href={getApplyLink()}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center justify-center gap-1.5 text-sm font-bold bg-amber-500 hover:bg-amber-400 text-slate-950 px-3 py-1.5 rounded-md shadow-xs transition-colors"
+                      title={applyUrl ? "Open the official job application link" : "Search Google Jobs to apply for this role"}
+                    >
+                      <ExternalLink className="h-4 w-4 text-slate-950 flex-shrink-0" />
+                      <span>Apply ↗</span>
+                    </a>
+
+                    <button
+                      onClick={handleCopy}
+                      className="flex items-center justify-center gap-1.5 text-sm font-semibold bg-white text-slate-700 hover:bg-slate-50 px-3 py-1.5 rounded-md border border-slate-200 transition-colors w-36"
+                    >
+                      <Copy className="h-4 w-4 flex-shrink-0" />
+                      <span>{copied ? 'Copied!' : 'Copy markdown'}</span>
+                    </button>
+
+                    <button
+                      onClick={handleSaveAsPdf}
+                      className="flex items-center justify-center gap-1.5 text-sm font-semibold bg-white text-slate-700 hover:bg-slate-50 px-3 py-1.5 rounded-md border border-slate-200 transition-colors"
+                    >
+                      <FileText className="h-4 w-4 flex-shrink-0 text-red-500" />
+                      <span>Save as PDF</span>
+                    </button>
+
+                    <button
+                      onClick={handleSave}
+                      disabled={saved}
+                      className={`flex items-center gap-1.5 text-sm font-bold px-3.5 py-1.5 rounded-md transition-all ${
+                        saved
+                          ? 'bg-emerald-600 text-white cursor-default opacity-95 shadow-2xs'
+                          : 'bg-indigo-600 hover:bg-indigo-700 text-white shadow-sm hover:shadow-md cursor-pointer ring-2 ring-indigo-500/30'
+                      }`}
+                      title={saved ? "Saved to Tailored Resumes & Job Tracker" : "Save this tailored CV to your permanent history and Job Tracker"}
+                    >
+                      {saved ? (
+                        <>
+                          <Check className="h-4 w-4 text-emerald-100" />
+                          <span>Saved to Tracker!</span>
+                        </>
+                      ) : (
+                        <>
+                          <Save className="h-4 w-4" />
+                          <span>Save Tailored CV</span>
+                        </>
+                      )}
+                    </button>
+
+                    <button
+                      onClick={handleStartFresh}
+                      className="flex items-center justify-center gap-1.5 text-sm font-semibold bg-white text-slate-700 hover:bg-slate-50 px-3 py-1.5 rounded-md border border-slate-200 transition-colors"
+                      title="Clear inputs and start fresh"
+                    >
+                      <RotateCcw className="h-4 w-4 text-slate-500" />
+                      <span>Start fresh</span>
+                    </button>
+                  </div>
+                </div>
 
               {/* Application Launchpad Banner */}
               <div className="bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white p-4 sm:p-5 border-b border-indigo-900/50 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 animate-in fade-in duration-200">
@@ -1269,7 +1490,51 @@ export default function TailorPage() {
                 )}
                 {activeTab === 'resume' && (
                   <div className="space-y-4 h-full">
-                    <pre className="whitespace-pre-wrap font-mono text-sm text-slate-600 leading-relaxed bg-slate-50 p-4 rounded-lg border border-slate-100 h-[800px] overflow-y-auto">
+                    <div className="flex items-center justify-between pb-2 border-b border-slate-200 flex-wrap gap-2">
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs font-bold text-slate-700">Tailored Resume Markdown</span>
+                        {saved ? (
+                          <span className="text-[11px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-md flex items-center gap-1">
+                            <Check className="h-3 w-3 text-emerald-600" />
+                            Saved to Tracker
+                          </span>
+                        ) : (
+                          <span className="text-[11px] font-bold text-amber-800 bg-amber-50 border border-amber-300 px-2 py-0.5 rounded-md flex items-center gap-1">
+                            <AlertTriangle className="h-3 w-3 text-amber-600" />
+                            Unsaved
+                          </span>
+                        )}
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <button
+                          type="button"
+                          onClick={handleCopy}
+                          className="flex items-center gap-1 text-xs font-semibold bg-white text-slate-700 hover:bg-slate-50 px-2.5 py-1 rounded-md border border-slate-200 cursor-pointer"
+                        >
+                          <Copy className="h-3.5 w-3.5" />
+                          <span>{copied ? 'Copied' : 'Copy markdown'}</span>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={handleSaveAsPdf}
+                          className="flex items-center gap-1 text-xs font-semibold bg-white text-slate-700 hover:bg-slate-50 px-2.5 py-1 rounded-md border border-slate-200 cursor-pointer"
+                        >
+                          <FileText className="h-3.5 w-3.5 text-red-500" />
+                          <span>Save as PDF</span>
+                        </button>
+                        {!saved && (
+                          <button
+                            type="button"
+                            onClick={handleSave}
+                            className="flex items-center gap-1 text-xs font-bold bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-1 rounded-md shadow-xs cursor-pointer ring-1 ring-indigo-500/30"
+                          >
+                            <Save className="h-3.5 w-3.5" />
+                            <span>Save CV</span>
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                    <pre className="whitespace-pre-wrap font-mono text-sm text-slate-600 leading-relaxed bg-slate-50 p-4 rounded-lg border border-slate-100 h-[750px] overflow-y-auto">
                       {result.tailoredResume}
                     </pre>
                   </div>
@@ -1476,6 +1741,7 @@ export default function TailorPage() {
                 )}
               </div>
             </div>
+            </>
           ) : (
             <div className="bg-white rounded-xl border border-slate-200 shadow-sm flex flex-col items-center justify-center h-[880px] text-slate-400 p-8 gap-3 animate-in fade-in duration-200">
               <Sparkles className="h-16 w-16 stroke-[1.5] animate-pulse text-slate-300" />
