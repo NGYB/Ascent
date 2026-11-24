@@ -28,6 +28,29 @@ interface SerpJob {
   }>;
 }
 
+// Job portals to fan-out to when a SerpAPI key is available.
+// Each entry drives a separate Google Jobs query so results from these
+// platforms are reliably surfaced even when Google ranks them lower.
+const PORTAL_TARGETS = [
+  { label: 'JobStreet',          site: 'jobstreet.com' },
+  { label: 'eFinancialCareers', site: 'efinancialcareers.com' },
+  { label: 'MyCareersFuture',   site: 'mycareersfuture.gov.sg' },
+] as const;
+
+// Infer locale/geo hints from the search location string.
+// Returns SerpAPI `gl` (country) and `hl` (language) values.
+function inferLocale(loc: string): { gl: string; hl: string } {
+  const l = loc.toLowerCase();
+  if (l.includes('singapore') || l === 'sg') return { gl: 'sg', hl: 'en' };
+  if (l.includes('malaysia') || l === 'my')  return { gl: 'my', hl: 'en' };
+  if (l.includes('australia') || l === 'au') return { gl: 'au', hl: 'en' };
+  if (l.includes('hong kong') || l === 'hk') return { gl: 'hk', hl: 'en' };
+  if (l.includes('india') || l === 'in')     return { gl: 'in', hl: 'en' };
+  if (l.includes('united kingdom') || l.includes(' uk') || l === 'uk') return { gl: 'gb', hl: 'en' };
+  // Default — let Google Jobs decide
+  return { gl: '', hl: 'en' };
+}
+
 export async function POST(req: NextRequest) {
   try {
     const { query, location, remoteOnly, resumeText } = await req.json();
@@ -59,15 +82,40 @@ export async function POST(req: NextRequest) {
           fullQuery = `${fullQuery} remote`;
         }
 
-        const buildUrl = (q: string) => {
+        const { gl, hl } = inferLocale(searchLocation);
+
+        const buildUrl = (q: string, extraParams?: Record<string, string>) => {
           const u = new URL('https://serpapi.com/search.json');
           u.searchParams.set('engine', 'google_jobs');
           u.searchParams.set('q', q);
-          u.searchParams.set('hl', 'en');
+          u.searchParams.set('hl', hl);
+          if (gl) u.searchParams.set('gl', gl);
           u.searchParams.set('api_key', serpApiKey!);
+          if (extraParams) {
+            for (const [k, v] of Object.entries(extraParams)) {
+              u.searchParams.set(k, v);
+            }
+          }
           return u.toString();
         };
 
+        // Helper: safe fetch → jobs array
+        const fetchJobs = async (url: string): Promise<SerpJob[]> => {
+          try {
+            const r = await fetch(url, { next: { revalidate: 300 } });
+            if (!r.ok) return [];
+            const d = await r.json();
+            return d.jobs_results || [];
+          } catch {
+            return [];
+          }
+        };
+
+        // Helper: deduplicate jobs by normalised title + company key
+        const dedupeKey = (j: SerpJob) =>
+          `${(j.title || '').toLowerCase().trim()}|${(j.company_name || '').toLowerCase().trim()}`;
+
+        // ── Main query ──────────────────────────────────────────────────────
         let serpRes = await fetch(buildUrl(fullQuery), {
           next: { revalidate: 300 }
         });
@@ -77,15 +125,34 @@ export async function POST(req: NextRequest) {
           serpData = await serpRes.json();
         }
 
-        // If no jobs returned with "in [Location]", retry with "[Role] [Location]" or just "[Role]"
-        let rawJobs: SerpJob[] = serpData.jobs_results || [];
-        if (rawJobs.length === 0 && searchLocation) {
-          const retryQuery = `${searchQuery} ${searchLocation}`;
-          const retryRes = await fetch(buildUrl(retryQuery));
-          if (retryRes.ok) {
-            const retryData = await retryRes.json();
-            if (retryData.jobs_results && retryData.jobs_results.length > 0) {
-              rawJobs = retryData.jobs_results;
+        // If no jobs returned with "in [Location]", retry with "[Role] [Location]"
+        let mainJobs: SerpJob[] = serpData.jobs_results || [];
+        if (mainJobs.length === 0 && searchLocation) {
+          mainJobs = await fetchJobs(buildUrl(`${searchQuery} ${searchLocation}`));
+        }
+
+        // ── Portal fan-out: parallel queries targeting specific job portals ──
+        // Runs concurrently with the main query result post-processing.
+        // Each portal query uses `site:` to bias Google Jobs toward that source.
+        const portalResults = await Promise.allSettled(
+          PORTAL_TARGETS.map(({ site }) =>
+            fetchJobs(buildUrl(`${fullQuery} site:${site}`))
+          )
+        );
+
+        // Merge: main first (highest relevance), then portal results
+        const seen = new Set<string>();
+        const rawJobs: SerpJob[] = [];
+
+        for (const j of mainJobs) {
+          const k = dedupeKey(j);
+          if (!seen.has(k)) { seen.add(k); rawJobs.push(j); }
+        }
+        for (const result of portalResults) {
+          if (result.status === 'fulfilled') {
+            for (const j of result.value) {
+              const k = dedupeKey(j);
+              if (!seen.has(k)) { seen.add(k); rawJobs.push(j); }
             }
           }
         }
@@ -238,7 +305,9 @@ Respond strictly in valid JSON format matching this array:
       message,
       query: searchQuery,
       location: searchLocation,
-      totalCount: jobs.length
+      totalCount: jobs.length,
+      // Portals actively queried in this request (only when live API is used)
+      portalsSurveyed: isDemo ? [] : PORTAL_TARGETS.map(p => p.label)
     });
 
   } catch (error: any) {

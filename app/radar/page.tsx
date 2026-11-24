@@ -71,6 +71,7 @@ export default function RadarPage() {
   const [isDemo, setIsDemo] = useState(false);
   const [hasApiKey, setHasApiKey] = useState(true);
   const [demoMessage, setDemoMessage] = useState('');
+  const [portalsSurveyed, setPortalsSurveyed] = useState<string[]>([]);
   const [expandedJobId, setExpandedJobId] = useState<string | null>(null);
   const [savedJobIds, setSavedJobIds] = useState<Set<string>>(new Set());
   const [hasMasterResume, setHasMasterResume] = useState(false);
@@ -189,6 +190,7 @@ export default function RadarPage() {
         setIsDemo(data.isDemo || false);
         setHasApiKey(data.hasApiKey ?? true);
         setDemoMessage(data.message || '');
+        setPortalsSurveyed(data.portalsSurveyed || []);
 
         // Persist last searched role and results so user never has to re-search from scratch
         try {
@@ -658,6 +660,20 @@ export default function RadarPage() {
             <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-indigo-50/90 text-indigo-700 border border-indigo-200/80 font-semibold text-[11px]">
               <ArrowDownWideNarrow className="h-3 w-3 text-indigo-600" />
               Highest Match on Top
+            </span>
+          )}
+          {/* Portal source badges — shown when live API returned portal-targeted results */}
+          {portalsSurveyed.length > 0 && jobs.length > 0 && !loading && !isDemo && (
+            <span className="inline-flex items-center gap-1 flex-wrap">
+              <span className="text-slate-400 text-[11px]">Sources:</span>
+              {(['LinkedIn', 'Indeed', ...portalsSurveyed]).map(p => (
+                <span
+                  key={p}
+                  className="inline-flex items-center px-1.5 py-0.5 rounded bg-slate-100 text-slate-600 border border-slate-200 text-[10px] font-medium"
+                >
+                  {p}
+                </span>
+              ))}
             </span>
           )}
         </div>
