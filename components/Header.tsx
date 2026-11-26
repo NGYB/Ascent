@@ -1,11 +1,12 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
-import { UserCheck, PanelLeftClose, PanelLeftOpen, HardDrive, MessageSquarePlus, Eye, ChevronsUp, HelpCircle } from 'lucide-react';
+import { UserCheck, PanelLeftClose, PanelLeftOpen, HardDrive, MessageSquarePlus, Eye, ChevronsUp, HelpCircle, Sparkles } from 'lucide-react';
 import { useSidebar } from '@/context/SidebarContext';
 import { useAccessibility } from '@/context/AccessibilityContext';
+import { useChangelog } from '@/context/ChangelogContext';
 import StorageManagerModal from '@/components/StorageManagerModal';
 import FeedbackModal from '@/components/FeedbackModal';
 
@@ -13,8 +14,17 @@ export default function Header() {
   const pathname = usePathname();
   const { isCollapsed, toggleCollapse } = useSidebar();
   const { isColorblindMode, toggleColorblindMode } = useAccessibility();
+  const { openChangelog, hasUnread } = useChangelog();
   const [isStorageModalOpen, setIsStorageModalOpen] = useState(false);
   const [isFeedbackModalOpen, setIsFeedbackModalOpen] = useState(false);
+
+  useEffect(() => {
+    const handleFeedbackOpen = () => {
+      setIsFeedbackModalOpen(true);
+    };
+    window.addEventListener('ascent-open-feedback', handleFeedbackOpen);
+    return () => window.removeEventListener('ascent-open-feedback', handleFeedbackOpen);
+  }, []);
 
   // Map pathnames to clean titles
   const getTitle = () => {
@@ -100,6 +110,24 @@ export default function Header() {
           <HelpCircle className={`h-4 w-4 sm:h-3.5 sm:w-3.5 ${pathname === '/faq' ? 'text-white' : 'text-slate-500'}`} />
           <span className="hidden sm:inline">FAQ</span>
         </Link>
+
+        {/* What's New / Changelog Button */}
+        <button
+          type="button"
+          onClick={openChangelog}
+          className="flex items-center justify-center gap-1.5 p-2 sm:px-3 sm:py-1.5 rounded-lg text-xs font-semibold text-slate-600 hover:text-indigo-600 bg-slate-50 hover:bg-indigo-50/70 border border-slate-200 hover:border-indigo-200 transition-all cursor-pointer shadow-2xs group relative"
+          title="What's New: View product updates & user-driven changes"
+          aria-label="View changelog"
+        >
+          <Sparkles className="h-4 w-4 sm:h-3.5 sm:w-3.5 text-amber-500 group-hover:scale-110 transition-transform" />
+          <span className="hidden sm:inline">What&apos;s New</span>
+          {hasUnread && (
+            <span className="flex h-2 w-2 relative -mr-0.5">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75" />
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-amber-500" />
+            </span>
+          )}
+        </button>
 
         {/* Feedback Button */}
         <button

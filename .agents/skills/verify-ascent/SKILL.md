@@ -53,6 +53,7 @@ Ascent is privacy-first and stores candidate data locally in browser `localStora
 | `ascent_interview_session` | Active practice session | JSON object of active 5-question interview session |
 | `ascent_interview_history` | Completed interview logs | JSON array of completed interview sessions |
 | `ascent_colorblind_mode` | Accessibility flag | Boolean string (`"true"` / `"false"`) |
+| `ascent_last_viewed_changelog_version` | Unread changelog badge tracker | String version (e.g. `"0.2.2"`) |
 | `ascent_sidebar_collapsed` | Desktop sidebar state | Boolean string (`"true"` / `"false"`) |
 
 ### External API Keys (`.env`)

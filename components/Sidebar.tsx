@@ -14,10 +14,12 @@ import {
   ChevronLeft,
   ChevronRight,
   Radar,
-  ShieldCheck
+  ShieldCheck,
+  Lightbulb
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useSidebar } from '@/context/SidebarContext';
+import { useChangelog } from '@/context/ChangelogContext';
 import { APP_VERSION, APP_STAGE } from '@/lib/version';
 
 const navItems = [
@@ -32,6 +34,7 @@ const navItems = [
 export default function Sidebar() {
   const pathname = usePathname();
   const { isCollapsed, toggleCollapse } = useSidebar();
+  const { openChangelog, hasUnread } = useChangelog();
 
   return (
     <aside 
@@ -62,9 +65,24 @@ export default function Sidebar() {
                 <span className="px-1.5 py-0.5 rounded text-[9px] font-extrabold tracking-wider bg-amber-400/15 text-amber-300 border border-amber-400/30 leading-none">
                   {APP_STAGE}
                 </span>
-                <span className="text-[10px] font-mono text-slate-400 leading-none">
-                  v{APP_VERSION}
-                </span>
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    openChangelog();
+                  }}
+                  className="inline-flex items-center gap-1 text-[10px] font-mono text-slate-400 hover:text-indigo-300 transition-colors leading-none cursor-pointer group/version"
+                  title="View Changelog & Updates"
+                >
+                  <span className="group-hover/version:underline">v{APP_VERSION}</span>
+                  {hasUnread && (
+                    <span className="flex h-1.5 w-1.5 relative">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75" />
+                      <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-amber-400" />
+                    </span>
+                  )}
+                </button>
               </div>
             </div>
           )}
@@ -115,6 +133,45 @@ export default function Sidebar() {
             </Link>
           );
         })}
+
+        {/* What's New / Changelog Navigation Item */}
+        <button
+          type="button"
+          onClick={openChangelog}
+          title={isCollapsed ? `What's New (v${APP_VERSION})` : undefined}
+          className={cn(
+            "w-full flex items-center rounded-lg transition-colors text-sm font-medium group relative cursor-pointer",
+            isCollapsed 
+              ? "px-0 py-3 justify-center" 
+              : "px-3.5 py-2.5 gap-3",
+            "text-slate-400 hover:bg-slate-800 hover:text-white"
+          )}
+        >
+          <div className="relative flex-shrink-0">
+            <Lightbulb className="h-5 w-5 text-amber-400/90 group-hover:text-amber-300 transition-colors" />
+            {hasUnread && (
+              <span className="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-amber-400 ring-2 ring-slate-900 animate-pulse" />
+            )}
+          </div>
+          {!isCollapsed ? (
+            <div className="flex items-center justify-between w-full min-w-0 pr-0.5">
+              <span className="truncate">What&apos;s New</span>
+              {hasUnread ? (
+                <span className="px-1.5 py-0.2 rounded text-[9px] font-extrabold uppercase tracking-wider bg-amber-400 text-slate-950">
+                  New
+                </span>
+              ) : (
+                <span className="text-[10px] text-slate-500 font-mono">
+                  v{APP_VERSION}
+                </span>
+              )}
+            </div>
+          ) : (
+            <div className="absolute left-full ml-3 px-2.5 py-1 bg-slate-800 text-white text-xs font-semibold rounded-md shadow-lg whitespace-nowrap opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity z-50 border border-slate-700">
+              What&apos;s New (v{APP_VERSION})
+            </div>
+          )}
+        </button>
       </nav>
 
       {/* Footer info & Toggle */}
@@ -127,7 +184,17 @@ export default function Sidebar() {
               </div>
               <div className="truncate">
                 <p className="text-xs font-semibold text-slate-300 truncate">Trial / Guest Mode</p>
-                <p className="text-[10px] text-slate-500 truncate">Progress saved locally • v{APP_VERSION}</p>
+                <button
+                  type="button"
+                  onClick={openChangelog}
+                  className="text-[10px] text-slate-500 hover:text-indigo-300 transition-colors flex items-center gap-1 cursor-pointer truncate"
+                  title="View Changelog & Updates"
+                >
+                  <span>Progress saved locally • v{APP_VERSION}</span>
+                  {hasUnread && (
+                    <span className="h-1.5 w-1.5 rounded-full bg-amber-400 flex-shrink-0" />
+                  )}
+                </button>
               </div>
             </div>
 

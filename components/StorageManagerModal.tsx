@@ -192,6 +192,7 @@ export default function StorageManagerModal({ isOpen, onClose, onStorageCleared 
         'ascent_resume_name',
         'ascent_tailored_resumes',
         'ascent_tailor_active_draft',
+        'ascent_last_viewed_changelog_version',
         'ascent_interview_session',
         'ascent_interview_history',
         'ascent_applications',
