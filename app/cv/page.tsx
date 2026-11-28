@@ -198,19 +198,19 @@ export default function CVPage() {
       case 'critical':
         return (
           <span className="px-2 py-0.5 rounded text-[10px] font-extrabold uppercase tracking-wider bg-rose-100 text-rose-800 border border-rose-300">
-            Critical Rx
+            Critical Fix
           </span>
         );
       case 'warning':
         return (
           <span className="px-2 py-0.5 rounded text-[10px] font-extrabold uppercase tracking-wider bg-amber-100 text-amber-800 border border-amber-300">
-            Priority Rx
+            Priority Action
           </span>
         );
       default:
         return (
           <span className="px-2 py-0.5 rounded text-[10px] font-extrabold uppercase tracking-wider bg-blue-100 text-blue-800 border border-blue-300">
-            Recommended Rx
+            Recommended Action
           </span>
         );
     }
@@ -393,7 +393,7 @@ export default function CVPage() {
 
                         <div className="mt-2 pt-2.5 border-t border-slate-200/80 bg-white p-2.5 rounded-lg border text-xs text-indigo-950 font-medium space-y-0.5">
                           <span className="text-[10px] font-extrabold text-indigo-700 uppercase tracking-wider block">
-                            Rx Prescription:
+                            Prescription (How to Fix):
                           </span>
                           <p className="text-slate-700 text-xs leading-relaxed">
                             {issue.prescription}
