@@ -64,11 +64,9 @@ export const CHANGELOG_RELEASES: Release[] = [
       {
         id: 'deterministic-scoring-and-clarity',
         title: 'Deterministic Score Stability & Clear Action Terminology',
-        description: 'Engineered a deterministic text-parsing engine ensuring that clicking "Re-diagnose" maintains consistent baseline scores without AI sampling variance. Replaced confusing medical jargon ("Rx") with clear, standard action labels.',
-        source: 'feedback',
+        description: 'Engineered a deterministic text-parsing engine ensuring that clicking "Re-diagnose" maintains consistent baseline scores without AI sampling variance. Replaced confusing medical shorthand ("Rx") with clear, standard action labels (Critical Fix, Priority Action, Recommended Action).',
+        source: 'roadmap',
         category: 'improvement',
-        feedbackQuote: 'If the user clicks \'Re-diagnose\', the baseline ATS health should not change. Also, there is the words \'Priority RX\', or \'Recommended RX\' - what does RX mean here? Need to make it clearer',
-        userCredit: 'User Feedback',
         tags: ['UX', 'Consistency', 'Scoring Engine']
       }
     ]
