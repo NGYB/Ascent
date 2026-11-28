@@ -47,6 +47,7 @@ Ascent is privacy-first and stores candidate data locally in browser `localStora
 | :--- | :--- | :--- |
 | `ascent_master_resume` | Core Master CV text | Plain string extracted from PDF or pasted |
 | `ascent_resume_name` | Original filename | String (e.g. `resume.pdf`) |
+| `ascent_cv_diagnosis` | Master CV clinical diagnosis & baseline ATS score | JSON object of `{ overallScore, rating, verdict, metricBulletRatio, pillars, topIssues, strengths, analyzedAt }` |
 | `ascent_tailored_resumes` | Versioned tailored resumes | JSON array of `{ id, jobTitle, company, tailoredResume, atsAnalysis, ... }` |
 | `ascent_tailor_active_draft` | Active in-progress tailoring session | JSON object of `{ jobTitle, company, jobDescription, result, saved, ... }` |
 | `ascent_applications` | Kanban applications | JSON array of `{ id, jobTitle, company, status, applyUrl, ... }` |

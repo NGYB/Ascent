@@ -121,12 +121,12 @@ export default function StorageManagerModal({ isOpen, onClose, onStorageCleared 
         },
         {
           id: 'cv',
-          name: 'Master CV Document',
-          description: 'Your uploaded core CV text and document name.',
+          name: 'Master CV & Health Diagnosis',
+          description: 'Your uploaded core CV text, document name, and baseline ATS diagnosis.',
           icon: FileText,
-          keys: ['ascent_master_resume', 'ascent_resume_name'],
-          sizeBytes: cvSize,
-          itemCount: cvCount
+          keys: ['ascent_master_resume', 'ascent_resume_name', 'ascent_cv_diagnosis'],
+          sizeBytes: cvSize + getBytes('ascent_cv_diagnosis'),
+          itemCount: cvCount + (localStorage.getItem('ascent_cv_diagnosis') ? 1 : 0)
         },
         {
           id: 'radar',
@@ -190,6 +190,7 @@ export default function StorageManagerModal({ isOpen, onClose, onStorageCleared 
       const allKeys = [
         'ascent_master_resume',
         'ascent_resume_name',
+        'ascent_cv_diagnosis',
         'ascent_tailored_resumes',
         'ascent_tailor_active_draft',
         'ascent_last_viewed_changelog_version',

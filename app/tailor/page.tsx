@@ -195,6 +195,7 @@ export default function TailorPage() {
   const [isQuickUploadOpen, setIsQuickUploadOpen] = useState(false);
   const [isDraftLoaded, setIsDraftLoaded] = useState(false);
   const [restoredFromDraft, setRestoredFromDraft] = useState(false);
+  const [masterCvBaseline, setMasterCvBaseline] = useState<{ overallScore: number; rating: string } | null>(null);
 
   const sortedHistoryList = [...historyList].sort((a, b) => {
     if (historySortBy === 'date-desc') {
@@ -222,6 +223,28 @@ export default function TailorPage() {
 
     const list = JSON.parse(localStorage.getItem('ascent_tailored_resumes') || '[]');
     setHistoryList(list);
+
+    try {
+      const diagStr = localStorage.getItem('ascent_cv_diagnosis');
+      if (diagStr) {
+        const diag = JSON.parse(diagStr);
+        if (typeof diag.overallScore === 'number') {
+          setMasterCvBaseline({
+            overallScore: diag.overallScore,
+            rating: diag.rating || 'Baseline'
+          });
+        } else if (typeof diag.baselineScore === 'number') {
+          setMasterCvBaseline({
+            overallScore: diag.baselineScore,
+            rating: diag.rating || 'Baseline'
+          });
+        }
+      } else {
+        setMasterCvBaseline(null);
+      }
+    } catch {
+      setMasterCvBaseline(null);
+    }
   };
 
   // Load master resume text, history, and active draft on mount
@@ -1631,26 +1654,51 @@ export default function TailorPage() {
                 {activeTab === 'scorecard' && (
                   <div className="space-y-6 overflow-y-auto max-h-[800px] pr-2">
                     {/* Score Circle Comparison */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 p-4 rounded-xl bg-slate-50 border border-slate-100">
-                      <div className="flex items-center gap-4 bg-white p-3 rounded-lg border border-slate-200 shadow-sm">
-                        <div className="h-16 w-16 rounded-full border-4 border-slate-300 bg-slate-50 flex flex-col items-center justify-center shadow-sm">
-                          <span className="text-lg font-black text-slate-700">{result.atsAnalysis.beforeScore}</span>
-                          <span className="text-[8px] text-slate-600 font-bold uppercase tracking-wider">Before</span>
+                    <div className={`grid grid-cols-1 ${masterCvBaseline ? 'sm:grid-cols-3' : 'sm:grid-cols-2'} gap-4 p-4 rounded-xl bg-slate-50 border border-slate-100`}>
+                      {masterCvBaseline && (
+                        <div className="flex items-center gap-3.5 bg-white p-3 rounded-lg border border-purple-200/80 shadow-sm relative overflow-hidden">
+                          <div className="h-14 w-14 shrink-0 rounded-full border-4 border-purple-500 bg-purple-50 flex flex-col items-center justify-center shadow-sm">
+                            <span className="text-base font-black text-purple-950">{masterCvBaseline.overallScore}</span>
+                            <span className="text-[7.5px] text-purple-700 font-bold uppercase tracking-wider">Baseline</span>
+                          </div>
+                          <div className="min-w-0">
+                            <div className="flex items-center gap-1.5">
+                              <h4 className="font-bold text-slate-800 text-xs truncate">Master CV Health</h4>
+                              <span className="px-1.5 py-0.5 rounded text-[9px] font-bold bg-purple-100 text-purple-800">
+                                {masterCvBaseline.rating}
+                              </span>
+                            </div>
+                            <p className="text-[11px] text-slate-500 font-medium line-clamp-1 mt-0.5">Role-agnostic ATS health</p>
+                          </div>
                         </div>
-                        <div>
-                          <h4 className="font-bold text-slate-700 text-sm">Original CV Match</h4>
-                          <p className="text-xs text-slate-500 font-medium">Baseline fit score</p>
+                      )}
+
+                      <div className="flex items-center gap-3.5 bg-white p-3 rounded-lg border border-slate-200 shadow-sm">
+                        <div className="h-14 w-14 shrink-0 rounded-full border-4 border-slate-300 bg-slate-50 flex flex-col items-center justify-center shadow-sm">
+                          <span className="text-base font-black text-slate-700">{result.atsAnalysis.beforeScore}</span>
+                          <span className="text-[7.5px] text-slate-600 font-bold uppercase tracking-wider">Before</span>
+                        </div>
+                        <div className="min-w-0">
+                          <h4 className="font-bold text-slate-800 text-xs">Original Role Fit</h4>
+                          <p className="text-[11px] text-slate-500 font-medium mt-0.5">Untailored match score</p>
                         </div>
                       </div>
                       
-                      <div className="flex items-center gap-4 bg-white p-3 rounded-lg border border-blue-300 shadow-sm">
-                        <div className="h-16 w-16 rounded-full border-4 border-blue-600 bg-blue-50 flex flex-col items-center justify-center shadow-sm">
-                          <span className="text-lg font-black text-blue-950">{result.atsAnalysis.afterScore}</span>
-                          <span className="text-[8px] text-blue-700 font-bold uppercase tracking-wider">After</span>
+                      <div className="flex items-center gap-3.5 bg-white p-3 rounded-lg border border-blue-300 shadow-sm relative overflow-hidden">
+                        <div className="h-14 w-14 shrink-0 rounded-full border-4 border-blue-600 bg-blue-50 flex flex-col items-center justify-center shadow-sm">
+                          <span className="text-base font-black text-blue-950">{result.atsAnalysis.afterScore}</span>
+                          <span className="text-[7.5px] text-blue-700 font-bold uppercase tracking-wider">After</span>
                         </div>
-                        <div>
-                          <h4 className="font-bold text-blue-900 text-sm">Optimized CV Match</h4>
-                          <p className="text-xs text-blue-700 font-semibold">After tailoring edits</p>
+                        <div className="min-w-0">
+                          <div className="flex items-center gap-1.5">
+                            <h4 className="font-bold text-blue-950 text-xs">Optimized Fit</h4>
+                            {result.atsAnalysis.afterScore > result.atsAnalysis.beforeScore && (
+                              <span className="px-1.5 py-0.5 rounded text-[9px] font-black bg-emerald-100 text-emerald-800">
+                                +{result.atsAnalysis.afterScore - result.atsAnalysis.beforeScore}%
+                              </span>
+                            )}
+                          </div>
+                          <p className="text-[11px] text-blue-700 font-medium mt-0.5">Tailored match score</p>
                         </div>
                       </div>
                     </div>
